@@ -86,6 +86,7 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     nonLinear_(nonLinearGeometry::OFF)
 {}
 
+Info << "First check on Boundary condition" << nl << endl;
 
 solidContactFvPatchVectorField::solidContactFvPatchVectorField
 (
