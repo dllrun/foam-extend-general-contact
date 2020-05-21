@@ -32,6 +32,7 @@ Class
 #include "volFields.H"
 #include "tractionBoundaryGradient.H"
 #include "Switch.H"
+#include <iostream.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -86,7 +87,6 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     nonLinear_(nonLinearGeometry::OFF)
 {}
 
-Info << "First check on Boundary condition" << nl << endl;
 
 solidContactFvPatchVectorField::solidContactFvPatchVectorField
 (
@@ -300,8 +300,8 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     forceCorrection_(false),
     nonLinear_(nonLinearGeometry::OFF)
 {
-    Info << "Creating " << solidContactFvPatchVectorField::typeName << " patch"
-        << endl;
+    //cout << "Creating " << solidContactFvPatchVectorField::typeName << " patch"
+     //   << endl;
 
     // check shadow patch exists
     if (shadowPatchID_ == -1)
@@ -314,7 +314,7 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     if (dict.found("orthotropic"))
     {
         orthotropic_ = Switch(dict.lookup("orthotropic"));
-        Info << "\torthotropic: " << orthotropic_ << endl;
+        //cout << "\torthotropic: " << orthotropic_ << endl;
     }
 
     if (dict.found("nonLinear"))
@@ -326,13 +326,13 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
 
     if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
       {
-        Info << "\tnonLinear set to updated Lagrangian"
-         << endl;
+        //Info << "\tnonLinear set to updated Lagrangian"
+        // << endl;
       }
     else if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
       {
-        Info << "\tnonLinear set to total Lagrangian"
-         << endl;
+        //Info << "\tnonLinear set to total Lagrangian"
+        // << endl;
       }
     }
 
@@ -391,8 +391,8 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
             //  slave to master only required if the contact is not rigid
             if (interpolationMethod_ == "patchToPatch")
             {
-                Info<< "\tInterpolation of traction from slave to master:"
-                    << " patchToPatch"<< endl;
+                //Info<< "\tInterpolation of traction from slave to master:"
+                //    << " patchToPatch"<< endl;
                 // slaveToMasterPatchToPatchInterpolatorPtr_ =
                 //   new zoneToZoneInterpolation
                 //   (
@@ -420,8 +420,8 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
             {
                 // still created if master is rigid because it is used to
                 // interpolate normals
-                Info<< "\tInterpolation of traction from slave to master:"
-                    << " ggi" << endl;
+                //Info<< "\tInterpolation of traction from slave to master:"
+                //    << " ggi" << endl;
                 slaveToMasterGgiInterpolatorPtr_ =
                     // new ggiZoneInterpolation
                     new GGIInterpolation<
@@ -456,8 +456,8 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
         }
         else
         {
-            Info<< "\t**The contact is not active, contact patches treated "
-                << "as traction-free**" << endl;
+            //Info<< "\t**The contact is not active, contact patches treated "
+            //    << "as traction-free**" << endl;
             valueFraction() = symmTensor::zero;
         }
     } // end of if master
@@ -595,6 +595,7 @@ void solidContactFvPatchVectorField::rmap
     // be careful when there are topological changes to the patch
 }
 
+//Info << "TEST By RANJAN" << nl << endl;
 
 void solidContactFvPatchVectorField::updateCoeffs()
 {
@@ -623,9 +624,9 @@ void solidContactFvPatchVectorField::updateCoeffs()
                     (
                         Ufield.boundaryField()[shadowPatchID_]
                         );
-                Info<< "\tSlave contact patch " << patch().name()
-                    << " grabbing normalContactModel pointer from master"
-                    << endl;
+                //Info<< "\tSlave contact patch " << patch().name()
+                //    << " grabbing normalContactModel pointer from master"
+                //    << endl;
                 normalContactModelPtr_ = Upatch.normalContactModelPtr();
                 if (!normalContactModelPtr_)
                 {
@@ -635,9 +636,9 @@ void solidContactFvPatchVectorField::updateCoeffs()
                         << exit(FatalError);
                 }
 
-                Info<< "\tSlave contact patch " << patch().name()
-                    << " grabbing frictionContactModel pointer from master"
-                    << endl;
+                //Info<< "\tSlave contact patch " << patch().name()
+                //    << " grabbing frictionContactModel pointer from master"
+                //    << endl;
                 frictionContactModelPtr_ = Upatch.frictionContactModelPtr();
                 if (!frictionContactModelPtr_)
                 {
