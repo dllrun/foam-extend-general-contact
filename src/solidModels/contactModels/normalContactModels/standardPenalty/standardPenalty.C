@@ -31,6 +31,7 @@ Class
 #include "fvc.H"
 #include "addToRunTimeSelectionTable.H"
 #include "constitutiveModel.H"
+#include <iostream.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -299,9 +300,14 @@ standardPenalty::standardPenalty
    }
 
    // relax pressure
+   // relaxation facotr (i.e. relaxFac\_) is used to help convergence 
+   // It is normally set to 0.01 as a good value    
+   // slavePressure_ is the pressure for the slave segment
    slavePressure_ =
        relaxFac_*newSlavePressure
        + (1.0 - relaxFac_)*slavePressure_;
+	   
+	 
 
    // in parallel, the log is poluted with warnings that
    // I am getting max of a list of size zero so
@@ -478,6 +484,11 @@ standardPenalty::standardPenalty
 
     // approximate penalty factor based on Hallquist et al.
     // we approximate penalty factor for traction instead of force
+	// The penalty factor (penaltyFactorPtr_) should be much larger than the material stiffness (Young’s modulus).
+    // Note that sometimes the penalty stiffness needs to be increased (because there is too much overlap) and decreased 
+	// (because it is so high it is causing convergence problems and the surfaces are being pushed too far apart), 
+	// so the penaltyScale scales this stiffness.
+    // Using a value of 0.01 generally is fine but we may need to increase or decrease it by orders of magnitude.
     penaltyFactorPtr_ =
         new scalar(penaltyScale_*bulkModulus*faceArea/cellVolume);
   }
