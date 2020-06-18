@@ -50,7 +50,7 @@ Author
 #include "solidTractionFvPatchVectorField.H"
 #include "normalContactModel.H"
 #include "frictionContactModel.H"
-#include "newGgiInterpolation.H"
+//RANJAN #include "newGgiInterpolation.H"       
 #include "Switch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -109,10 +109,10 @@ class solidGeneralContactFvPatchVectorField
         mutable PtrList<frictionContactModel> frictionModels_;
 
         // Master face zone kept in deformed configuration
-        mutable standAlonePatch* zonePtr_;
+        //RANJAN mutable standAlonePatch* zonePtr_;
 
         //- List of zone-to-zone interpolators
-        mutable PtrList<newGgiStandAlonePatchInterpolation> zoneToZones_;
+        //RANJAN mutable PtrList<newGgiStandAlonePatchInterpolation> zoneToZones_;
 
         //- Patch to patch algorithm
         const intersection::algorithm alg_;
@@ -364,28 +364,28 @@ public:
             ) const;
 
             //- Return const reference to deformed master zone
-            const standAlonePatch& zone() const;
+            //RANJAN const standAlonePatch& zone() const;
 
             //- Return reference to deformed master zone
-            standAlonePatch& zone();
+            //RANJAN standAlonePatch& zone();
 
             //- Return const reference to deformed master zone
-            const standAlonePatch& shadowZone(const label shadowI) const;
+            //RANJAN const standAlonePatch& shadowZone(const label shadowI) const;
 
             //- Return reference to deformed master zone
-            standAlonePatch& shadowZone(const label shadowI);
+            //RANJAN standAlonePatch& shadowZone(const label shadowI);
 
             //- Return const reference to patch-to-patch interpolation
-            const newGgiStandAlonePatchInterpolation& zoneToZone
-            (
-                const label shadowI
-            ) const;
+            //RANJAN const newGgiStandAlonePatchInterpolation& zoneToZone
+            //RANJAN (
+            //RANJAN     const label shadowI
+            //RANJAN ) const;
 
             //- Return reference to patch-to-patch interpolation
-            newGgiStandAlonePatchInterpolation& zoneToZone
-            (
-                const label shadowI
-            );
+            //RANJAN newGgiStandAlonePatchInterpolation& zoneToZone
+            //RANJAN (
+            //RANJAN     const label shadowI
+            //RANJAN );
 
             //- Given the patch index of a shadow, return the position in the
             // shadow list of the current patch
@@ -437,9 +437,9 @@ public:
 
 } // End namespace Foam
 
-#ifdef NoRepository
-#   include "solidGeneralContactFvPatchVectorFieldTemplates.C"
-#endif
+//RANJAN #ifdef NoRepository
+//RANJAN #   include "solidGeneralContactFvPatchVectorFieldTemplates.C"
+//RANJAN #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
