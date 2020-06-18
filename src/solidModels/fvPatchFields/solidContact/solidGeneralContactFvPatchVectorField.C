@@ -87,8 +87,8 @@ moveZonesToDeformedConfiguration()
     forAll(shadPatchIndices, shadowI)
     {
         // Assemble the zone face displacement field to move the zones
-        //RANJAN vectorField zoneD(zone().size(), vector::zero);
-        //RANJAN vectorField shadowZoneD(shadowZone(shadowI).size(), vector::zero);
+        vectorField zoneD(zone().size(), vector::zero);
+        vectorField shadowZoneD(shadowZone(shadowI).size(), vector::zero);
 
         // For a non-moving mesh, we will move the zones by the total
         // displacement, whereas for a moving mesh (updated Lagrangian), we will
@@ -445,8 +445,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
                     dict(),
                     shadowPatchIndices()[shadowI], // master
                     patch().index(), // slave
-                //RANJAN     shadowZone(shadowI), // master
-                //RANJAN     zone() // slave
+                    shadowZone(shadowI), // master
+                    zone() // slave
                 )
             );
         }
@@ -607,24 +607,24 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex() const
 
 void Foam::solidGeneralContactFvPatchVectorField::calcZone() const
 {
-    //RANJAN if (zonePtr_)
-    //RANJAN {
-    //RANJAN     FatalErrorIn
-    //RANJAN     (
-    //RANJAN         "void Foam::solidGeneralContactFvPatchVectorField::calcZone() const"
-    //RANJAN     )   << "zonePtr_ already set" << abort(FatalError);
-    //RANJAN }
+    if (zonePtr_)
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::calcZone() const"
+        )   << "zonePtr_ already set" << abort(FatalError);
+    }
 
     const fvMesh& mesh = patch().boundaryMesh().mesh();
 
     // Note: the main mesh will either be in the initial configuration or the
     // updated configuration
-    //RANJAN zonePtr_ =
-    //RANJAN     new standAlonePatch
-    //RANJAN     (
-    //RANJAN        mesh.faceZones()[zoneIndex()]().localFaces(),
-    //RANJAN        mesh.faceZones()[zoneIndex()]().localPoints()
-    //RANJAN     );
+    zonePtr_ =
+        new standAlonePatch
+        (
+            mesh.faceZones()[zoneIndex()]().localFaces(),
+            mesh.faceZones()[zoneIndex()]().localPoints()
+        );
 }
 
 
@@ -639,7 +639,7 @@ Foam::label Foam::solidGeneralContactFvPatchVectorField::zoneIndex() const
 }
 
 
-//RANJAN const Foam::standAlonePatch&
+const Foam::standAlonePatch&
 Foam::solidGeneralContactFvPatchVectorField::zone() const
 {
     if (!zonePtr_)
@@ -651,7 +651,7 @@ Foam::solidGeneralContactFvPatchVectorField::zone() const
 }
 
 
-//RANJAN Foam::standAlonePatch& Foam::solidGeneralContactFvPatchVectorField::zone()
+Foam::standAlonePatch& Foam::solidGeneralContactFvPatchVectorField::zone()
 {
     if (!zonePtr_)
     {
@@ -662,7 +662,7 @@ Foam::solidGeneralContactFvPatchVectorField::zone() const
 }
 
 
-//RANJAN const Foam::standAlonePatch&
+const Foam::standAlonePatch&
 Foam::solidGeneralContactFvPatchVectorField::shadowZone
 (
     const label shadowI
@@ -684,7 +684,7 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZone
 }
 
 
-//RANJAN Foam::standAlonePatch&
+Foam::standAlonePatch&
 Foam::solidGeneralContactFvPatchVectorField::shadowZone
 (
     const label shadowI
@@ -713,17 +713,17 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZone
 void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
 {
     // Create zone-to-zone interpolation
-//RANJAN     if (!zoneToZones_.empty())
- //RANJAN    {
- //RANJAN        FatalErrorIn
- //RANJAN        (
- //RANJAN            "void solidGeneralContactFvPatchVectorField::calcZoneToZones()"
- //RANJAN            "const"
- //RANJAN        )   << "Zone to zone interpolation already calculated"
- //RANJAN            << abort(FatalError);
-//RANJAN     }
+    if (!zoneToZones_.empty())
+    {
+        FatalErrorIn
+        (
+            "void solidGeneralContactFvPatchVectorField::calcZoneToZones()"
+            "const"
+        )   << "Zone to zone interpolation already calculated"
+            << abort(FatalError);
+    }
 
-//RANJAN     zoneToZones_.setSize(shadowPatchNames().size());
+    zoneToZones_.setSize(shadowPatchNames().size());
 
     const boolList& locSlave = localSlave();
 
@@ -734,30 +734,30 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
         {
             zoneToZones_.set
                 (
-                     shadowI,
-//RANJAN                     new newGgiStandAlonePatchInterpolation
-//RANJAN                     (
-//RANJAN                         shadowZone(shadowI), // master
-//RANJAN                         zone(), // slave
-//RANJAN                         tensorField(0),
-//RANJAN                         tensorField(0),
-//RANJAN                         vectorField(0), // Slave-to-master separation.
-//RANJAN                         true,           // global data
-//RANJAN                         0,              // Non-overlapping face tolerances
-//RANJAN                         0,              //
-//RANJAN                         true,           // Rescale weighting factors.
-//RANJAN                         newGgiInterpolation::AABB
-//RANJAN                         //newGgiInterpolation::BB_OCTREE
-//RANJAN                         //newGgiInterpolation::THREE_D_DISTANCE
-//RANJAN                         //newGgiInterpolation::N_SQUARED
- //RANJAN                    )
+                    shadowI,
+                    new newGgiStandAlonePatchInterpolation
+                    (
+                        shadowZone(shadowI), // master
+                        zone(), // slave
+                        tensorField(0),
+                        tensorField(0),
+                        vectorField(0), // Slave-to-master separation.
+                        true,           // global data
+                        0,              // Non-overlapping face tolerances
+                        0,              //
+                        true,           // Rescale weighting factors.
+                        newGgiInterpolation::AABB
+                        //newGgiInterpolation::BB_OCTREE
+                        //newGgiInterpolation::THREE_D_DISTANCE
+                        //newGgiInterpolation::N_SQUARED
+                    )
                 );
         }
     }
 }
 
 
-//RANJAN const Foam::newGgiStandAlonePatchInterpolation&
+const Foam::newGgiStandAlonePatchInterpolation&
 Foam::solidGeneralContactFvPatchVectorField::zoneToZone
 (
     const label shadowI
@@ -788,7 +788,7 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZone
 }
 
 
-//RANJAN Foam::newGgiStandAlonePatchInterpolation&
+Foam::newGgiStandAlonePatchInterpolation&
 Foam::solidGeneralContactFvPatchVectorField::zoneToZone(const label shadowI)
 {
     if (!localSlave()[shadowI])
@@ -929,7 +929,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
         // Calculate slip
         if (locSlave[shadowI])
         {
-//RANJAN             curPatchSlip = frictionModel(shadowI).slip();
+            curPatchSlip = frictionModel(shadowI).slip();
         }
         else
         {
@@ -942,8 +942,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
             const label locShadowID =
                 shadowPatchField.findShadowID(patch().index());
 
-//RANJAN             vectorField shadowPatchSlip =
-//RANJAN                 shadowPatchField.frictionModel(locShadowID).slip();
+            vectorField shadowPatchSlip =
+                shadowPatchField.frictionModel(locShadowID).slip();
 
             vectorField shadowZoneSlip =
                 zoneField
@@ -956,11 +956,11 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
             // Interpolate from shadow to the current patch
             // Face-to-face
 
-//RANJAN             vectorField curZoneSlip =
-//RANJAN                 shadowPatchField.zoneToZone(locShadowID).slaveToMaster
-//RANJAN                 (
-//RANJAN                     shadowZoneSlip
-//RANJAN                 );
+            vectorField curZoneSlip =
+                shadowPatchField.zoneToZone(locShadowID).slaveToMaster
+                (
+                    shadowZoneSlip
+                );
 
             curPatchSlip =
                 patchField
@@ -1003,8 +1003,8 @@ solidGeneralContactFvPatchVectorField
     dict_(NULL),
     normalModels_(0),
     frictionModels_(0),
- //RANJAN    zonePtr_(NULL),
- //RANJAN    zoneToZones_(0),
+    zonePtr_(NULL),
+    zoneToZones_(0),
     alg_(Foam::intersection::VISIBLE),
     dir_(Foam::intersection::CONTACT_SPHERE),
     curTimeIndex_(-1),
@@ -1050,8 +1050,8 @@ solidGeneralContactFvPatchVectorField
     dict_(ptf.dict_),
     normalModels_(ptf.normalModels_),
     frictionModels_(ptf.frictionModels_),
- //RANJAN    zonePtr_(NULL),
- //RANJAN    zoneToZones_(0),
+    zonePtr_(NULL),
+    zoneToZones_(0),
     alg_(ptf.alg_),
     dir_(ptf.dir_),
     curTimeIndex_(ptf.curTimeIndex_),
@@ -1112,26 +1112,26 @@ solidGeneralContactFvPatchVectorField
         shadowZoneIndicesPtr_ = new labelList(*ptf.shadowZoneIndicesPtr_);
     }
 
-//RANJAN     if (ptf.zonePtr_)
-//RANJAN     {
-//RANJAN         zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
-//RANJAN     }
+    if (ptf.zonePtr_)
+    {
+        zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
+    }
 
-//RANJAN     if (!ptf.zoneToZones_.empty())
- //RANJAN    {
- //RANJAN        // I will not copy the GGI interpolators
- //RANJAN        // They can be re-created when required
- //RANJAN        WarningIn
- //RANJAN        (
- //RANJAN            "Foam::solidGeneralContactFvPatchVectorField::"
- //RANJAN            "solidGeneralContactFvPatchVectorField"
-  //RANJAN           "("
-  //RANJAN           "    const solidGeneralContactFvPatchVectorField& ptf,"
-  //RANJAN           "    const DimensionedField<vector, volMesh>& iF"
-  //RANJAN           ")"
-  //RANJAN       )   << "solidGeneralContact: zoneToZone GGI interpolators not mapped"
-  //RANJAN           << endl;
-  //RANJAN   }
+    if (!ptf.zoneToZones_.empty())
+    {
+        // I will not copy the GGI interpolators
+        // They can be re-created when required
+        WarningIn
+        (
+            "Foam::solidGeneralContactFvPatchVectorField::"
+            "solidGeneralContactFvPatchVectorField"
+            "("
+            "    const solidGeneralContactFvPatchVectorField& ptf,"
+            "    const DimensionedField<vector, volMesh>& iF"
+            ")"
+        )   << "solidGeneralContact: zoneToZone GGI interpolators not mapped"
+            << endl;
+    }
 
     if (ptf.curPatchTractionPtr_)
     {
@@ -1171,8 +1171,8 @@ solidGeneralContactFvPatchVectorField
     dict_(dict),
     normalModels_(0),
     frictionModels_(0),
- //RANJAN    zonePtr_(0),
- //RANJAN    zoneToZones_(0),
+    zonePtr_(0),
+    zoneToZones_(0),
     alg_(Foam::intersection::VISIBLE),
     dir_(Foam::intersection::CONTACT_SPHERE),
     curTimeIndex_(-1),
@@ -1226,8 +1226,8 @@ solidGeneralContactFvPatchVectorField
     dict_(ptf.dict_),
     normalModels_(ptf.normalModels_),
     frictionModels_(ptf.frictionModels_),
- //RANJAN    zonePtr_(NULL),
- //RANJAN    zoneToZones_(0),
+    zonePtr_(NULL),
+    zoneToZones_(0),
     alg_(ptf.alg_),
     dir_(ptf.dir_),
     curTimeIndex_(ptf.curTimeIndex_),
@@ -1285,26 +1285,26 @@ solidGeneralContactFvPatchVectorField
         shadowZoneIndicesPtr_ = new labelList(*ptf.shadowZoneIndicesPtr_);
     }
 
- //RANJAN    if (ptf.zonePtr_)
- //RANJAN    {
- //RANJAN        zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
- //RANJAN    }
+    if (ptf.zonePtr_)
+    {
+        zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
+    }
 
-//RANJAN     if (!ptf.zoneToZones_.empty())
- //RANJAN    {
- //RANJAN        // I will not copy the GGI interpolators
- //RANJAN        // They can be re-created when required
-  //RANJAN       WarningIn
-  //RANJAN       (
-  //RANJAN           "Foam::solidGeneralContactFvPatchVectorField::"
-  //RANJAN           "solidGeneralContactFvPatchVectorField"
-  //RANJAN           "("
-   //RANJAN          "    const solidGeneralContactFvPatchVectorField& ptf,"
-   //RANJAN          "    const DimensionedField<vector, volMesh>& iF"
-   //RANJAN          ")"
-   //RANJAN      )   << "solidGeneralContact: zoneToZone GGI interpolators not mapped"
-   //RANJAN          << endl;
-  //RANJAN   }
+    if (!ptf.zoneToZones_.empty())
+    {
+        // I will not copy the GGI interpolators
+        // They can be re-created when required
+        WarningIn
+        (
+            "Foam::solidGeneralContactFvPatchVectorField::"
+            "solidGeneralContactFvPatchVectorField"
+            "("
+            "    const solidGeneralContactFvPatchVectorField& ptf,"
+            "    const DimensionedField<vector, volMesh>& iF"
+            ")"
+        )   << "solidGeneralContact: zoneToZone GGI interpolators not mapped"
+            << endl;
+    }
 
     if (ptf.curPatchTractionPtr_)
     {
@@ -1344,8 +1344,8 @@ solidGeneralContactFvPatchVectorField
     dict_(ptf.dict_),
     normalModels_(ptf.normalModels_),
     frictionModels_(ptf.frictionModels_),
- //RANJAN    zonePtr_(NULL),
- //RANJAN    zoneToZones_(0),
+    zonePtr_(NULL),
+    zoneToZones_(0),
     alg_(ptf.alg_),
     dir_(ptf.dir_),
     curTimeIndex_(ptf.curTimeIndex_),
@@ -1403,26 +1403,26 @@ solidGeneralContactFvPatchVectorField
         shadowZoneIndicesPtr_ = new labelList(*ptf.shadowZoneIndicesPtr_);
     }
 
- //RANJAN    if (ptf.zonePtr_)
- //RANJAN    {
- //RANJAN        zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
- //RANJAN    }
+    if (ptf.zonePtr_)
+    {
+        zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
+    }
 
-//RANJAN     if (!ptf.zoneToZones_.empty())
- //RANJAN    {
- //RANJAN        // I will not copy the GGI interpolators
- //RANJAN        // They can be re-created when required
- //RANJAN        WarningIn
- //RANJAN        (
- //RANJAN            "Foam::solidGeneralContactFvPatchVectorField::"
- //RANJAN            "solidGeneralContactFvPatchVectorField"
- //RANJAN            "("
- //RANJAN            "    const solidGeneralContactFvPatchVectorField& ptf,"
- //RANJAN            "    const DimensionedField<vector, volMesh>& iF"
- //RANJAN            ")"
- //RANJAN        )   << "solidGeneralContact: zoneToZone GGI interpolators not mapped"
- //RANJAN            << endl;
- //RANJAN    }
+    if (!ptf.zoneToZones_.empty())
+    {
+        // I will not copy the GGI interpolators
+        // They can be re-created when required
+        WarningIn
+        (
+            "Foam::solidGeneralContactFvPatchVectorField::"
+            "solidGeneralContactFvPatchVectorField"
+            "("
+            "    const solidGeneralContactFvPatchVectorField& ptf,"
+            "    const DimensionedField<vector, volMesh>& iF"
+            ")"
+        )   << "solidGeneralContact: zoneToZone GGI interpolators not mapped"
+            << endl;
+    }
 
     if (ptf.curPatchTractionPtr_)
     {
@@ -1468,9 +1468,9 @@ Foam::solidGeneralContactFvPatchVectorField::
     normalModels_.clear();
     frictionModels_.clear();
 
-//RANJAN     deleteDemandDrivenData(zonePtr_);
+    deleteDemandDrivenData(zonePtr_);
 
-//RANJAN     zoneToZones_.clear();
+    zoneToZones_.clear();
 
     deleteDemandDrivenData(curPatchTractionPtr_);
     deleteDemandDrivenData(QcPtr_);
@@ -1615,8 +1615,8 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
             {
                 // Let the contact models know that it is a new time-step, in
                 // case they need to update anything
-//RANJAN                 normalModel(shadowI).newTimeStep();
-//RANJAN                 frictionModel(shadowI).newTimeStep();
+                normalModel(shadowI).newTimeStep();
+                frictionModel(shadowI).newTimeStep();
             }
         }
     }
@@ -1650,10 +1650,10 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
         {
             if (localSlave()[slaveI])
             {
- //RANJAN                zoneToZone(slaveI).movePoints
-//RANJAN                 (
- //RANJAN                    tensorField(0), tensorField(0), vectorField(0)
- //RANJAN                );
+                zoneToZone(slaveI).movePoints
+                (
+                    tensorField(0), tensorField(0), vectorField(0)
+                );
             }
         }
 
@@ -1666,7 +1666,7 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
         const boolList& locSlave = localSlave();
 
         // Create master bounding box used for quick check
-//RANJAN         boundBox masterBb(zone().localPoints(), false);
+        boundBox masterBb(zone().localPoints(), false);
 
         // The BB may have zero thickness in one of the directions e.g. for a
         // flat patch, so we will check for this and, if found, create an offset
@@ -1703,7 +1703,7 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
             // pair as active.
 
             // Create shadow bounding box
-//RANJAN             boundBox shadowBb(shadowZone(shadowI).localPoints(), false);
+            boundBox shadowBb(shadowZone(shadowI).localPoints(), false);
 
             // Check for a zero dimension in the shadowBb
             if (shadowBb.minDim() < bbOff)
@@ -1817,7 +1817,7 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
                         (
                             shadowPatchIndices()[shadowI],
                             shadowZoneIndices()[shadowI],
-//RANJAN                             zoneToZone(shadowI).masterToSlave(zoneDD)()
+                            zoneToZone(shadowI).masterToSlave(zoneDD)()
                         );
 
                     FatalError
@@ -1834,7 +1834,7 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
                     (
                         normalModel(shadowI).slavePressure(),
                         shadowPatchFaceNormals,
-//RANJAN                         normalModel(shadowI).areaInContact(),
+                        normalModel(shadowI).areaInContact(),
                         shadowPatchDD,
                         patchDDInterpToShadowPatch
                     );
@@ -1870,15 +1870,15 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
                     const label masterShadowI =
                         localMasterField.findShadowID(patch().index());
 
-//RANJAN                     vectorField shadowPatchTraction =
-//RANJAN                         -localMasterField.frictionModel
- //RANJAN                        (
- //RANJAN                            masterShadowI
- //RANJAN                        ).slaveTractionForMaster()
- //RANJAN                        -localMasterField.normalModel
-  //RANJAN                       (
-  //RANJAN                           masterShadowI
-  //RANJAN                       ).slavePressure();
+                    vectorField shadowPatchTraction =
+                        -localMasterField.frictionModel
+                        (
+                            masterShadowI
+                        ).slaveTractionForMaster()
+                        -localMasterField.normalModel
+                        (
+                            masterShadowI
+                        ).slavePressure();
 
                     vectorField shadowZoneTraction =
                         zoneField
@@ -1889,11 +1889,11 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
                         );
 
                     // Face-to-face
- //RANJAN                    vectorField masterZoneTraction =
-//RANJAN                         localMasterField.zoneToZone
- //RANJAN                        (
- //RANJAN                            masterShadowI
- //RANJAN                        ).slaveToMaster(shadowZoneTraction);
+                    vectorField masterZoneTraction =
+                        localMasterField.zoneToZone
+                        (
+                            masterShadowI
+                        ).slaveToMaster(shadowZoneTraction);
 
                     // We store master patch traction as thermalGeneralContact
                     // uses it
@@ -2001,10 +2001,10 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
         vectorField curPatchSlip(Qc.size(), vector::zero);
 
         // Calculate slip
-         if (locSlave[shadowI])
-         {
- //RANJAN            curPatchSlip = frictionModel(shadowI).slip();
-         }
+        if (locSlave[shadowI])
+        {
+            curPatchSlip = frictionModel(shadowI).slip();
+        }
         else
         {
             const solidGeneralContactFvPatchVectorField& shadowPatchField =
@@ -2016,8 +2016,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
             const label locShadowID =
             shadowPatchField.findShadowID(patch().index());
 
- //RANJAN            vectorField shadowPatchSlip =
-//RANJAN             shadowPatchField.frictionModel(locShadowID).slip();
+            vectorField shadowPatchSlip =
+            shadowPatchField.frictionModel(locShadowID).slip();
 
             vectorField shadowZoneSlip =
             zoneField
@@ -2030,8 +2030,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
             // Interpolate from shadow to the current patch
             // Face-to-face
 
- //RANJAN            vectorField curZoneSlip =
-//RANJAN             shadowPatchField.zoneToZone(locShadowID).slaveToMaster
+            vectorField curZoneSlip =
+            shadowPatchField.zoneToZone(locShadowID).slaveToMaster
             (
                 shadowZoneSlip
             );
