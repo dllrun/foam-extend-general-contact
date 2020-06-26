@@ -6,11 +6,13 @@ EXE_INC = \
     -I$(LIB_SRC)/dynamicMesh/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/dynamicFvMesh/lnInclude \
+	-I$(LIB_SRC)/foam/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/topoChangerFvMesh/lnInclude
 
 LIB_LIBS = \
     -lfiniteVolume \
     -lmeshTools \
+	-lfoam \
     -lfiniteArea \
     -ldynamicFvMesh \
     -ldynamicMesh \

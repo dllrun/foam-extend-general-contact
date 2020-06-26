@@ -50,8 +50,9 @@ Author
 #include "solidTractionFvPatchVectorField.H"
 #include "normalContactModel.H"
 #include "frictionContactModel.H"
-#include "newGgiInterpolation.H"
+#include "ggiInterpolation.H"
 #include "Switch.H"
+#include "standAlonePatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
