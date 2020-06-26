@@ -69,7 +69,27 @@ class solidContactFvPatchVectorField
 {
     // Private data
 	
+	//* * * * * * Added from the solidGeneralContactFvPatchVectorField.H  * * * * * * * * //
+	
+		//- Is this the global master patch: the global master patches keeps a
+        // copy of mesh.allPoints() and updates them to the deformed position
+        // each time before the contact is corrected
+        mutable bool* globalMasterPtr_;
 		
+		//- Patch index of global master patch
+        mutable label* globalMasterIndexPtr_;
+		
+		//- If the current patch is the local slave of the contact pair
+        // The local slave is the patch with the lower patch index
+        mutable boolList* localSlavePtr_;
+		
+		//- List of shadow patch names
+        mutable List<word>* shadowPatchNamesPtr_;
+
+        //- List of shadow patch indices
+        mutable List<label>* shadowPatchIndicesPtr_;
+		
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //	
 
         //- Name of the displacement field
         const word fieldName_;
