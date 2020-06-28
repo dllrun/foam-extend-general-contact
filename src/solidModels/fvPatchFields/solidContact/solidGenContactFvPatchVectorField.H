@@ -65,7 +65,7 @@ namespace Foam
 
 class solidContactFvPatchVectorField
 :
-    public directionMixedFvPatchVectorField
+    public directionMixedFvPatchVectorField   //non-orthogonal (grid points) correction for diffusion term 
 {
     // Private data
 	
@@ -89,7 +89,52 @@ class solidContactFvPatchVectorField
         //- List of shadow patch indices
         mutable List<label>* shadowPatchIndicesPtr_;
 		
-	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //	
+		//- Is the current patch considered rigid in contact
+        Switch rigidMaster_;
+
+        // Copy of contact dictionary
+        const dictionary dict_;
+
+        //- List of normal contact models
+        mutable PtrList<normalContactModel> normalModels_;
+
+        //- List of friction contact models
+        mutable PtrList<frictionContactModel> frictionModels_;
+
+        // Master face zone kept in deformed configuration
+        mutable standAlonePatch* zonePtr_;
+
+        //- List of zone-to-zone interpolators
+        mutable PtrList<newGgiStandAlonePatchInterpolation> zoneToZones_;
+
+        //- Patch to patch algorithm
+        const intersection::algorithm alg_;
+
+        //- Patch to patch direction
+        const intersection::direction dir_;
+
+        //- Current time index
+        label curTimeIndex_;
+
+        //- Global face zones in the mesh
+        mutable labelList* globalFaceZonesPtr_;
+
+        // Point map from global to local for global face zones
+        mutable IOList<labelList>* globalToLocalFaceZonePointMapPtr_;
+
+        //- The current patch tractions for each contatc pair
+        mutable List<vectorField>* curPatchTractionPtr_;
+
+        // Rate of friction energy dissipation
+        mutable scalarField* QcPtr_;
+
+        // Rate of friction energy dissipation for each contact pair
+        mutable List<scalarField>* QcsPtr_;
+
+        //- Offset used if bounding box of patch has a zero dimension
+        mutable scalar bbOffset_;
+		
+	// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //	
 
         //- Name of the displacement field
         const word fieldName_;
@@ -200,7 +245,111 @@ class solidContactFvPatchVectorField
 
         //  check shadow patch and face zones exist
         virtual bool checkPatchAndFaceZones(const dictionary& dict) const;
+		
+		
+	//* * * * * * Added from the solidGeneralContactFvPatchVectorField.H  * * * * * * * * //	
+		
+		//- Is a moving mesh (e.g. updated Lagrangian) approach be used
+        bool movingMesh() const;
 
+        //- Move the master and slave zones to the deformed configuration
+        void moveZonesToDeformedConfiguration();
+
+        //- Check global master patch
+        void calcGlobalMaster() const;
+
+        //- Check global master patch index
+        void calcGlobalMasterIndex() const;
+
+        //- Calculate local slaves
+        void calcLocalSlave() const;
+
+        //- Return local slaves
+        const boolList& localSlave() const;
+
+        //- Calculate shadow patch names
+        void calcShadowPatchNames() const;
+
+        //- Calculate shadow zone names
+        void calcShadowZoneNames() const;
+
+        //- Create the normal contact model
+        void calcNormalModels() const;
+
+        //- Create the friction contact model
+        void calcFrictionModels() const;
+
+        //- Calculate zone index
+        void calcZoneIndex() const;
+
+        //- Calculate zone
+        void calcZone() const;
+
+        //- Calculate zone old points
+        void calcOldZonePoints() const;
+
+        //- Calculate interpolation
+        void calcZoneToZones() const;
+
+        //- Make the current patch traction list
+        void makeCurPatchTractions() const;
+
+        //- Calculate rate of dissipated friction energy
+        void calcQc() const;
+
+        //- Calculate rate of dissipated friction energy for each contact
+        //  pair
+        void calcQcs() const;
+
+        //- Calculate the bounding box offset
+        void calcBbOffset() const;
+
+        //- Return the bounding box offset
+        scalar bbOffset() const;
+
+        // Contact dictionary
+        const dictionary& dict() const
+        {
+            return dict_;
+        };
+
+        //- Get zone field from patch field
+        template<class Type>
+        tmp<Field<Type> > zoneField
+        (
+            const label zoneIndex,
+            const label patchIndex,
+            const Field<Type>& patchField
+        ) const;
+
+        //- Get patch field from zone field
+        template<class Type>
+        tmp<Field<Type> > patchField
+        (
+            const label patchIndex,
+            const label zoneIndex,
+            const Field<Type>& zoneField
+        ) const;
+
+        //- Interpolate zone face values to points
+        template<class Type>
+        tmp<Field<Type> > zoneFaceToPointInterpolate
+        (
+            const label zoneIndex,
+            const Field<Type>& zoneField,
+            const label shadowI
+        ) const;
+
+        //- Interpolate zone point values to faces
+        template<class Type>
+        tmp<Field<Type> > zonePointToFaceInterpolate
+        (
+            const label zoneIndex,
+            const Field<Type>& zonePointField,
+            const label shadowI
+        ) const;
+	
+	// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 
 public:
 
