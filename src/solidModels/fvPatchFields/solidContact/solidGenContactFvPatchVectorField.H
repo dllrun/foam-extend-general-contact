@@ -239,12 +239,6 @@ class solidContactFvPatchVectorField
 
 
     // Private Member Functions
-
-        //  Move the contact face zone patches to the deformed position
-        virtual void moveFaceZonePatches();
-
-        //  check shadow patch and face zones exist
-        virtual bool checkPatchAndFaceZones(const dictionary& dict) const;
 		
 		
 	//* * * * * * Added from the solidGeneralContactFvPatchVectorField.H  * * * * * * * * //	
@@ -350,8 +344,88 @@ class solidContactFvPatchVectorField
         ) const;
 	
 	// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
+	
+		//  Move the contact face zone patches to the deformed position
+        virtual void moveFaceZonePatches();
+
+        //  check shadow patch and face zones exist
+        virtual bool checkPatchAndFaceZones(const dictionary& dict) const;
 
 public:
+
+	//* * * * * * Added from the solidGeneralContactFvPatchVectorField.H  * * * * * * * * //
+	
+	//- Runtime type information
+    TypeName("solidGeneralContact");
+
+
+    // Constructors
+
+        //- Construct from patch and internal field
+        solidGeneralContactFvPatchVectorField
+        (
+            const fvPatch&,
+            const DimensionedField<vector, volMesh>&
+        );
+
+        //- Construct from patch, internal field and dictionary
+        solidGeneralContactFvPatchVectorField
+        (
+            const fvPatch&,
+            const DimensionedField<vector, volMesh>&,
+            const dictionary&
+        );
+
+        //- Construct by mapping given solidGeneralContactFvPatchVectorField
+        // onto a new patch
+        solidGeneralContactFvPatchVectorField
+        (
+            const solidGeneralContactFvPatchVectorField&,
+            const fvPatch&,
+            const DimensionedField<vector, volMesh>&,
+            const fvPatchFieldMapper&
+        );
+
+        //- Construct as copy
+        solidGeneralContactFvPatchVectorField
+        (
+            const solidGeneralContactFvPatchVectorField&
+        );
+
+        //- Construct and return a clone
+        virtual tmp<fvPatchField<vector> > clone() const
+        {
+            return tmp<fvPatchField<vector> >
+            (
+                new solidGeneralContactFvPatchVectorField(*this)
+            );
+        }
+
+        //- Construct as copy setting internal field reference
+        solidGeneralContactFvPatchVectorField
+        (
+            const solidGeneralContactFvPatchVectorField&,
+            const DimensionedField<vector, volMesh>&
+        );
+
+        //- Construct and return a clone setting internal field reference
+        virtual tmp<fvPatchField<vector> > clone
+        (
+            const DimensionedField<vector, volMesh>& iF
+        ) const
+        {
+            return tmp<fvPatchField<vector> >
+            (
+                new solidGeneralContactFvPatchVectorField(*this, iF)
+            );
+        }
+	
+	// Destructor
+
+        virtual ~solidGeneralContactFvPatchVectorField();
+	
+	
+	// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 
     //- Runtime type information
     TypeName("solidContact");
