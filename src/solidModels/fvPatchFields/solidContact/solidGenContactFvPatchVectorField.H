@@ -416,64 +416,7 @@ public:
 	
 	// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 
-    //- Runtime type information
-    TypeName("solidContact");
 
-
-    // Constructors
-
-        //- Construct from patch and internal field
-        solidContactFvPatchVectorField
-        (
-            const fvPatch&,
-            const DimensionedField<vector, volMesh>&
-        );
-
-        //- Construct from patch, internal field and dictionary
-        solidContactFvPatchVectorField
-        (
-            const fvPatch&,
-            const DimensionedField<vector, volMesh>&,
-            const dictionary&
-        );
-
-        //- Construct by mapping given solidContactFvPatchVectorField onto
-        //  a new patch
-        solidContactFvPatchVectorField
-        (
-            const solidContactFvPatchVectorField&,
-            const fvPatch&,
-            const DimensionedField<vector, volMesh>&,
-            const fvPatchFieldMapper&
-        );
-
-        //- Construct and return a clone
-        virtual tmp<fvPatchField<vector> > clone() const
-        {
-            return tmp<fvPatchField<vector> >
-            (
-                new solidContactFvPatchVectorField(*this)
-            );
-        }
-
-        //- Construct as copy setting internal field reference
-        solidContactFvPatchVectorField
-        (
-            const solidContactFvPatchVectorField&,
-            const DimensionedField<vector, volMesh>&
-        );
-
-        //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<vector> > clone
-        (
-            const DimensionedField<vector, volMesh>& iF
-        ) const
-        {
-            return tmp<fvPatchField<vector> >
-            (
-                new solidContactFvPatchVectorField(*this, iF)
-            );
-        }
 
     // Destructor
 
