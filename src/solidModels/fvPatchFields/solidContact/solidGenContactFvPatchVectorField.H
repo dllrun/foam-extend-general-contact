@@ -492,6 +492,91 @@ public:
 
 
     // Member functions
+	
+		//* * * * * * Added from the solidGeneralContactFvPatchVectorField.H  * * * * * * * * //
+		
+		
+		// Access
+
+            //- Return true if this patch field fixes a value.
+            //  Needed to check if a level has to be specified while solving
+            //  Poissons equations.
+            virtual bool fixesValue() const
+            {
+                return true;
+            }
+
+            //- Return true if this patch is the global master
+            bool globalMaster() const;
+
+            //- Return index of global master patch
+            label globalMasterIndex() const;
+
+            //- Return the list of shadow patch names
+            const List<word>& shadowPatchNames() const;
+
+            //- Return the list of shadow patch indices
+            const List<label>& shadowPatchIndices() const;
+
+            //- Return index of the zone
+            label zoneIndex() const;
+
+            //- Return the list of shadow zone names
+            const List<word>& shadowZoneNames() const;
+
+            //- Return the list of shadow zone indices
+            const List<label>& shadowZoneIndices() const;
+
+            //- Return reference to the normal contact model
+            normalContactModel& normalModel(const label shadowI);
+
+            //- Return const reference to the normal contact model
+            const normalContactModel& normalModel(const label shadowI) const;
+
+            //- Return reference to the friction contact model
+            frictionContactModel& frictionModel(const label shadowI);
+
+            //- Return const reference to the friction contact model
+            const frictionContactModel& frictionModel
+            (
+                const label shadowI
+            ) const;
+
+            //- Return const reference to deformed master zone
+            const standAlonePatch& zone() const;
+
+            //- Return reference to deformed master zone
+            standAlonePatch& zone();
+
+            //- Return const reference to deformed master zone
+            const standAlonePatch& shadowZone(const label shadowI) const;
+
+            //- Return reference to deformed master zone
+            standAlonePatch& shadowZone(const label shadowI);
+
+            //- Return const reference to patch-to-patch interpolation
+            const newGgiStandAlonePatchInterpolation& zoneToZone
+            (
+                const label shadowI
+            ) const;
+
+            //- Return reference to patch-to-patch interpolation
+            newGgiStandAlonePatchInterpolation& zoneToZone
+            (
+                const label shadowI
+            );
+
+            //- Given the patch index of a shadow, return the position in the
+            // shadow list of the current patch
+            label findShadowID(const label patchID) const;
+
+            //- Return the current patch traction for shadowI
+            const vectorField& curPatchTractions(const label shadowI) const;
+
+            //- Return the current patch traction for shadowI
+            vectorField& curPatchTractions(const label shadowI);
+	
+		// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 
         // Access
 
@@ -568,6 +653,24 @@ public:
             }
 
         // Mapping functions
+		
+		//* * * * * * Added from the solidGeneralContactFvPatchVectorField.H  * * * * * * * * //
+		
+		    //- Map (and resize as needed) from self given a mapping object
+            virtual void autoMap
+            (
+                const fvPatchFieldMapper&
+            );
+
+            //- Reverse map the given fvPatchField onto this fvPatchField
+            virtual void rmap
+            (
+                const fvPatchField<vector>&,
+                const labelList&
+            );
+		
+		
+		// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 
             //- Map (and resize as needed) from self given a mapping object
             virtual void autoMap
@@ -584,6 +687,13 @@ public:
 
 
         // Evaluation functions
+		
+		//* * * * * * Added from the solidGeneralContactFvPatchVectorField.H  * * * * * * * * * *//
+		
+		    //- Update the coefficients associated with the patch field
+            virtual void updateCoeffs();
+		
+		// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();
@@ -601,6 +711,19 @@ public:
 
 
         // Member functions
+		
+		//* * * * * * Added from the solidGeneralContactFvPatchVectorField.H  * * * * * * * * * *//
+		
+		    //- Dissipated energy due to friction
+            virtual const scalarField& Qc() const;
+
+            //- Dissipated energy due to friction from contact with shadowI
+            virtual const scalarField& Qc(const label shadowI) const;
+
+            //- Write
+            virtual void write(Ostream&) const;
+		
+		// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 
             // interpolate the given field from patch to patch in parallel
             virtual tmp<vectorField> interpolateSlaveToMaster
