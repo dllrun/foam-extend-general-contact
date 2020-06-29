@@ -512,47 +512,40 @@ public:
 
         // Access
 
-            //- Return true if this patch field fixes a value.
-            //  Needed to check if a level has to be specified while solving
-            //  Poissons equations.
-            virtual bool fixesValue() const
-            {
-                return true;
-            }
-
-            //- Return if this patch is the master
+            
+            //- Return if this patch is the master  //ALERT: global Version uses bool 
             Switch master() const
             {
                 return master_;
             }
 
-            //- Return contact normal law pointer
+            //- Return contact normal law pointer    //ALERT: global Version uses reference var
             normalContactModel* normalContactModelPtr() const
             {
                 return normalContactModelPtr_;
             }
 
-            //- Return contact normal friction pointer
+            //- Return contact normal friction pointer   //ALERT: global Version uses reference var
             frictionContactModel* frictionContactModelPtr() const
             {
                 return frictionContactModelPtr_;
             }
 
-            //- Return masterFaceZonePatch pointer
+            //- Return masterFaceZonePatch pointer   //ALERT: global Version uses reference standAlonePatch
             PrimitivePatch<face, Foam::List, pointField>*
             masterFaceZonePatchPtr() const
             {
                 return masterFaceZonePatchPtr_;
             }
 
-            //- Return masterFaceZonePatch pointer
+            //- Return slaveFaceZonePatch pointer
             PrimitivePatch<face, Foam::List, pointField>*
             slaveFaceZonePatchPtr() const
             {
                 return slaveFaceZonePatchPtr_;
             }
 
-            //- Return patchToPatch interpolator pointer
+            //- Return patchToPatch interpolator pointer  
             PatchToPatchInterpolation
             <
                 PrimitivePatch<face, Foam::List, pointField>,
@@ -562,7 +555,7 @@ public:
                 return slaveToMasterPatchToPatchInterpolatorPtr_;
             }
 
-            //- Return GGI interpolator pointer
+            //- Return GGI interpolator pointer   //ALERT: global Version newGgiStandAlonePatchInterpolation& zoneToZone
             GGIInterpolation
             <
                 PrimitivePatch< face, Foam::List, pointField >,
@@ -604,20 +597,7 @@ public:
 		
 		// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 
-            //- Map (and resize as needed) from self given a mapping object
-            virtual void autoMap
-            (
-                const fvPatchFieldMapper&
-            );
-
-            //- Reverse map the given fvPatchField onto this fvPatchField
-            virtual void rmap
-            (
-                const fvPatchField<vector>&,
-                const labelList&
-            );
-
-
+        
         // Evaluation functions
 		
 		//* * * * * * Added from the solidGeneralContactFvPatchVectorField.H  * * * * * * * * * *//
@@ -627,9 +607,7 @@ public:
 		
 		// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 
-            //- Update the coefficients associated with the patch field
-            virtual void updateCoeffs();
-
+        
             //- Evaluate the patch field
             virtual void evaluate
             (
@@ -669,7 +647,7 @@ public:
                 forceCorrection_ = true;
             }
 
-            //- Dissipated energy due to friction
+            //- Dissipated energy due to friction   //ALERT: global Version uses reference scalarField
             virtual tmp<scalarField> Qc() const;
 
             // Return const reference to stickSlipField
@@ -684,8 +662,6 @@ public:
                 return stickSlipFieldPtr_->boundaryField()[patch().index()];
             }
 
-            //- Write
-            virtual void write(Ostream&) const;
 
     // Member operators
 
