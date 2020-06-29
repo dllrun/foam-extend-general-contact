@@ -26,7 +26,7 @@ Class
 
 \*---------------------------------------------------------------------------*/
 
-#include "solidContactFvPatchVectorField.H"
+#include "solidGenContactFvPatchVectorField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "transformField.H"
 #include "volFields.H"

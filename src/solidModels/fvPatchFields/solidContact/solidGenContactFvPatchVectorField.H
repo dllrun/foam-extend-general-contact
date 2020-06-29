@@ -111,7 +111,7 @@ class solidContactFvPatchVectorField
         mutable standAlonePatch* zonePtr_;
 
         //- List of zone-to-zone interpolators
-        mutable PtrList<newGgiStandAlonePatchInterpolation> zoneToZones_;
+        mutable PtrList<primitivePatchInterpolation> zoneToZones_;
 
         //- Global face zones in the mesh
         mutable labelList* globalFaceZonesPtr_;
@@ -495,13 +495,13 @@ public:
             standAlonePatch& shadowZone(const label shadowI);
 
             //- Return const reference to patch-to-patch interpolation
-            const newGgiStandAlonePatchInterpolation& zoneToZone
+            const primitivePatchInterpolation& zoneToZone
             (
                 const label shadowI
             ) const;
 
             //- Return reference to patch-to-patch interpolation
-            newGgiStandAlonePatchInterpolation& zoneToZone
+            primitivePatchInterpolation& zoneToZone
             (
                 const label shadowI
             );
@@ -563,7 +563,7 @@ public:
                 return slaveToMasterPatchToPatchInterpolatorPtr_;
             }
 
-            //- Return GGI interpolator pointer   //ALERT: global Version newGgiStandAlonePatchInterpolation& zoneToZone
+            //- Return GGI interpolator pointer   //ALERT: global Version primitivePatchInterpolation& zoneToZone
             GGIInterpolation
             <
                 PrimitivePatch< face, Foam::List, pointField >,
