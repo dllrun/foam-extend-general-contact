@@ -25,34 +25,42 @@ Class
     solidGenContactFvPatchVectorField
 
 Description
+	    General contact boundary conditions for finite volume solidMechanics
+    solvers.
+    Multiple patches may be defined as solidGeneralContact and master-slave
+    contact pairs will be created between each.
+    As calculation of point distances is expensive, an initial quick check will
+    be performed to check if a contact pair is active. 
+								+
     contact boundary conditions for finite volume solidMechanics solvers.
     There is a master and a slave patch. The master creates the contactModel
     and the slave gets the pointer to it.
     The treatment of the normal contact and tangential contact can be specified
     individually at run-time using the normalContactModel and
-    frictionContactModel.
+    frictionContactModel. 
 
 SourceFiles
-    solidContactFvPatchVectorField.C
+    solidGenContactFvPatchVectorField.C
 
 Author
     Philip Cardiff UCD
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef solidContactFvPatchVectorField_H
-#define solidContactFvPatchVectorField_H
+#ifndef solidContactFvPatchVectorField_H          //1. check name
+#define solidContactFvPatchVectorField_H		  //2. check name
 
 #include "fvPatchFields.H"
-#include "directionMixedFvPatchFields.H"
+#include "directionMixedFvPatchFields.H"		  //try multiple inheritance if this doesn't work (with solidTractionFvPatchVectorField.H)
 #include "nonLinearGeometry.H"
 #include "normalContactModel.H"
 #include "frictionContactModel.H"
 #include "primitivePatchInterpolation.H"
 #include "patchToPatchInterpolation.H"
-#include "ggiInterpolation.H"
+#include "ggiInterpolation.H"                     //3. check name
 #include "Switch.H"
 #include "NamedEnum.H"
+#include "standAlonePatch.H"					  //Check standAlonePatch vs primitivePatchInterpolation
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -672,6 +680,9 @@ public:
 
 } // End namespace Foam
 
+// #ifdef NoRepository
+// #   include "solidGeneralContactFvPatchVectorFieldTemplates.C"
+// #endif 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
