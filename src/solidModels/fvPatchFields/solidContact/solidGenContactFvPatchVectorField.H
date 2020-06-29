@@ -89,8 +89,6 @@ class solidContactFvPatchVectorField
         //- List of shadow patch indices
         mutable List<label>* shadowPatchIndicesPtr_;
 		
-		//- Is the current patch considered rigid in contact
-        Switch rigidMaster_;
 
         // Copy of contact dictionary
         const dictionary dict_;
@@ -106,15 +104,6 @@ class solidContactFvPatchVectorField
 
         //- List of zone-to-zone interpolators
         mutable PtrList<newGgiStandAlonePatchInterpolation> zoneToZones_;
-
-        //- Patch to patch algorithm
-        const intersection::algorithm alg_;
-
-        //- Patch to patch direction
-        const intersection::direction dir_;
-
-        //- Current time index
-        label curTimeIndex_;
 
         //- Global face zones in the mesh
         mutable labelList* globalFaceZonesPtr_;
@@ -145,7 +134,7 @@ class solidContactFvPatchVectorField
         // is the contact boundary active
         Switch contactActive_;
 
-        // is the contact boundary active
+        // is the contact boundary active //- Is the current patch considered rigid in contact
         Switch rigidMaster_;
 
         //- contact normallaw pointer
