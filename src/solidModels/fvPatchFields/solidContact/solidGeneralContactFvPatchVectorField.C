@@ -32,6 +32,9 @@ Class
 #include "volFields.H"
 #include "tractionBoundaryGradient.H"
 #include "Switch.H"
+#include "pointFields.H"
+#include "polyPatchID.H"
+#include "ZoneIDs.H"
 #include <iostream.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -1326,7 +1329,133 @@ snGrad() const
 }
 
 
-//- Increment of dissipated energy due to friction
+//* * * * * * Added from the solidGeneralContactFvPatchVectorField.H  * * * * * * * * * *//
+//- Increment of dissipated energy due to friction for each pair
+const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc
+(
+    const label shadowI
+) const
+{
+    if (!QcsPtr_)
+    {
+        calcQcs();
+    }
+
+    return (*QcsPtr_)[shadowI];
+}
+
+
+void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
+{
+    const boolList& locSlave = localSlave();
+
+    QcsPtr_ = new List<scalarField>(locSlave.size());
+
+    bool sigmaCauchyFound =
+        db().foundObject<volSymmTensorField>
+        (
+            "sigmaCauchy"
+        );
+
+    const scalar deltaT = patch().boundaryMesh().mesh().time().deltaT().value();
+
+    const volVectorField& field =
+        db().lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    forAll(locSlave, shadowI)
+    {
+        scalarField& Qc = (*QcsPtr_)[shadowI];
+        Qc.setSize(patch().size(), 0.0);
+
+        // For now, we assume traction is constant over time-step
+        // Todo: use trapezoidal rule
+        vectorField curTraction(Qc.size(), vector::zero);
+
+        // sigma/sigmaCauchy is up-to-date as Qc is called after momentum loop
+        // has converged and sigma has been updated and mesh moved
+        if (sigmaCauchyFound)
+        {
+            const symmTensorField& sigma =
+                db().lookupObject<volSymmTensorField>
+                (
+                    "sigmaCauchy"
+                ).boundaryField()[patch().index()];
+
+            curTraction = patch().nf() & sigma;
+        }
+        else
+        {
+            const symmTensorField& sigma =
+            db().lookupObject<volSymmTensorField>
+            (
+                "sigma"
+            ).boundaryField()[patch().index()];
+
+            curTraction = patch().nf() & sigma;
+        }
+
+        // Calculate Qc for shadowI
+
+        vectorField curPatchSlip(Qc.size(), vector::zero);
+
+        // Calculate slip
+        if (locSlave[shadowI])
+        {
+            curPatchSlip = frictionModel(shadowI).slip();
+        }
+        else
+        {
+            const solidGeneralContactFvPatchVectorField& shadowPatchField =
+            refCast<const solidGeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[shadowPatchIndices()[shadowI]]
+            );
+
+            const label locShadowID =
+            shadowPatchField.findShadowID(patch().index());
+
+            vectorField shadowPatchSlip =
+            shadowPatchField.frictionModel(locShadowID).slip();
+
+            vectorField shadowZoneSlip =
+            zoneField
+            (
+                shadowZoneIndices()[shadowI],
+                shadowPatchIndices()[shadowI],
+                shadowPatchSlip
+            );
+
+            // Interpolate from shadow to the current patch
+            // Face-to-face
+
+            vectorField curZoneSlip =
+            shadowPatchField.zoneToZone(locShadowID).slaveToMaster
+            (
+                shadowZoneSlip
+            );
+
+            curPatchSlip =
+            patchField
+            (
+                patch().index(),
+                zoneIndex(),
+                curZoneSlip
+            );
+        }
+
+        // Heat flux rate: rate of dissipated frictional energy
+        // The dot product of the traction vectors and the slip vectors
+        // gives the dissipated frictional energy rate per unit area, which
+        // is always positive
+        Qc = mag(curTraction & (curPatchSlip/deltaT));
+    }
+}
+// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
+
+/* //- Increment of dissipated energy due to friction
 tmp<scalarField> solidGeneralContactFvPatchVectorField::Qc() const
 {
     tmp<scalarField> tQc(new scalarField(patch().size(), 0.0));
@@ -1419,7 +1548,7 @@ tmp<scalarField> solidGeneralContactFvPatchVectorField::Qc() const
     Qc = mag(0.5*(avForce & curDU));
 
     return tQc;
-}
+} */
 
 
 // Write
