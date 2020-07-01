@@ -62,7 +62,7 @@ bool Foam::solidGeneralContactFvPatchVectorField::movingMesh() const
 
 
 void Foam::solidGeneralContactFvPatchVectorField::
-moveZonesToDeformedConfiguration()
+moveZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration 
 {
     // Only the master moves the zones
     if (!globalMaster())
@@ -183,7 +183,7 @@ moveZonesToDeformedConfiguration()
 }
 
 
-void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMaster() const
+void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMaster() const   //// CHECK method to calculate global master
 {
     if (globalMasterPtr_)
     {
