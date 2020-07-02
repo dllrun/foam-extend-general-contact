@@ -73,7 +73,7 @@ namespace Foam
 
 class solidGeneralContactFvPatchVectorField
 :
-    public directionMixedFvPatchVectorField   //non-orthogonal (grid points) correction for diffusion term 
+    public solidTractionFvPatchVectorField  //non-orthogonal (grid points) correction for diffusion term 
 {
     // Private data
 	

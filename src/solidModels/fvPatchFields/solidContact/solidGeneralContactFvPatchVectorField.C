@@ -52,13 +52,13 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF
 )
-:
-    directionMixedFvPatchVectorField(p, iF),
+:	// CHECK // initializing the base constructor explicitly with initialisation list 
+    directionMixedFvPatchVectorField(p, iF),  // CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     fieldName_("undefined"),
     master_("undefined"),
     contactActive_(false),
     rigidMaster_(false),
-    normalContactModelPtr_(NULL),
+    normalContactModelPtr_(NULL),   // CHECK // initializing pointer to null (good practice) if it is not pointing to valid memory address
     frictionContactModelPtr_(NULL),
     shadowPatchID_(-1),
     patchInChargeOfCorrection_(-1),
@@ -98,8 +98,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     const DimensionedField<vector, volMesh>& iF,
     const fvPatchFieldMapper& mapper
 )
-:
-    directionMixedFvPatchVectorField(ptf, p, iF, mapper),
+:	// CHECK // initializing the base constructor
+    directionMixedFvPatchVectorField(ptf, p, iF, mapper), // CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     fieldName_(ptf.fieldName_),
     master_(ptf.master_),
     contactActive_(ptf.contactActive_),
@@ -146,11 +146,11 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     const dictionary& dict
 )
     : // only the master reads the properties
-    directionMixedFvPatchVectorField(p, iF),
+    directionMixedFvPatchVectorField(p, iF),	// CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     fieldName_(dimensionedInternalField().name()),
     master_
     (
-        checkPatchAndFaceZones(dict)
+        checkPatchAndFaceZones(dict)					// CHECK Note: condition ? statement : statement // used instead of if-else 
         ? dict.lookup("master") : dict.lookup("master")
         ),
     contactActive_(dict.lookup("contactActive")),
@@ -519,7 +519,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     const DimensionedField<vector, volMesh>& iF
 )
 :
-    directionMixedFvPatchVectorField(ptf, iF),
+    directionMixedFvPatchVectorField(ptf, iF),		// CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     fieldName_(ptf.fieldName_),
     master_(ptf.master_),
     contactActive_(ptf.contactActive_),
