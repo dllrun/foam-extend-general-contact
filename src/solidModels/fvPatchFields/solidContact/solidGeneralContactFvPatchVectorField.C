@@ -70,7 +70,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     curPatchTractionPtr_(NULL),
     QcPtr_(NULL),
     QcsPtr_(NULL),
-    bbOffset_(0.0)
+//    bbOffset_(0.0)
 	
 	// *************************************** END general ****************************
 
@@ -158,7 +158,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     curPatchTractionPtr_(NULL),
     QcPtr_(NULL),
     QcsPtr_(NULL),
-    bbOffset_(ptf.bbOffset_)
+ //   bbOffset_(ptf.bbOffset_)
 // ********************************************** END General ********************************************
 
 	// CHECK // initializing the base constructor
@@ -326,7 +326,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     curPatchTractionPtr_(NULL),
     QcPtr_(NULL),
     QcsPtr_(NULL),
-    bbOffset_(0.0)
+  //  bbOffset_(0.0)
 	
 	// ********************************************** END General ********************************************
 	

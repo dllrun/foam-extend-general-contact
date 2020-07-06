@@ -131,7 +131,7 @@ class solidGeneralContactFvPatchVectorField
         //- Offset used if bounding box of patch has a zero dimension
         mutable scalar bbOffset_;
 		
-		// inherited from solidTractionFvPatchVectorField 
+		// CHECK inherited from solidTractionFvPatchVectorField 
 		mutable label zoneIndex_;  
 		
 	// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //	
