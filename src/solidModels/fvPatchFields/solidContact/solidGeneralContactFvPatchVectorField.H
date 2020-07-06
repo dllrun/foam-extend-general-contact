@@ -131,6 +131,9 @@ class solidGeneralContactFvPatchVectorField
         //- Offset used if bounding box of patch has a zero dimension
         mutable scalar bbOffset_;
 		
+		// inherited from solidTractionFvPatchVectorField 
+		mutable label zoneIndex_;  
+		
 	// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //	
 
         //- Name of the displacement field
@@ -303,7 +306,8 @@ class solidGeneralContactFvPatchVectorField
         {
             return dict_;
         };
-
+		
+		
         //- Get zone field from patch field
         template<class Type>
         tmp<Field<Type> > zoneField

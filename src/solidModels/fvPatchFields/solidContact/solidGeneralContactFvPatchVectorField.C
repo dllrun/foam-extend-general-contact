@@ -1554,7 +1554,7 @@ const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc
 {
     if (!QcsPtr_)
     {
-        calcQcs();
+ //       calcQcs();
     }
 
     return (*QcsPtr_)[shadowI];
@@ -1563,7 +1563,7 @@ const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc
 
 void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
 {
-    const boolList& locSlave = localSlave();
+/*    const boolList& locSlave = localSlave();
 
     QcsPtr_ = new List<scalarField>(locSlave.size());
 
@@ -1668,6 +1668,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
         // is always positive
         Qc = mag(curTraction & (curPatchSlip/deltaT));
     }
+	*/
 }
 // * * * * * * * * * * * * * * * * * * * * * * END General * * * * * * * * * * * * * * * * * * * * //
 
