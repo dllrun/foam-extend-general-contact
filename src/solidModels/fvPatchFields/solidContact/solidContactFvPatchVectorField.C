@@ -46,8 +46,8 @@ namespace Foam
 
 solidContactFvPatchVectorField::solidContactFvPatchVectorField
 (
-    const fvPatch& p,
-    const DimensionedField<vector, volMesh>& iF
+    const fvPatch& p,			// reference to patch 
+    const DimensionedField<vector, volMesh>& iF		// reference to internal field
 )
 :
     directionMixedFvPatchVectorField(p, iF),
@@ -595,7 +595,6 @@ void solidContactFvPatchVectorField::rmap
     // be careful when there are topological changes to the patch
 }
 
-//Info << "TEST By RANJAN" << nl << endl;
 
 void solidContactFvPatchVectorField::updateCoeffs()
 {

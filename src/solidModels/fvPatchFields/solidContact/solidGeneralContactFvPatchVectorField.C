@@ -52,12 +52,34 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF
 )
-:	// CHECK // initializing the base constructor explicitly with initialisation list 
+:	// *************************************** START general ****************************
+	// solidTractionFvPatchVectorField(p, iF),
+    globalMasterPtr_(NULL),
+    globalMasterIndexPtr_(NULL),
+    localSlavePtr_(NULL),
+    shadowPatchNamesPtr_(NULL),
+    shadowPatchIndicesPtr_(NULL),
+    zoneIndex_(-1),
+    shadowZoneNamesPtr_(NULL),
+    shadowZoneIndicesPtr_(NULL), 
+    dict_(NULL),
+    normalModels_(0),
+    frictionModels_(0),
+    zonePtr_(NULL),
+    zoneToZones_(0),
+    curPatchTractionPtr_(NULL),
+    QcPtr_(NULL),
+    QcsPtr_(NULL),
+    bbOffset_(0.0)
+	
+	// *************************************** END general ****************************
+
+// CHECK // initializing the base constructor explicitly with initialisation list 
     directionMixedFvPatchVectorField(p, iF),  // CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     fieldName_("undefined"),
     master_("undefined"),
     contactActive_(false),
-    rigidMaster_(false),
+    rigidMaster_(false),   
     normalContactModelPtr_(NULL),   // CHECK // initializing pointer to null (good practice) if it is not pointing to valid memory address
     frictionContactModelPtr_(NULL),
     shadowPatchID_(-1),
@@ -88,8 +110,23 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     stickSlipFieldPtr_(NULL),
     forceCorrection_(false),
     nonLinear_(nonLinearGeometry::OFF)
-{}
-
+// {}  // Uncomment if not general 
+// ******************************************** START General *****************************************
+{
+    if (debug)
+    {
+        InfoIn
+        (
+            "Foam::solidGeneralContactFvPatchVectorField::"
+            "solidGeneralContactFvPatchVectorField"
+            "("
+            "    const fvPatch& p,"
+            "    const DimensionedField<vector, volMesh>& iF"
+            ")"
+        ) << endl;
+    }
+}
+// ********************************************** END General ********************************************
 
 solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 (
@@ -98,7 +135,33 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     const DimensionedField<vector, volMesh>& iF,
     const fvPatchFieldMapper& mapper
 )
-:	// CHECK // initializing the base constructor
+:	// ******************************************** START General *****************************************
+	
+//	solidTractionFvPatchVectorField(ptf, p, iF, mapper),
+    globalMasterPtr_(NULL),
+    globalMasterIndexPtr_(NULL),
+    localSlavePtr_(NULL),
+    shadowPatchNamesPtr_(NULL),
+    shadowPatchIndicesPtr_(NULL),
+    zoneIndex_(ptf.zoneIndex_),
+    shadowZoneNamesPtr_(NULL),
+    shadowZoneIndicesPtr_(NULL),
+    // rigidMaster_(ptf.rigidMaster_),
+    dict_(ptf.dict_),
+    normalModels_(ptf.normalModels_),
+    frictionModels_(ptf.frictionModels_),
+    zonePtr_(NULL),
+    zoneToZones_(0),
+//    alg_(ptf.alg_),
+//    dir_(ptf.dir_),
+//    curTimeIndex_(ptf.curTimeIndex_),
+    curPatchTractionPtr_(NULL),
+    QcPtr_(NULL),
+    QcsPtr_(NULL),
+    bbOffset_(ptf.bbOffset_)
+// ********************************************** END General ********************************************
+
+	// CHECK // initializing the base constructor
     directionMixedFvPatchVectorField(ptf, p, iF, mapper), // CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     fieldName_(ptf.fieldName_),
     master_(ptf.master_),
@@ -136,7 +199,101 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     stickSlipFieldPtr_(ptf.stickSlipFieldPtr_),
     forceCorrection_(ptf.forceCorrection_),
     nonLinear_(ptf.nonLinear_)
-{}
+// {} Uncomment if not general 
+
+// ******************************************** START General *****************************************
+{
+    if (debug)
+    {
+        InfoIn
+        (
+            "Foam::solidGeneralContactFvPatchVectorField::"
+            "solidGeneralContactFvPatchVectorField"
+            "("
+            "    const solidGeneralContactFvPatchVectorField& ptf,"
+            "    const fvPatch& p,"
+            "    const DimensionedField<vector, volMesh>& iF,"
+            "    const fvPatchFieldMapper& mapper"
+            ")"
+        ) << endl;
+    }
+
+    // Copy pointer objects
+
+    if (ptf.globalMasterPtr_)
+    {
+        globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
+    }
+
+    if (ptf.globalMasterIndexPtr_)
+    {
+        globalMasterIndexPtr_ = new label(*ptf.globalMasterIndexPtr_);
+    }
+
+    if (ptf.localSlavePtr_)
+    {
+        localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+    }
+
+    if (ptf.shadowPatchNamesPtr_)
+    {
+        shadowPatchNamesPtr_ = new wordList(*ptf.shadowPatchNamesPtr_);
+    }
+
+    if (ptf.shadowPatchIndicesPtr_)
+    {
+        shadowPatchIndicesPtr_ = new labelList(*ptf.shadowPatchIndicesPtr_);
+    }
+
+    if (ptf.shadowZoneNamesPtr_)
+    {
+        shadowZoneNamesPtr_ = new wordList(*ptf.shadowZoneNamesPtr_);
+    }
+
+    if (ptf.shadowZoneIndicesPtr_)
+    {
+        shadowZoneIndicesPtr_ = new labelList(*ptf.shadowZoneIndicesPtr_);
+    }
+
+    if (ptf.zonePtr_)
+    {
+        zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
+    }
+
+    if (!ptf.zoneToZones_.empty())
+    {
+        // I will not copy the GGI interpolators
+        // They can be re-created when required
+        WarningIn
+        (
+            "Foam::solidGeneralContactFvPatchVectorField::"
+            "solidGeneralContactFvPatchVectorField"
+            "("
+            "    const solidGeneralContactFvPatchVectorField& ptf,"
+            "    const DimensionedField<vector, volMesh>& iF"
+            ")"
+        )   << "solidGeneralContact: zoneToZone GGI interpolators not mapped"
+            << endl;
+    }
+
+    if (ptf.curPatchTractionPtr_)
+    {
+        curPatchTractionPtr_ =
+            new List<vectorField>(*ptf.curPatchTractionPtr_);
+    }
+
+    if (ptf.QcPtr_)
+    {
+        QcPtr_ = new scalarField(*ptf.QcPtr_);
+    }
+
+    if (ptf.QcsPtr_)
+    {
+        QcsPtr_ = new List<scalarField>(*ptf.QcsPtr_);
+    }
+}
+
+// ********************************************** END General ********************************************
 
 
 solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
@@ -145,7 +302,35 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     const DimensionedField<vector, volMesh>& iF,
     const dictionary& dict
 )
-    : // only the master reads the properties
+    : 
+	// ********************************************** START General ********************************************
+	
+	solidTractionFvPatchVectorField(p, iF),
+    globalMasterPtr_(NULL),
+    globalMasterIndexPtr_(NULL),
+    localSlavePtr_(NULL),
+    shadowPatchNamesPtr_(NULL),
+    shadowPatchIndicesPtr_(NULL),
+    zoneIndex_(-1),
+    shadowZoneNamesPtr_(NULL),
+    shadowZoneIndicesPtr_(NULL),
+    rigidMaster_(dict.lookupOrDefault<Switch>("rigidMaster", false)),
+    dict_(dict),
+    normalModels_(0),
+    frictionModels_(0),
+    zonePtr_(0),
+    zoneToZones_(0),
+    alg_(Foam::intersection::VISIBLE),
+    dir_(Foam::intersection::CONTACT_SPHERE),
+    curTimeIndex_(-1),
+    curPatchTractionPtr_(NULL),
+    QcPtr_(NULL),
+    QcsPtr_(NULL),
+    bbOffset_(0.0)
+	
+	// ********************************************** END General ********************************************
+	
+	// only the master reads the properties
     directionMixedFvPatchVectorField(p, iF),	// CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     fieldName_(dimensionedInternalField().name()),
     master_
@@ -302,6 +487,37 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
      ),
     forceCorrection_(false),
     nonLinear_(nonLinearGeometry::OFF)
+	
+	// ********************************************** START General ********************************************
+	
+	{
+    Info<< "Creating " << solidGeneralContactFvPatchVectorField::typeName
+        << " patch" << endl;
+
+    if (dict.found("gradient"))
+    {
+        gradient() = vectorField("gradient", dict, p.size());
+    }
+    else
+    {
+        gradient() = vector::zero;
+    }
+
+    if (dict.found("value"))
+    {
+        Field<vector>::operator=(vectorField("value", dict, p.size()));
+    }
+    else
+    {
+        Field<vector>::operator=
+        (
+            patchInternalField() + gradient()/patch().deltaCoeffs()
+        );
+    }
+}
+	
+	// ********************************************** END General ********************************************
+	
 {
     //cout << "Creating " << solidGeneralContactFvPatchVectorField::typeName << " patch"
      //   << endl;
@@ -1329,7 +1545,7 @@ snGrad() const
 }
 
 
-//* * * * * * Added from the solidGeneralContactFvPatchVectorField.H  * * * * * * * * * *//
+//* * * * * * * * * * * * * * * * * * * * * * * * * START General  * * * * * * * * * * * * * * * * * * * * *//
 //- Increment of dissipated energy due to friction for each pair
 const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc
 (
@@ -1453,7 +1669,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
         Qc = mag(curTraction & (curPatchSlip/deltaT));
     }
 }
-// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * END General * * * * * * * * * * * * * * * * * * * * //
 
 /* //- Increment of dissipated energy due to friction
 tmp<scalarField> solidGeneralContactFvPatchVectorField::Qc() const
@@ -1555,7 +1771,61 @@ tmp<scalarField> solidGeneralContactFvPatchVectorField::Qc() const
 void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
 {
   //Info << "writing..."<<flush;
-    directionMixedFvPatchVectorField::write(os);
+  
+  //****************************START general***************************************//
+  
+  directionMixedFvPatchVectorField::write(os);      //solidTractionFvPatchVectorField::write(os);
+
+    os.writeKeyword("rigidMaster")
+        << rigidMaster_ << token::END_STATEMENT << nl;
+
+    // Write the dict from the first contact model
+
+    const label shadowI = 0;
+
+    if (localSlave()[shadowI])
+    {
+        os.writeKeyword("normalContactModel")
+            << normalModel(shadowI).type() << token::END_STATEMENT << nl;
+        normalModel(shadowI).writeDict(os);
+
+        os.writeKeyword("frictionContactModel")
+            << frictionModel(shadowI).type() << token::END_STATEMENT << nl;
+        frictionModel(shadowI).writeDict(os);
+    }
+    else
+    {
+        const volVectorField& field =
+            db().lookupObject<volVectorField>
+            (
+                dimensionedInternalField().name()
+            );
+
+        const solidGeneralContactFvPatchVectorField& localSlaveField =
+            refCast<const solidGeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()
+                [
+                    shadowPatchIndices()[shadowI]
+                ]
+            );
+
+        const label localSlaveID =
+            localSlaveField.findShadowID(patch().index());
+
+        os.writeKeyword("normalContactModel")
+            << localSlaveField.normalModel(localSlaveID).type()
+            << token::END_STATEMENT << nl;
+        localSlaveField.normalModel(localSlaveID).writeDict(os);
+
+        os.writeKeyword("frictionContactModel")
+            << localSlaveField.frictionModel(localSlaveID).type()
+            << token::END_STATEMENT << nl;
+        localSlaveField.frictionModel(localSlaveID).writeDict(os);
+    }
+	//****************************END general***************************************//
+	
+    // directionMixedFvPatchVectorField::write(os);
 
     os.writeKeyword("master") << master_ << token::END_STATEMENT << nl;
     os.writeKeyword("shadowPatch")

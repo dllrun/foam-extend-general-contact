@@ -73,7 +73,7 @@ namespace Foam
 
 class solidGeneralContactFvPatchVectorField
 :
-    public solidTractionFvPatchVectorField  //non-orthogonal (grid points) correction for diffusion term 
+    public directionMixedFvPatchVectorField  // non-orthogonal (grid points) correction for diffusion term 
 {
     // Private data
 	
@@ -142,7 +142,7 @@ class solidGeneralContactFvPatchVectorField
         // is the contact boundary active
         Switch contactActive_;
 
-        // is the contact boundary active //- Is the current patch considered rigid in contact
+        // is the contact boundary active //- Is the current patch considered rigid in contact (valid for general)
         Switch rigidMaster_;
 
         //- contact normallaw pointer
