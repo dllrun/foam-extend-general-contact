@@ -44,6 +44,49 @@ namespace Foam
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
+// *************************************** START general ****************************
+/* void Foam::solidGeneralContactFvPatchVectorField::calcShadowZoneNames() const
+{
+    if (shadowZoneNamesPtr_ || shadowZoneIndicesPtr_)
+    {
+        FatalErrorIn
+        (
+            "label Foam::solidGeneralContactFvPatchVectorField::"
+            "calcShadowZoneNames() const"
+        )   << "shadowZoneNames_ or shadowZoneIndices_ already set"
+            << abort(FatalError);
+    }
+
+    const wordList& shadNames = shadowPatchNames();
+
+    shadowZoneNamesPtr_ = new wordList(shadNames.size());
+    wordList& shadowZoneNames = *shadowZoneNamesPtr_;
+
+    shadowZoneIndicesPtr_ = new labelList(shadNames.size());
+    labelList& shadowZoneIndices = *shadowZoneIndicesPtr_;
+
+    const fvMesh& mesh = patch().boundaryMesh().mesh();
+
+    forAll(shadNames, shadowI)
+    {
+        word zoneName = shadNames[shadowI] + "FaceZone";
+
+        faceZoneID zone(zoneName, mesh.faceZones());
+
+        if (!zone.active())
+        {
+            FatalErrorIn("solidGeneralContactFvPatchVectorField")
+                << "Face zone name " << zoneName
+                << " not found.  Please check your zone definition."
+                << abort(FatalError);
+        }
+
+        shadowZoneNames[shadowI] = zoneName;
+
+        shadowZoneIndices[shadowI] = zone.index();
+    }
+} */
+// *************************************** END general ****************************
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -60,8 +103,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     shadowPatchNamesPtr_(NULL),
     shadowPatchIndicesPtr_(NULL),
     zoneIndex_(-1),
-    shadowZoneNamesPtr_(NULL),
-    shadowZoneIndicesPtr_(NULL), 
+ //   shadowZoneNamesPtr_(NULL),
+ //   shadowZoneIndicesPtr_(NULL), 
     dict_(NULL),
     normalModels_(0),
     frictionModels_(0),
@@ -144,8 +187,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     shadowPatchNamesPtr_(NULL),
     shadowPatchIndicesPtr_(NULL),
     zoneIndex_(ptf.zoneIndex_),
-    shadowZoneNamesPtr_(NULL),
-    shadowZoneIndicesPtr_(NULL),
+//    shadowZoneNamesPtr_(NULL),
+//    shadowZoneIndicesPtr_(NULL),
     // rigidMaster_(ptf.rigidMaster_),
     dict_(ptf.dict_),
     normalModels_(ptf.normalModels_),
@@ -245,15 +288,15 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         shadowPatchIndicesPtr_ = new labelList(*ptf.shadowPatchIndicesPtr_);
     }
 
-    if (ptf.shadowZoneNamesPtr_)
+/*    if (ptf.shadowZoneNamesPtr_)
     {
         shadowZoneNamesPtr_ = new wordList(*ptf.shadowZoneNamesPtr_);
-    }
+    } */
 
-    if (ptf.shadowZoneIndicesPtr_)
+/*    if (ptf.shadowZoneIndicesPtr_)
     {
         shadowZoneIndicesPtr_ = new labelList(*ptf.shadowZoneIndicesPtr_);
-    }
+    }	*/
 
     if (ptf.zonePtr_)
     {
@@ -305,22 +348,22 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     : 
 	// ********************************************** START General ********************************************
 	
-	solidTractionFvPatchVectorField(p, iF),
+//	solidTractionFvPatchVectorField(p, iF),
     globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
     localSlavePtr_(NULL),
     shadowPatchNamesPtr_(NULL),
     shadowPatchIndicesPtr_(NULL),
     zoneIndex_(-1),
-    shadowZoneNamesPtr_(NULL),
-    shadowZoneIndicesPtr_(NULL),
+//    shadowZoneNamesPtr_(NULL),
+//    shadowZoneIndicesPtr_(NULL),
     rigidMaster_(dict.lookupOrDefault<Switch>("rigidMaster", false)),
     dict_(dict),
     normalModels_(0),
     frictionModels_(0),
     zonePtr_(0),
     zoneToZones_(0),
-    alg_(Foam::intersection::VISIBLE),
+//    alg_(Foam::intersection::VISIBLE),
     dir_(Foam::intersection::CONTACT_SPHERE),
     curTimeIndex_(-1),
     curPatchTractionPtr_(NULL),
@@ -339,7 +382,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         ? dict.lookup("master") : dict.lookup("master")
         ),
     contactActive_(dict.lookup("contactActive")),
-    rigidMaster_(false), //dict.lookup("rigidMaster")),
+//    rigidMaster_(false), //dict.lookup("rigidMaster")),
     normalContactModelPtr_(NULL),
     frictionContactModelPtr_(NULL),
     shadowPatchID_
@@ -734,15 +777,15 @@ solidGeneralContactFvPatchVectorField:: solidGeneralContactFvPatchVectorField
     const solidGeneralContactFvPatchVectorField& ptf
 )
 :
-    solidTractionFvPatchVectorField(ptf),
+ //   solidTractionFvPatchVectorField(ptf),
     globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
     localSlavePtr_(NULL),
     shadowPatchNamesPtr_(NULL),
     shadowPatchIndicesPtr_(NULL),
     zoneIndex_(ptf.zoneIndex_),
-    shadowZoneNamesPtr_(NULL),
-    shadowZoneIndicesPtr_(NULL),
+//    shadowZoneNamesPtr_(NULL),
+//    shadowZoneIndicesPtr_(NULL),
     rigidMaster_(ptf.rigidMaster_),
     dict_(ptf.dict_),
     normalModels_(ptf.normalModels_),
@@ -796,15 +839,15 @@ solidGeneralContactFvPatchVectorField:: solidGeneralContactFvPatchVectorField
         shadowPatchIndicesPtr_ = new labelList(*ptf.shadowPatchIndicesPtr_);
     }
 
-    if (ptf.shadowZoneNamesPtr_)
+/*    if (ptf.shadowZoneNamesPtr_)
     {
         shadowZoneNamesPtr_ = new wordList(*ptf.shadowZoneNamesPtr_);
-    }
+    } */
 
-    if (ptf.shadowZoneIndicesPtr_)
+/*    if (ptf.shadowZoneIndicesPtr_)
     {
         shadowZoneIndicesPtr_ = new labelList(*ptf.shadowZoneIndicesPtr_);
-    }
+    } */
 
     if (ptf.zonePtr_)
     {
@@ -853,15 +896,15 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 )
 : 	//**************************************************** START General**********************************************
 
-	solidTractionFvPatchVectorField(ptf, iF),
+//	solidTractionFvPatchVectorField(ptf, iF),
     globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
     localSlavePtr_(NULL),
     shadowPatchNamesPtr_(NULL),
     shadowPatchIndicesPtr_(NULL),
     zoneIndex_(ptf.zoneIndex_),
-    shadowZoneNamesPtr_(NULL),
-    shadowZoneIndicesPtr_(NULL),
+//    shadowZoneNamesPtr_(NULL),
+//    shadowZoneIndicesPtr_(NULL),
     rigidMaster_(ptf.rigidMaster_),
     dict_(ptf.dict_),
     normalModels_(ptf.normalModels_),
@@ -881,7 +924,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     fieldName_(ptf.fieldName_),
     master_(ptf.master_),
     contactActive_(ptf.contactActive_),
-    rigidMaster_(ptf.rigidMaster_),
+//    rigidMaster_(ptf.rigidMaster_),
     normalContactModelPtr_(ptf.normalContactModelPtr_),
     frictionContactModelPtr_(ptf.frictionContactModelPtr_),
     shadowPatchID_(ptf.shadowPatchID_),
@@ -905,7 +948,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     slaveFaceZonePatchInterpolatorPtr_(ptf.slaveFaceZonePatchInterpolatorPtr_),
     oldMasterFaceZonePoints_(ptf.oldMasterFaceZonePoints_),
     oldSlaveFaceZonePoints_(ptf.oldSlaveFaceZonePoints_),
-    alg_(ptf.alg_),
+//    alg_(ptf.alg_),
     dir_(ptf.dir_),
     curTimeIndex_(ptf.curTimeIndex_),
     iCorr_(ptf.iCorr_),
@@ -958,15 +1001,15 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         shadowPatchIndicesPtr_ = new labelList(*ptf.shadowPatchIndicesPtr_);
     }
 
-    if (ptf.shadowZoneNamesPtr_)
+/*    if (ptf.shadowZoneNamesPtr_)
     {
         shadowZoneNamesPtr_ = new wordList(*ptf.shadowZoneNamesPtr_);
-    }
+    } */
 
-    if (ptf.shadowZoneIndicesPtr_)
+/*    if (ptf.shadowZoneIndicesPtr_)
     {
         shadowZoneIndicesPtr_ = new labelList(*ptf.shadowZoneIndicesPtr_);
-    }
+    }	*/
 
     if (ptf.zonePtr_)
     {
@@ -1029,8 +1072,8 @@ Foam::solidGeneralContactFvPatchVectorField::
     deleteDemandDrivenData(localSlavePtr_);
     deleteDemandDrivenData(shadowPatchNamesPtr_);
     deleteDemandDrivenData(shadowPatchIndicesPtr_);
-    deleteDemandDrivenData(shadowZoneNamesPtr_);
-    deleteDemandDrivenData(shadowZoneIndicesPtr_);
+//    deleteDemandDrivenData(shadowZoneNamesPtr_);
+//    deleteDemandDrivenData(shadowZoneIndicesPtr_);
 
     normalModels_.clear();
     frictionModels_.clear();
