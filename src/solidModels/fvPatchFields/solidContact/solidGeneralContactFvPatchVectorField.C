@@ -728,13 +728,155 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     }
 }
 
+//******************************************** START General ******************************************** 
+solidGeneralContactFvPatchVectorField:: solidGeneralContactFvPatchVectorField
+(
+    const solidGeneralContactFvPatchVectorField& ptf
+)
+:
+    solidTractionFvPatchVectorField(ptf),
+    globalMasterPtr_(NULL),
+    globalMasterIndexPtr_(NULL),
+    localSlavePtr_(NULL),
+    shadowPatchNamesPtr_(NULL),
+    shadowPatchIndicesPtr_(NULL),
+    zoneIndex_(ptf.zoneIndex_),
+    shadowZoneNamesPtr_(NULL),
+    shadowZoneIndicesPtr_(NULL),
+    rigidMaster_(ptf.rigidMaster_),
+    dict_(ptf.dict_),
+    normalModels_(ptf.normalModels_),
+    frictionModels_(ptf.frictionModels_),
+    zonePtr_(NULL),
+    zoneToZones_(0),
+    alg_(ptf.alg_),
+    dir_(ptf.dir_),
+    curTimeIndex_(ptf.curTimeIndex_),
+    curPatchTractionPtr_(NULL),
+    QcPtr_(NULL),
+    QcsPtr_(NULL),
+//    bbOffset_(ptf.bbOffset_)
+{
+    if (debug)
+    {
+        InfoIn
+        (
+            "Foam::solidGeneralContactFvPatchVectorField::"
+            "solidGeneralContactFvPatchVectorField"
+            "("
+            "    const solidGeneralContactFvPatchVectorField& ptf"
+            ")"
+        ) << endl;
+    }
+
+    // Copy pointer objects
+
+    if (ptf.globalMasterPtr_)
+    {
+        globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
+    }
+
+    if (ptf.globalMasterIndexPtr_)
+    {
+        globalMasterIndexPtr_ = new label(*ptf.globalMasterIndexPtr_);
+    }
+
+    if (ptf.localSlavePtr_)
+    {
+        localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+    }
+
+    if (ptf.shadowPatchNamesPtr_)
+    {
+        shadowPatchNamesPtr_ = new wordList(*ptf.shadowPatchNamesPtr_);
+    }
+
+    if (ptf.shadowPatchIndicesPtr_)
+    {
+        shadowPatchIndicesPtr_ = new labelList(*ptf.shadowPatchIndicesPtr_);
+    }
+
+    if (ptf.shadowZoneNamesPtr_)
+    {
+        shadowZoneNamesPtr_ = new wordList(*ptf.shadowZoneNamesPtr_);
+    }
+
+    if (ptf.shadowZoneIndicesPtr_)
+    {
+        shadowZoneIndicesPtr_ = new labelList(*ptf.shadowZoneIndicesPtr_);
+    }
+
+    if (ptf.zonePtr_)
+    {
+        zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
+    }
+
+    if (!ptf.zoneToZones_.empty())
+    {
+        // I will not copy the GGI interpolators
+        // They can be re-created when required
+        WarningIn
+        (
+            "Foam::solidGeneralContactFvPatchVectorField::"
+            "solidGeneralContactFvPatchVectorField"
+            "("
+            "    const solidGeneralContactFvPatchVectorField& ptf,"
+            "    const DimensionedField<vector, volMesh>& iF"
+            ")"
+        )   << "solidGeneralContact: zoneToZone GGI interpolators not mapped"
+            << endl;
+    }
+
+    if (ptf.curPatchTractionPtr_)
+    {
+        curPatchTractionPtr_ =
+            new List<vectorField>(*ptf.curPatchTractionPtr_);
+    }
+
+    if (ptf.QcPtr_)
+    {
+        QcPtr_ = new scalarField(*ptf.QcPtr_);
+    }
+
+    if (ptf.QcsPtr_)
+    {
+        QcsPtr_ = new List<scalarField>(*ptf.QcsPtr_);
+    }
+}
+
+//**************************************************** END General**********************************************
 
 solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 (
     const solidGeneralContactFvPatchVectorField& ptf,
     const DimensionedField<vector, volMesh>& iF
 )
-:
+: 	//**************************************************** START General**********************************************
+
+	solidTractionFvPatchVectorField(ptf, iF),
+    globalMasterPtr_(NULL),
+    globalMasterIndexPtr_(NULL),
+    localSlavePtr_(NULL),
+    shadowPatchNamesPtr_(NULL),
+    shadowPatchIndicesPtr_(NULL),
+    zoneIndex_(ptf.zoneIndex_),
+    shadowZoneNamesPtr_(NULL),
+    shadowZoneIndicesPtr_(NULL),
+    rigidMaster_(ptf.rigidMaster_),
+    dict_(ptf.dict_),
+    normalModels_(ptf.normalModels_),
+    frictionModels_(ptf.frictionModels_),
+    zonePtr_(NULL),
+    zoneToZones_(0),
+    alg_(ptf.alg_),
+    dir_(ptf.dir_),
+    curTimeIndex_(ptf.curTimeIndex_),
+    QcPtr_(NULL),
+    QcsPtr_(NULL),
+//    bbOffset_(ptf.bbOffset_)
+
+	//**************************************************** END General**********************************************
+	
     directionMixedFvPatchVectorField(ptf, iF),		// CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     fieldName_(ptf.fieldName_),
     master_(ptf.master_),
@@ -772,8 +914,137 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     stickSlipFieldPtr_(ptf.stickSlipFieldPtr_),
     forceCorrection_(ptf.forceCorrection_),
     nonLinear_(ptf.nonLinear_)
-{}
+// {}  // Uncomment if not general
 
+//**************************************************** START General**********************************************
+{
+    if (debug)
+    {
+        InfoIn
+        (
+            "Foam::solidGeneralContactFvPatchVectorField::"
+            "solidGeneralContactFvPatchVectorField"
+            "("
+            "    const solidGeneralContactFvPatchVectorField& ptf,"
+            "    const DimensionedField<vector, volMesh>& iF"
+            ")"
+        ) << endl;
+    }
+
+    // Copy pointer objects
+
+    if (ptf.globalMasterPtr_)
+    {
+        globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
+    }
+
+    if (ptf.globalMasterIndexPtr_)
+    {
+        globalMasterIndexPtr_ = new label(*ptf.globalMasterIndexPtr_);
+    }
+
+    if (ptf.localSlavePtr_)
+    {
+        localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+    }
+
+    if (ptf.shadowPatchNamesPtr_)
+    {
+        shadowPatchNamesPtr_ = new wordList(*ptf.shadowPatchNamesPtr_);
+    }
+
+    if (ptf.shadowPatchIndicesPtr_)
+    {
+        shadowPatchIndicesPtr_ = new labelList(*ptf.shadowPatchIndicesPtr_);
+    }
+
+    if (ptf.shadowZoneNamesPtr_)
+    {
+        shadowZoneNamesPtr_ = new wordList(*ptf.shadowZoneNamesPtr_);
+    }
+
+    if (ptf.shadowZoneIndicesPtr_)
+    {
+        shadowZoneIndicesPtr_ = new labelList(*ptf.shadowZoneIndicesPtr_);
+    }
+
+    if (ptf.zonePtr_)
+    {
+        zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
+    }
+
+    if (!ptf.zoneToZones_.empty())
+    {
+        // I will not copy the GGI interpolators
+        // They can be re-created when required
+        WarningIn
+        (
+            "Foam::solidGeneralContactFvPatchVectorField::"
+            "solidGeneralContactFvPatchVectorField"
+            "("
+            "    const solidGeneralContactFvPatchVectorField& ptf,"
+            "    const DimensionedField<vector, volMesh>& iF"
+            ")"
+        )   << "solidGeneralContact: zoneToZone GGI interpolators not mapped"
+            << endl;
+    }
+
+    if (ptf.curPatchTractionPtr_)
+    {
+        curPatchTractionPtr_ =
+            new List<vectorField>(*ptf.curPatchTractionPtr_);
+    }
+
+    if (ptf.QcPtr_)
+    {
+        QcPtr_ = new scalarField(*ptf.QcPtr_);
+    }
+
+    if (ptf.QcsPtr_)
+    {
+        QcsPtr_ = new List<scalarField>(*ptf.QcsPtr_);
+    }
+}
+
+//**************************************************** END General**********************************************
+
+// * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * * //
+
+//**************************************************** START General**********************************************
+
+Foam::solidGeneralContactFvPatchVectorField::
+~solidGeneralContactFvPatchVectorField()
+{
+    if (debug)
+    {
+        InfoIn
+        (
+            "Foam::solidGeneralContactFvPatchVectorField::"
+            "~solidGeneralContactFvPatchVectorField()"
+        ) << endl;
+    }
+
+    deleteDemandDrivenData(globalMasterPtr_);
+    deleteDemandDrivenData(globalMasterIndexPtr_);
+    deleteDemandDrivenData(localSlavePtr_);
+    deleteDemandDrivenData(shadowPatchNamesPtr_);
+    deleteDemandDrivenData(shadowPatchIndicesPtr_);
+    deleteDemandDrivenData(shadowZoneNamesPtr_);
+    deleteDemandDrivenData(shadowZoneIndicesPtr_);
+
+    normalModels_.clear();
+    frictionModels_.clear();
+
+    deleteDemandDrivenData(zonePtr_);
+
+    zoneToZones_.clear();
+
+    deleteDemandDrivenData(curPatchTractionPtr_);
+    deleteDemandDrivenData(QcPtr_);
+    deleteDemandDrivenData(QcsPtr_);
+}
+
+//**************************************************** END General**********************************************
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
