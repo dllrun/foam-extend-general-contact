@@ -191,8 +191,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 //    shadowZoneIndicesPtr_(NULL),
     // rigidMaster_(ptf.rigidMaster_),
     dict_(ptf.dict_),
-    normalModels_(ptf.normalModels_),
-    frictionModels_(ptf.frictionModels_),
+    normalModels_(NULL),  //(ptf.normalModels_),
+    frictionModels_(NULL), //(ptf.frictionModels_),
     zonePtr_(NULL),
     zoneToZones_(0),
 //    alg_(ptf.alg_),
@@ -364,8 +364,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     zonePtr_(0),
     zoneToZones_(0),
 //    alg_(Foam::intersection::VISIBLE),
-    dir_(Foam::intersection::CONTACT_SPHERE),
-    curTimeIndex_(-1),
+//    dir_(Foam::intersection::CONTACT_SPHERE),
+//    curTimeIndex_(-1),
     curPatchTractionPtr_(NULL),
     QcPtr_(NULL),
     QcsPtr_(NULL),
@@ -537,7 +537,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     Info<< "Creating " << solidGeneralContactFvPatchVectorField::typeName
         << " patch" << endl;
 
-    if (dict.found("gradient"))
+ /*   if (dict.found("gradient"))
     {
         gradient() = vectorField("gradient", dict, p.size());
     }
@@ -556,12 +556,12 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         (
             patchInternalField() + gradient()/patch().deltaCoeffs()
         );
-    }
-}
+    } */
+//}
 	
 	// ********************************************** END General ********************************************
 	
-{
+//{
     //cout << "Creating " << solidGeneralContactFvPatchVectorField::typeName << " patch"
      //   << endl;
 
@@ -772,15 +772,19 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 }
 
 //******************************************** START General ******************************************** 
-solidGeneralContactFvPatchVectorField:: solidGeneralContactFvPatchVectorField
+solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 (
     const solidGeneralContactFvPatchVectorField& ptf
 )
 :
  //   solidTractionFvPatchVectorField(ptf),
+	directionMixedFvPatchVectorField(ptf),
     globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
+	masterFaceZoneID_(0),
+	slaveFaceZoneID_(0),
     localSlavePtr_(NULL),
+	shadowPatchID_(0),
     shadowPatchNamesPtr_(NULL),
     shadowPatchIndicesPtr_(NULL),
     zoneIndex_(ptf.zoneIndex_),
@@ -788,8 +792,8 @@ solidGeneralContactFvPatchVectorField:: solidGeneralContactFvPatchVectorField
 //    shadowZoneIndicesPtr_(NULL),
     rigidMaster_(ptf.rigidMaster_),
     dict_(ptf.dict_),
-    normalModels_(ptf.normalModels_),
-    frictionModels_(ptf.frictionModels_),
+    normalModels_(NULL),   //(ptf.normalModels_),
+    frictionModels_(NULL),   //(ptf.frictionModels_),
     zonePtr_(NULL),
     zoneToZones_(0),
     alg_(ptf.alg_),
@@ -797,7 +801,7 @@ solidGeneralContactFvPatchVectorField:: solidGeneralContactFvPatchVectorField
     curTimeIndex_(ptf.curTimeIndex_),
     curPatchTractionPtr_(NULL),
     QcPtr_(NULL),
-    QcsPtr_(NULL),
+    QcsPtr_(NULL)
 //    bbOffset_(ptf.bbOffset_)
 {
     if (debug)
@@ -907,13 +911,13 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 //    shadowZoneIndicesPtr_(NULL),
     rigidMaster_(ptf.rigidMaster_),
     dict_(ptf.dict_),
-    normalModels_(ptf.normalModels_),
-    frictionModels_(ptf.frictionModels_),
+    normalModels_(NULL),  //(ptf.normalModels_),
+    frictionModels_(NULL), //(ptf.frictionModels_),
     zonePtr_(NULL),
     zoneToZones_(0),
     alg_(ptf.alg_),
-    dir_(ptf.dir_),
-    curTimeIndex_(ptf.curTimeIndex_),
+//    dir_(ptf.dir_),
+//    curTimeIndex_(ptf.curTimeIndex_),
     QcPtr_(NULL),
     QcsPtr_(NULL),
 //    bbOffset_(ptf.bbOffset_)

@@ -519,6 +519,7 @@ public:
 
             //- Return the current patch traction for shadowI
             vectorField& curPatchTractions(const label shadowI);
+			
 	
 		// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 
@@ -674,7 +675,11 @@ public:
                 return stickSlipFieldPtr_->boundaryField()[patch().index()];
             }
 
-
+			
+/*			// CHECK Additional declaration missing
+			virtual Field<Type>& gradient();
+			*/
+			
     // Member operators
 
 };
