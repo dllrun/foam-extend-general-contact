@@ -181,6 +181,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 :	// ******************************************** START General *****************************************
 	
 //	solidTractionFvPatchVectorField(ptf, p, iF, mapper),
+    directionMixedFvPatchVectorField(ptf, p, iF, mapper), // CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
     localSlavePtr_(NULL),
@@ -205,8 +206,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 // ********************************************** END General ********************************************
 
 	// CHECK // initializing the base constructor
-    directionMixedFvPatchVectorField(ptf, p, iF, mapper), // CHECK // i.e. calling the parameterized constructor needs to be done explicitely
-    fieldName_(ptf.fieldName_),
+	fieldName_(ptf.fieldName_),
     master_(ptf.master_),
     contactActive_(ptf.contactActive_),
     rigidMaster_(ptf.rigidMaster_),

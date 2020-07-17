@@ -58,23 +58,23 @@ solidContactFvPatchVectorField::solidContactFvPatchVectorField
     normalContactModelPtr_(NULL),
     frictionContactModelPtr_(NULL),
     shadowPatchID_(-1),
-    patchInChargeOfCorrection_(-1),
-    masterFaceZoneName_("undefined"),
+    patchInChargeOfCorrection_(-1),    //- the patch with the lowest patchID is in charge of correcting the contact laws
+    masterFaceZoneName_("undefined"),  // master and slave face zone names and IDs
     slaveFaceZoneName_("undefined"),
-    masterFaceZoneID_(-1),
+    masterFaceZoneID_(-1),             // master and slave face zone names and IDs
     slaveFaceZoneID_(-1),
     // masterFaceZonePatchPoints_(pointField(0)),
     // slaveFaceZonePatchPoints_(pointField(0)),
     // masterFaceZonePatchFaces_(faceList(0)),
     // slaveFaceZonePatchFaces_(faceList(0)),
-    masterFaceZonePatchPtr_(NULL),
+    masterFaceZonePatchPtr_(NULL),     // these patches keep a local copy of the points and faces
     slaveFaceZonePatchPtr_(NULL),
-    interpolationMethod_("undefined"),
-    slaveToMasterPatchToPatchInterpolatorPtr_(NULL),
+    interpolationMethod_("undefined"),   // method name to interpolate traction from slave to master
+    slaveToMasterPatchToPatchInterpolatorPtr_(NULL), // zoneToZone or ggiZone for interpolation of traction from slave to master
     slaveToMasterGgiInterpolatorPtr_(NULL),
-    masterFaceZonePatchInterpolatorPtr_(NULL),
+    masterFaceZonePatchInterpolatorPtr_(NULL),  // To interpolate value for the face zone patch faces to vertices and vice versa
     slaveFaceZonePatchInterpolatorPtr_(NULL),
-    oldMasterFaceZonePoints_(0,vector::zero),
+    oldMasterFaceZonePoints_(0,vector::zero),   // old master and slave face zone points
     oldSlaveFaceZonePoints_(0,vector::zero),
     alg_(Foam::intersection::VISIBLE),
     dir_(Foam::intersection::CONTACT_SPHERE),
