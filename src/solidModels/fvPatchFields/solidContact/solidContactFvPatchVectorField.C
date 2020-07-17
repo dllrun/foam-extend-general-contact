@@ -32,7 +32,7 @@ Class
 #include "volFields.H"
 #include "tractionBoundaryGradient.H"
 #include "Switch.H"
-#include <iostream.h>
+#include <iostream>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

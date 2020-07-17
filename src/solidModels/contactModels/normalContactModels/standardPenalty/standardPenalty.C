@@ -31,7 +31,7 @@ Class
 #include "fvc.H"
 #include "addToRunTimeSelectionTable.H"
 #include "constitutiveModel.H"
-#include <iostream.h>
+#include <iostream>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

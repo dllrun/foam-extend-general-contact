@@ -35,7 +35,7 @@ Class
 #include "pointFields.H"
 #include "polyPatchID.H"
 #include "ZoneIDs.H"
-#include <iostream.h>
+#include <iostream>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -1879,6 +1879,17 @@ const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc
 }
 
 
+const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc() const
+{
+    if (!QcPtr_)
+    {
+//        calcQc();
+    }
+
+    return *QcPtr_;
+}
+
+
 void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
 {
 /*    const boolList& locSlave = localSlave();
@@ -2217,6 +2228,137 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
 
     //Info << "done" << endl;
 }
+
+Foam::label Foam::solidGeneralContactFvPatchVectorField::findShadowID
+(
+    const label patchID
+) const
+{
+    label shadowI = -1;
+/*
+    const labelList shadowIDs = shadowPatchIndices();
+
+    forAll(shadowIDs, I)
+    {
+        if (patchID == shadowIDs[I])
+        {
+            shadowI = I;
+            break;
+        }
+    }
+
+    if (shadowI == -1)
+    {
+        FatalErrorIn("findShadowID(const label patchID)")
+            << "shadow patch not found!" << abort(FatalError);
+    }
+*/
+    return shadowI;
+}
+
+const Foam::List<Foam::label>&
+Foam::solidGeneralContactFvPatchVectorField::shadowPatchIndices() const
+{
+/*
+    if (!shadowPatchIndicesPtr_)
+    {
+        calcShadowPatchNames();
+    }
+*/
+    return *shadowPatchIndicesPtr_;
+}
+
+const Foam::boolList&
+Foam::solidGeneralContactFvPatchVectorField::localSlave() const
+{
+    if (!localSlavePtr_)
+    {
+//        calcLocalSlave();
+    }
+
+    return *localSlavePtr_;
+}
+
+Foam::normalContactModel&
+Foam::solidGeneralContactFvPatchVectorField::normalModel(const label shadowI)
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("normalModel(const label shadowI)")
+            << "Only the local slave can call the contact model"
+            << abort(FatalError);
+    }
+
+    if (normalModels_.empty())
+    {
+        //calcNormalModels();
+    }
+
+    return normalModels_[shadowI];
+}
+
+
+const Foam::normalContactModel&
+Foam::solidGeneralContactFvPatchVectorField::normalModel
+(
+    const label shadowI
+) const
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("normalModel(const label shadowI)")
+            << "Only the local slave can call the contact model"
+            << abort(FatalError);
+    }
+
+    if (normalModels_.empty())
+    {
+        //calcNormalModels();
+    }
+
+    return normalModels_[shadowI];
+}
+
+Foam::frictionContactModel&
+Foam::solidGeneralContactFvPatchVectorField::frictionModel(const label shadowI)
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("frictionModel(const label shadowI)")
+            << "Only the local slave can call the contact model"
+            << abort(FatalError);
+    }
+
+    if (frictionModels_.empty())
+    {
+        //calcFrictionModels();
+    }
+
+    return frictionModels_[shadowI];
+}
+
+
+const Foam::frictionContactModel&
+Foam::solidGeneralContactFvPatchVectorField::frictionModel
+(
+    const label shadowI
+) const
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("frictionModel(const label shadowI)")
+            << "Only the local slave can call the contact model"
+            << abort(FatalError);
+    }
+
+    if (frictionModels_.empty())
+    {
+        //calcFrictionModels();
+    }
+
+    return frictionModels_[shadowI];
+}
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
