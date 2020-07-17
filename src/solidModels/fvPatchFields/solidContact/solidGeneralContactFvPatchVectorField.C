@@ -2100,18 +2100,23 @@ tmp<scalarField> solidGeneralContactFvPatchVectorField::Qc() const
 // Write
 void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
 {
-  //Info << "writing..."<<flush;
+  Info << "solidGeneralContactFvPatchVectorField::write..." << endl;
   
   //****************************START general***************************************//
   
-  directionMixedFvPatchVectorField::write(os);      //solidTractionFvPatchVectorField::write(os);
+  directionMixedFvPatchVectorField::write(os);    
 
-    os.writeKeyword("rigidMaster")
+   os.writeKeyword("rigidMaster")
         << rigidMaster_ << token::END_STATEMENT << nl;
 
     // Write the dict from the first contact model
 
     const label shadowI = 0;
+
+    if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
+        FatalError  << "solidGeneralContactFvPatchVectorField::write: localSlavePtr_ NOT defined:" 
+                    << "Cannot write slave information because no slave identified!"  
+                    << exit(FatalError);;
 
     if (localSlave()[shadowI])
     {
