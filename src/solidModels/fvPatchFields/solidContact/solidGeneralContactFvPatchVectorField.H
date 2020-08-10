@@ -247,7 +247,7 @@ class solidGeneralContactFvPatchVectorField
         bool movingMesh() const;
 
         //- Move the master and slave zones to the deformed configuration
-        void moveZonesToDeformedConfiguration();
+        void moveFaceZonesToDeformedConfiguration();
 
         //- Check global master patch
         void calcGlobalMaster() const;

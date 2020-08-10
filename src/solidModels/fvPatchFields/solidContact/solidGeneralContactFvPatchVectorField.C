@@ -65,7 +65,7 @@ bool Foam::solidGeneralContactFvPatchVectorField::movingMesh() const
 }
 
 void Foam::solidGeneralContactFvPatchVectorField::
-moveZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration 
+moveFaceZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration 
 {
     // Only the master moves the zones
     if (!globalMaster())
@@ -182,6 +182,30 @@ moveZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration
         }
         const_cast<pointField&>(shadowZone(shadowI).points()) =
             shadowZoneNewPoints;
+    }
+}
+
+void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMaster() const   //// CHECK method to calculate global master
+{
+    if (globalMasterPtr_)
+    {
+        FatalErrorIn
+            (
+                "void Foam::solidGeneralContactFvPatchVectorField::"
+                "calcGlobalMaster() const"
+            )   << "globalMasterPtr_ already set" << abort(FatalError);
+    }
+
+    // The global master is the first solidGeneralContact patch i.e. the one
+    // with the lowest patch index
+
+    if (globalMasterIndex() == patch().index())
+    {
+        globalMasterPtr_ = new bool(true);
+    }
+    else
+    {
+        globalMasterPtr_ = new bool(false);
     }
 }
 
