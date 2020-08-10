@@ -209,6 +209,64 @@ void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMaster() const   ///
     }
 }
 
+
+void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMasterIndex() const
+{
+    if (globalMasterIndexPtr_)
+    {
+        FatalErrorIn
+        (
+            "label Foam::solidGeneralContactFvPatchVectorField::"
+            "calcGlobalMasterIndex() const"
+        )   << "globalMasterIndexPtr_ already set" << abort(FatalError);
+    }
+
+    // The global master is the first solidGeneralContact patch i.e. the one
+    // with the lowest patch index
+
+    const volVectorField& field =
+        db().objectRegistry::lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    globalMasterIndexPtr_ = new label(-1);
+    label& gMasterID = *globalMasterIndexPtr_;
+
+    forAll(field.boundaryField(), patchI)
+    {
+        if
+        (
+            field.boundaryField()[patchI].type()
+            == solidGeneralContactFvPatchVectorField::typeName
+        )
+        {
+            gMasterID = patchI;
+
+            break;
+        }
+    }
+
+    // Check there is only one global master
+
+    label GMasterID = returnReduce(gMasterID, maxOp<label>());
+
+    if (gMasterID != GMasterID)
+    {
+        FatalErrorIn
+        (
+            "solidGeneralContactFvPatchVectorField::"
+            "calcGlobalMasterIndex() const"
+        )   << "There are multiple global masters" << abort(FatalError);
+    }
+
+    if (debug)
+    {
+        Pout<< nl << "The global master contact patch is "
+            << patch().boundaryMesh()[gMasterID].name() << endl;
+    }
+}
+
 /* void Foam::solidGeneralContactFvPatchVectorField::calcShadowZoneNames() const
 {
     if (shadowZoneNamesPtr_ || shadowZoneIndicesPtr_)
