@@ -267,6 +267,46 @@ void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMasterIndex() const
     }
 }
 
+
+void Foam::solidGeneralContactFvPatchVectorField::calcLocalSlave() const
+{
+    if (localSlavePtr_)
+    {
+        FatalErrorIn
+        (
+            "label Foam::solidGeneralContactFvPatchVectorField::"
+            "calcLocalSlave() const"
+        )   << "localSlavePtr_ already set" << abort(FatalError);
+    }
+
+    localSlavePtr_ = new boolList(shadowPatchNames().size(), false);
+
+    boolList& localSlave = *localSlavePtr_;
+
+    forAll(localSlave, shadowI)
+    {
+        if (patch().index() < shadowPatchIndices()[shadowI])
+        {
+            localSlave[shadowI] = true;
+
+            Info<< "solidGeneralContact: "
+                << shadowPatchNames()[shadowI] << " (master)" << " to "
+                << patch().name() << " (slave)" << endl;
+        }
+    }
+}
+
+const Foam::boolList&
+Foam::solidGeneralContactFvPatchVectorField::localSlave() const
+{
+    if (!localSlavePtr_)
+    {
+        calcLocalSlave();
+    }
+
+    return *localSlavePtr_;
+}
+
 /* void Foam::solidGeneralContactFvPatchVectorField::calcShadowZoneNames() const
 {
     if (shadowZoneNamesPtr_ || shadowZoneIndicesPtr_)
@@ -2495,7 +2535,7 @@ Foam::solidGeneralContactFvPatchVectorField::shadowPatchIndices() const
     return *shadowPatchIndicesPtr_;
 }
 
-const Foam::boolList&
+/* const Foam::boolList&
 Foam::solidGeneralContactFvPatchVectorField::localSlave() const
 {
     if (!localSlavePtr_)
@@ -2504,7 +2544,7 @@ Foam::solidGeneralContactFvPatchVectorField::localSlave() const
     }
 
     return *localSlavePtr_;
-}
+} */
 
 Foam::normalContactModel&
 Foam::solidGeneralContactFvPatchVectorField::normalModel(const label shadowI)
