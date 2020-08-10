@@ -134,6 +134,12 @@ class solidGeneralContactFvPatchVectorField
 		// CHECK inherited from solidTractionFvPatchVectorField 
 		mutable label zoneIndex_;  
 		
+		//- List of shadow zone names
+        mutable List<word>* shadowZoneNamesPtr_;
+
+        //- List of shadow zone indices
+        mutable List<label>* shadowZoneIndicesPtr_;
+		
 	// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //	
 
         //- Name of the displacement field

@@ -307,7 +307,72 @@ Foam::solidGeneralContactFvPatchVectorField::localSlave() const
     return *localSlavePtr_;
 }
 
-/* void Foam::solidGeneralContactFvPatchVectorField::calcShadowZoneNames() const
+void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
+{
+    if (shadowPatchNamesPtr_ || shadowPatchIndicesPtr_)
+    {
+        FatalErrorIn
+        (
+            "label Foam::solidGeneralContactFvPatchVectorField::"
+            "calcShadowPatchNames() const"
+        )   << "shadowPatchNames_ or shadowPatchIndices_ already set"
+            << abort(FatalError);
+    }
+
+    // Add each solidGeneralContact patch in the order of increasing patch index
+
+    const volVectorField& field =
+        db().objectRegistry::lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    // Count shadow patches
+
+    label nShadPatches = 0;
+
+    forAll(field.boundaryField(), patchI)
+    {
+        if
+        (
+            field.boundaryField()[patchI].type()
+            == solidGeneralContactFvPatchVectorField::typeName
+            && patchI != patch().index()
+        )
+        {
+            nShadPatches++;
+        }
+    }
+
+    shadowPatchNamesPtr_ = new wordList(nShadPatches);
+    wordList& shadowPatchNames = *shadowPatchNamesPtr_;
+
+    shadowPatchIndicesPtr_ = new labelList(nShadPatches);
+    labelList& shadowPatchIndices = *shadowPatchIndicesPtr_;
+
+    // Record shadow patch names
+
+    label shadowI = 0;
+
+    forAll(field.boundaryField(), patchI)
+    {
+        if
+        (
+            field.boundaryField()[patchI].type()
+            == solidGeneralContactFvPatchVectorField::typeName
+            && patchI != patch().index()
+        )
+        {
+            shadowPatchNames[shadowI] = patch().boundaryMesh()[patchI].name();
+
+            shadowPatchIndices[shadowI++] = patchI;
+        }
+    }
+}
+
+
+
+ void Foam::solidGeneralContactFvPatchVectorField::calcShadowZoneNames() const
 {
     if (shadowZoneNamesPtr_ || shadowZoneIndicesPtr_)
     {
@@ -347,7 +412,7 @@ Foam::solidGeneralContactFvPatchVectorField::localSlave() const
 
         shadowZoneIndices[shadowI] = zone.index();
     }
-} */
+} 
 // *************************************** END general ****************************
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
