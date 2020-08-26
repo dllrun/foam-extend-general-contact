@@ -695,9 +695,10 @@ public:
 
 } // End namespace Foam
 
-// #ifdef NoRepository
-// #   include "solidGeneralContactFvPatchVectorFieldTemplates.C"
-// #endif 
+#ifdef NoRepository
+#   include "solidGeneralContactFvPatchVectorFieldTemplates.C"
+#endif
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

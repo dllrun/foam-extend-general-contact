@@ -1422,6 +1422,187 @@ Foam::solidGeneralContactFvPatchVectorField::
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+const Foam::List<Foam::label>&
+Foam::solidGeneralContactFvPatchVectorField::shadowZoneIndices() const
+{
+    if (!shadowZoneIndicesPtr_)
+    {
+        calcShadowZoneNames();
+    }
+
+    return *shadowZoneIndicesPtr_;
+}
+
+Foam::label Foam::solidGeneralContactFvPatchVectorField::globalMasterIndex()
+const
+{
+    if (!globalMasterIndexPtr_)
+    {
+        calcGlobalMasterIndex();
+    }
+
+    return *globalMasterIndexPtr_;
+}
+
+const Foam::List<Foam::word>&
+Foam::solidGeneralContactFvPatchVectorField::shadowPatchNames() const
+{
+    if (!shadowPatchNamesPtr_)
+    {
+        calcShadowPatchNames();
+    }
+
+    return *shadowPatchNamesPtr_;
+}
+
+
+Foam::label Foam::solidGeneralContactFvPatchVectorField::zoneIndex() const
+{
+    if (zoneIndex_ == -1)
+    {
+        calcZoneIndex();
+    }
+
+    return zoneIndex_;
+}
+
+
+const Foam::standAlonePatch&
+Foam::solidGeneralContactFvPatchVectorField::zone() const
+{
+    if (!zonePtr_)
+    {
+        calcZone();
+    }
+
+    return *zonePtr_;
+}
+
+
+Foam::standAlonePatch& Foam::solidGeneralContactFvPatchVectorField::zone()
+{
+    if (!zonePtr_)
+    {
+        calcZone();
+    }
+
+    return *zonePtr_;
+}
+
+
+const Foam::standAlonePatch&
+Foam::solidGeneralContactFvPatchVectorField::shadowZone
+(
+    const label shadowI
+) const
+{
+    const volVectorField& field =
+        db().objectRegistry::lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    const solidGeneralContactFvPatchVectorField& shadowPatchField =
+        refCast<const solidGeneralContactFvPatchVectorField>
+        (
+            field.boundaryField()[shadowPatchIndices()[shadowI]]
+        );
+
+    return shadowPatchField.zone();
+}
+
+
+Foam::standAlonePatch&
+Foam::solidGeneralContactFvPatchVectorField::shadowZone
+(
+    const label shadowI
+)
+{
+    const volVectorField& field =
+        db().objectRegistry::lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    // Const cast away the const-ness
+    solidGeneralContactFvPatchVectorField& shadowPatchField =
+        const_cast<solidGeneralContactFvPatchVectorField&>
+        (
+            refCast<const solidGeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[shadowPatchIndices()[shadowI]]
+            )
+        );
+
+    return shadowPatchField.zone();
+}
+
+void Foam::solidGeneralContactFvPatchVectorField::calcZone() const
+{
+    if (zonePtr_)
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::calcZone() const"
+        )   << "zonePtr_ already set" << abort(FatalError);
+    }
+
+    const fvMesh& mesh = patch().boundaryMesh().mesh();
+
+    // Note: the main mesh will either be in the initial configuration or the
+    // updated configuration
+    zonePtr_ =
+        new standAlonePatch
+        (
+            mesh.faceZones()[zoneIndex()]().localFaces(),
+            mesh.faceZones()[zoneIndex()]().localPoints()
+        );
+}
+
+
+bool Foam::solidGeneralContactFvPatchVectorField::globalMaster() const
+{
+    if (!globalMasterPtr_)
+    {
+        calcGlobalMaster();
+    }
+
+    return *globalMasterPtr_;
+}
+
+
+void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex() const
+{
+    if (zoneIndex_ != -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex()"
+            "const"
+        )   << "zoneIndex_ already set" << abort(FatalError);
+    }
+
+    const fvMesh& mesh = patch().boundaryMesh().mesh();
+
+    word zoneName = patch().name() + "FaceZone";
+
+    faceZoneID zone(zoneName, mesh.faceZones());
+
+    if (!zone.active())
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex()"
+            "const"
+        )   << "Face zone name " << zoneName
+            << " not found.  Please check your zone definition." << nl
+            << "Current faceZones are:" << mesh.faceZones().names()
+            << abort(FatalError);
+    }
+
+    zoneIndex_ = zone.index();
+}
+
 // Map from self
 void solidGeneralContactFvPatchVectorField::autoMap
 (
