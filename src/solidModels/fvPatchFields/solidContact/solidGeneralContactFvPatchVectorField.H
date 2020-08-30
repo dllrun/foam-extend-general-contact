@@ -51,7 +51,8 @@ Author
 #define solidGeneralContactFvPatchVectorField_H		  //2. check name
 
 #include "fvPatchFields.H"
-#include "directionMixedFvPatchFields.H"		  //try multiple inheritance if this doesn't work (with solidTractionFvPatchVectorField.H)
+//#include "directionMixedFvPatchFields.H"		  //try multiple inheritance if this doesn't work (with solidTractionFvPatchVectorField.H)
+#include "solidTractionFvPatchVectorField.H"
 #include "nonLinearGeometry.H"
 #include "normalContactModel.H"
 #include "frictionContactModel.H"
@@ -73,7 +74,7 @@ namespace Foam
 
 class solidGeneralContactFvPatchVectorField
 :
-    public directionMixedFvPatchVectorField  // non-orthogonal (grid points) correction for diffusion term 
+    public solidTractionFvPatchVectorField //directionMixedFvPatchVectorField  // non-orthogonal (grid points) correction for diffusion term 
 {
     // Private data
 	

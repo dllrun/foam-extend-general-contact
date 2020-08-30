@@ -192,6 +192,11 @@ public:
             const word nonLinear,
             const vectorField& slaveFaceNormals
         ) = 0;
+		
+		
+		//- It is the start of a new time step
+        virtual void newTimeStep() const
+        {}
 
         //- Return slave friction displacement
         virtual const vectorField& slaveDisp() const = 0;

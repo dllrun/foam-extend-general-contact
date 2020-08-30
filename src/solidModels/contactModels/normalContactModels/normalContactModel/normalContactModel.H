@@ -216,6 +216,11 @@ public:
                               PrimitivePatch< face, List, pointField >
                               >* ggiInterpolatorPtr
             ) = 0;
+			
+			
+		//- It is the start of a new time step
+        virtual void newTimeStep() const
+        {}
 
         //- Return slave displacement
         virtual const vectorField& slaveDisp() const = 0;

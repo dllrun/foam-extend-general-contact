@@ -445,7 +445,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 	// *************************************** END general ****************************
 
 // CHECK // initializing the base constructor explicitly with initialisation list 
-    directionMixedFvPatchVectorField(p, iF),  // CHECK // i.e. calling the parameterized constructor needs to be done explicitely
+    solidTractionFvPatchVectorField(p, iF),  // CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     fieldName_("undefined"),
     master_("undefined"),
     contactActive_(false),
@@ -508,7 +508,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 :	// ******************************************** START General *****************************************
 	
 //	solidTractionFvPatchVectorField(ptf, p, iF, mapper),
-    directionMixedFvPatchVectorField(ptf, p, iF, mapper), // CHECK // i.e. calling the parameterized constructor needs to be done explicitely
+    solidTractionFvPatchVectorField(ptf, p, iF, mapper), // CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
     localSlavePtr_(NULL),
@@ -701,7 +701,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 	// ********************************************** END General ********************************************
 	
 	// only the master reads the properties
-    directionMixedFvPatchVectorField(p, iF),	// CHECK // i.e. calling the parameterized constructor needs to be done explicitely
+    solidTractionFvPatchVectorField(p, iF),	// CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     fieldName_(dimensionedInternalField().name()),
     master_
     (
@@ -884,7 +884,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
             patchInternalField() + gradient()/patch().deltaCoeffs()
         );
     } */
-//}
+}
 	
 	// ********************************************** END General ********************************************
 	
@@ -893,7 +893,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
      //   << endl;
 
     // check shadow patch exists
-    if (shadowPatchID_ == -1)
+/*    if (shadowPatchID_ == -1)
     {
         FatalError
             << "\nCannot find shadowPatch called " << dict.lookup("shadowPatch")
@@ -1097,6 +1097,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         Field<vector>::operator=(normalValue + transformGradValue);
     }
 }
+*/
+
 
 //******************************************** START General ******************************************** 
 solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
@@ -1105,7 +1107,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 )
 :
  //   solidTractionFvPatchVectorField(ptf),
-	directionMixedFvPatchVectorField(ptf),
+	solidTractionFvPatchVectorField(ptf),
     globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
 	masterFaceZoneID_(0),
@@ -1251,7 +1253,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
 	//**************************************************** END General**********************************************
 	
-    directionMixedFvPatchVectorField(ptf, iF),		// CHECK // i.e. calling the parameterized constructor needs to be done explicitely
+    solidTractionFvPatchVectorField(ptf, iF),		// CHECK // i.e. calling the parameterized constructor needs to be done explicitely
     fieldName_(ptf.fieldName_),
     master_(ptf.master_),
     contactActive_(ptf.contactActive_),
@@ -1631,7 +1633,7 @@ void Foam::solidGeneralContactFvPatchVectorField::autoMap
         ")"
     )   << "member mapping not implemented" << endl;
 
-    directionMixedFvPatchVectorField::autoMap(m);
+    solidTractionFvPatchVectorField::autoMap(m);
 }
 
 
@@ -1651,7 +1653,7 @@ void Foam::solidGeneralContactFvPatchVectorField::rmap
         ")"
     )   << "member mapping not implemented" << endl;
 	
-    directionMixedFvPatchVectorField::rmap(ptf, addr);
+    solidTractionFvPatchVectorField::rmap(ptf, addr);
 
     // not sure if pointers are mapped correctly
     // be careful when there are topological changes to the patch
@@ -1665,11 +1667,12 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
     {
         return;
     }
-	
+
+//**************************************************** START General**********************************************	
 	boolList activeContactPairs(shadowPatchNames().size(), false);
 	
 	    // if it is a new time step then reset iCorr
-/*    if (curTimeIndex_ != db().time().timeIndex())
+    if (curTimeIndex_ != db().time().timeIndex())
     {
         curTimeIndex_ = db().time().timeIndex();
 
@@ -1689,9 +1692,26 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
             }
         }
     }
-	*/
+	
+	// Method
+    // Move all global face zones to the deformed configuration
+    // Clear interpolator weights
+    // Perform quick check to find potential contacting pairs
+    // Call normal and frction contact models for active contacting pairs
+    // Accumulate contact force contributions for all active contact pairs
 
-    if (contactActive_)
+
+/*    if (rigidMaster_)
+    {
+        // Set to master to traction free to mimic a rigid patch
+        traction() = vector::zero;
+    }	
+*/	
+	
+	
+//**************************************************** END General**********************************************
+
+ /*   if (contactActive_)
     {
         // for the first updateCoeffs, the slave needs to grab the conatct
         // law pointers
@@ -1951,8 +1971,9 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                 incremental
             );
     }
+	*/
 
-    directionMixedFvPatchVectorField::updateCoeffs();
+    solidTractionFvPatchVectorField::updateCoeffs();
 }
 
 
@@ -2348,6 +2369,7 @@ bool solidGeneralContactFvPatchVectorField::checkPatchAndFaceZones
   return true;
 }
 
+/*
 void solidGeneralContactFvPatchVectorField::evaluate(const Pstream::commsTypes)
 {
     if (!this->updated())
@@ -2411,6 +2433,7 @@ snGrad() const
        - (pif + (k&gradField.patchInternalField()))
        )*this->patch().deltaCoeffs();
 }
+*/
 
 
 //* * * * * * * * * * * * * * * * * * * * * * * * * START General  * * * * * * * * * * * * * * * * * * * * *//
@@ -2654,7 +2677,7 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
   
   //****************************START general***************************************//
   
-  directionMixedFvPatchVectorField::write(os);    
+  solidTractionFvPatchVectorField::write(os);    
 
    os.writeKeyword("rigidMaster")
         << rigidMaster_ << token::END_STATEMENT << nl;
@@ -2710,7 +2733,7 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
     }
 	//****************************END general***************************************//
 	
-    // directionMixedFvPatchVectorField::write(os);
+    // solidTractionFvPatchVectorField::write(os);
 
     os.writeKeyword("master") << master_ << token::END_STATEMENT << nl;
     os.writeKeyword("shadowPatch")
