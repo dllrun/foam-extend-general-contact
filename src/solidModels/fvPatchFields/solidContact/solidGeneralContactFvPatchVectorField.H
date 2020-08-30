@@ -505,13 +505,13 @@ public:
             //- Return reference to deformed master zone
             standAlonePatch& shadowZone(const label shadowI);
 
-            //- Return const reference to patch-to-patch interpolation
-            const primitivePatchInterpolation& zoneToZone
+            //- Return const reference to patch-to-patch interpolation (Replacement of newGgiStandAlonePatchInterpolation)
+            const primitivePatchInterpolation& zoneToZone				
             (
                 const label shadowI
             ) const;
 
-            //- Return reference to patch-to-patch interpolation
+            //- Return reference to patch-to-patch interpolation (Replacement of newGgiStandAlonePatchInterpolation class)
             primitivePatchInterpolation& zoneToZone
             (
                 const label shadowI

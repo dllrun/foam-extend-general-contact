@@ -1701,277 +1701,311 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
     // Accumulate contact force contributions for all active contact pairs
 
 
-/*    if (rigidMaster_)
+    if (rigidMaster_)
     {
         // Set to master to traction free to mimic a rigid patch
         traction() = vector::zero;
     }	
-*/	
-	
+	else
+    {
+	// Move all global face zones to the deformed configuration
+        if (globalMaster())
+        {
+           // Move the master and slave zone to the deformed configuration
+            moveFaceZonesToDeformedConfiguration();
+        }
+
+//*************************************** ERROR (NoMatchingFunctionForCall.png) *************************************
+	/*	// Clear interpolator weights
+
+        forAll(activeContactPairs, slaveI)
+        {
+            if (localSlave()[slaveI])
+            {
+                zoneToZone(slaveI).movePoints
+                (
+                    tensorField(0), tensorField(0), vectorField(0)
+                );
+            }
+        }
+		*/
+//*************************************** ERROR (NoMatchingFunctionForCall.png) **************************************
+
+		// Accumulated traction for the current patch
+        vectorField curPatchTraction(patch().size(), vector::zero);
+		
+		// Only the local masters calculates the contact force and the local
+        // master interpolates this force
+        const boolList& locSlave = localSlave();
+
+        // Create master bounding box used for quick check
+        boundBox masterBb(zone().localPoints(), false);
+
+        // The BB may have zero thickness in one of the directions e.g. for a
+        // flat patch, so we will check for this and, if found, create an offset
+        const scalar bbOff = bbOffset();
+		if (masterBb.minDim() < bbOff)
+        {
+            const vector bbDiag = masterBb.max() - masterBb.min();
+
+            if (bbDiag.x() < bbOff)
+            {
+                vector offset(bbOff, 0, 0);
+                masterBb.min() -= offset;
+                masterBb.max() += offset;
+            }
+            else if (bbDiag.y() < bbOff)
+            {
+                vector offset(0, bbOff, 0);
+                masterBb.min() -= offset;
+                masterBb.max() += offset;
+            }
+            else if (bbDiag.z() < bbOff)
+            {
+                vector offset(0, 0, bbOff);
+                masterBb.min() -= offset;
+                masterBb.max() += offset;
+            }
+        }
+		
+		forAll(activeContactPairs, shadowI)
+        {
+            // Perform quick check to find potential contacting pairs
+            // The quick check is based on the bounding box (BB) of the contact
+            // pairs: if the BBs of pair intersect then we will designate the
+            // pair as active.
+			
+			// Create shadow bounding box
+            boundBox shadowBb(shadowZone(shadowI).localPoints(), false);
+			
+			// Check for a zero dimension in the shadowBb
+            if (shadowBb.minDim() < bbOff)
+            {
+                const vector bbDiag = shadowBb.max() - shadowBb.min();
+
+                if (bbDiag.x() < bbOff)
+                {
+                    vector offset(bbOff, 0, 0);
+                    shadowBb.min() -= offset;
+                    shadowBb.max() += offset;
+                }
+                else if (bbDiag.y() < bbOff)
+                {
+                    vector offset(0, bbOff, 0);
+                    shadowBb.min() -= offset;
+                    shadowBb.max() += offset;
+                }
+                else if (bbDiag.z() < bbOff)
+                {
+                    vector offset(0, 0, bbOff);
+                    shadowBb.min() -= offset;
+                    shadowBb.max() += offset;
+                }
+            }
+			
+			if (masterBb.overlaps(shadowBb))
+            {
+                activeContactPairs[shadowI] = true;
+            }
+			
+			// Call normal and frction contact models for active contacting
+            // pairs
+            // Accumulate contact force contributions for all active contact
+            // pairs
+
+            if (activeContactPairs[shadowI])
+            {
+				if (locSlave[shadowI])
+                {
+                    // Correct normal and friction contact models for the
+                    // current contact pair
+
+                    // Calculate the slave patch face unit normals as they are
+                    // units by both the normal and friction models
+					const vectorField shadowPatchFaceNormals =
+                        patchField
+                        (
+                            shadowPatchIndices()[shadowI],
+                            shadowZoneIndices()[shadowI],
+                            shadowZone(shadowI).faceNormals()
+                        );
+
+                    // Interpolate the master displacement increment to the
+                    // slave patch as it is required by specific normal and
+                    // friction contact models
+
+                    vectorField patchDD(patch().size(), vector::zero);
+                    vectorField shadowPatchDD
+                    (
+                        patch().boundaryMesh()
+                        [
+                            shadowPatchIndices()[shadowI]
+                        ].size(),
+                        vector::zero
+                    );
+					
+					if (movingMesh())
+                    {
+                        // Updated Lagrangian, we will directly lookup the
+                        // displacement increment
+
+                        const volVectorField& DD =
+                            db().lookupObject<volVectorField>("DU");
+
+                        patchDD = DD.boundaryField()[patch().index()];
+                        shadowPatchDD =
+                            DD.boundaryField()[shadowPatchIndices()[shadowI]];
+                    }
+					else
+                    {
+                        // We will lookup the total displacement and old total
+                        // displacement
+
+                        const volVectorField& D =
+                            db().lookupObject<volVectorField>("U");
+
+                        patchDD =
+                            D.boundaryField()[patch().index()]
+                          - D.oldTime().boundaryField()[patch().index()];
+                        shadowPatchDD =
+                            D.boundaryField()[shadowPatchIndices()[shadowI]]
+                          - D.oldTime().boundaryField()
+                            [
+                                shadowPatchIndices()[shadowI]
+                            ];
+                    }
+					
+					// Master zone DD
+                    const vectorField zoneDD =
+                        zoneField
+                        (
+                            zoneIndex(),
+                            patch().index(),
+                            patchDD
+                        );
+					
+					
+					//*********************** start ERROR (primitivePatchInterpolationHasNoMember.png) **************************
+                    /*// Master patch DD interpolated to the slave patch
+                    const vectorField patchDDInterpToShadowPatch =
+                        patchField
+                        (
+                            shadowPatchIndices()[shadowI],
+                            shadowZoneIndices()[shadowI],
+                            zoneToZone(shadowI).masterToSlave(zoneDD)()
+                        );
+						*/
+					//********************* end ERROR (primitivePatchInterpolationHasNoMember.png) *****************************
+					
+					
+					FatalError
+                        << "Disabled: use jasakSolidContact" << abort(FatalError);
+                    // normalModel(shadowI).correct
+                    // (
+                    //     shadowPatchFaceNormals,
+                    //     zoneToZone(shadowI),
+                    //     shadowPatchDD,
+                    //     patchDDInterpToShadowPatch
+                    // );
+					
+					// *********** start ERROR(patchDDInterpToShadowPatch was not declared in this scope)*************
+					/*
+					frictionModel(shadowI).correct
+                    (
+                        normalModel(shadowI).slavePressure(),
+                        shadowPatchFaceNormals,
+                        normalModel(shadowI).areaInContact(),
+                        shadowPatchDD,
+                        patchDDInterpToShadowPatch
+                    );
+					*/
+					// *********** end ERROR(patchDDInterpToShadowPatch was not declared in this scope)*************
+					
+					// Accumulate traction
+
+                    curPatchTractions(shadowI) =
+                        frictionModel(shadowI).slaveTraction()
+                        + normalModel(shadowI).slavePressure();
+
+                    curPatchTraction += curPatchTractions(shadowI);
+				}
+
+				else // local master
+                {
+					// Get traction from local slave
+
+                    const volVectorField& field =
+                        db().lookupObject<volVectorField>
+                        (
+                            dimensionedInternalField().name()
+                        );
+						
+					const solidGeneralContactFvPatchVectorField&
+                        localMasterField =
+                        refCast<const solidGeneralContactFvPatchVectorField>
+                        (
+                            field.boundaryField()
+                            [
+                                shadowPatchIndices()[shadowI]
+                            ]
+                        );
+						
+					const label masterShadowI =
+                        localMasterField.findShadowID(patch().index());
+
+                    vectorField shadowPatchTraction =
+                        -localMasterField.frictionModel
+                        (
+                            masterShadowI
+                        ).slaveTractionForMaster()
+                        -localMasterField.normalModel
+                        (
+                            masterShadowI
+                        ).slavePressure();
+
+                    vectorField shadowZoneTraction =
+                        zoneField
+                        (
+                            shadowZoneIndices()[shadowI],
+                            shadowPatchIndices()[shadowI],
+                            shadowPatchTraction
+                        );
+				
+					// Face-to-face
+					//********************** start ERROR (primitivePatchInterpolationHasNoMember.png) ***********************
+                    /*vectorField masterZoneTraction =
+                        localMasterField.zoneToZone
+                        (
+                            masterShadowI
+                        ).slaveToMaster(shadowZoneTraction);
+						*/
+					
+					//*********************** end ERROR (primitivePatchInterpolationHasNoMember.png) ************************
+
+                    // We store master patch traction as thermalGeneralContact
+                    // uses it
+					//*********************** start ERROR (masterZoneTraction not declared in scope) ************************
+                    /*curPatchTractions(shadowI) =
+                        patchField
+                        (
+                            patch().index(),
+                            zoneIndex(),
+                            masterZoneTraction
+                        );
+					*/
+					//*********************** start ERROR (masterZoneTraction not declared in scope) ************************
+					
+                    curPatchTraction += curPatchTractions(shadowI);
+				}				
+			} // if contact pair is active
+		} // forAll contact pairs
+		
+		// Set master gradient based on accumulated traction
+        traction() = curPatchTraction;
+	}
 	
 //**************************************************** END General**********************************************
 
- /*   if (contactActive_)
-    {
-        // for the first updateCoeffs, the slave needs to grab the conatct
-        // law pointers
-        if (!normalContactModelPtr_)
-        {
-            if (!master_)
-            {
-                // grab pointers
-                const volVectorField& Ufield =
-                    this->db().objectRegistry::lookupObject<volVectorField>
-                    (
-                        fieldName_
-                        );
-
-                const solidGeneralContactFvPatchVectorField& Upatch =
-                    refCast<const solidGeneralContactFvPatchVectorField>
-                    (
-                        Ufield.boundaryField()[shadowPatchID_]
-                        );
-                //Info<< "\tSlave contact patch " << patch().name()
-                //    << " grabbing normalContactModel pointer from master"
-                //    << endl;
-                normalContactModelPtr_ = Upatch.normalContactModelPtr();
-                if (!normalContactModelPtr_)
-                {
-                    FatalError
-                        << "\nThe patch " << patch().name()
-                        << " has a NULL normalContactModel pointer!"
-                        << exit(FatalError);
-                }
-
-                //Info<< "\tSlave contact patch " << patch().name()
-                //    << " grabbing frictionContactModel pointer from master"
-                //    << endl;
-                frictionContactModelPtr_ = Upatch.frictionContactModelPtr();
-                if (!frictionContactModelPtr_)
-                {
-                    FatalError
-                        << "\nThe patch " << patch().name()
-                        << " has a NULL frictionContactModel pointer!"
-                        << exit(FatalError);
-                }
-
-                // lookup master's correction frequency
-                correctionFreq_ = Upatch.correctionFreq();
-
-                // get face zone patch pointers
-                masterFaceZonePatchPtr_ = Upatch.masterFaceZonePatchPtr();
-                slaveFaceZonePatchPtr_ = Upatch.slaveFaceZonePatchPtr();
-
-                // get patchToPatch and GGI interpolator pointers
-                // one of them is NULL
-                slaveToMasterGgiInterpolatorPtr_ =
-                    Upatch.slaveToMasterGgiInterpolatorPtr();
-                slaveToMasterPatchToPatchInterpolatorPtr_ =
-                    Upatch.slaveToMasterPatchToPatchInterpolatorPtr();
-            }
-            else
-            {
-                FatalErrorIn("solidGeneralContactFvPatchVectorField::updateCoeff()")
-                    << "NULL contactLaw\ncontactLaw not created by master."
-                    << abort(FatalError);
-            }
-        }
-
-        // if it is a new time step then reset iCorr
-        if (curTimeIndex_ != this->db().time().timeIndex())
-        {
-            curTimeIndex_ = this->db().time().timeIndex();
-            iCorr_ = 0;
-
-            // update old face zone points
-            if (master_ && nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
-            {
-                oldMasterFaceZonePoints_ =
-                    masterFaceZonePatchPtr_->localPoints();
-                oldSlaveFaceZonePoints_ =
-                    slaveFaceZonePatchPtr_->localPoints();
-            }
-        }
-
-        // the time taken to correct the contact may not be negligible
-        // so reduce the correctiion frequency can speed up the simulation
-        if (iCorr_++ % correctionFreq_ == 0
-            || forceCorrection_ )
-        {
-            forceCorrection_ = false;
-
-            // master moves faceZone patches to the current deformed position
-            if (master_)
-            {
-                moveFaceZonePatches();
-            }
-
-            // just one of the patches updates the interpolators and
-            // corrects the contact laws
-            if (master_)
-            {
-                // update interpolation classes
-                if (!rigidMaster_)
-                {
-                    if (slaveToMasterGgiInterpolatorPtr_)
-                    {
-                        slaveToMasterGgiInterpolatorPtr_->movePoints
-                        (
-                            tensorField(0),
-                            tensorField(0),
-                            vectorField(0)
-                        );
-                    }
-                    else if (slaveToMasterPatchToPatchInterpolatorPtr_)
-                    {
-                        slaveToMasterPatchToPatchInterpolatorPtr_->movePoints();
-                    }
-                    else
-                    {
-                        FatalErrorIn("solidGeneralContactFvPatchVectorField::"
-                                     "updateCoeff()")
-                            << "Neither patchToPatch or GGI interpolator found!"
-                            << abort(FatalError);
-                    }
-                }
-
-                // correct laws
-                // the normal model sets what face normal to use
-                // on the slave e.g. use actual face normals, or master normals
-                // interpolated to the slave, undeformed/deformed normals.
-                // the friction model then uses these face normals
-                vectorField slaveFaceNormals
-                    (
-                        patch().boundaryMesh().mesh().boundary()
-                        [shadowPatchID_].size(),
-                        vector::zero
-                        );
-
-                normalContactModelPtr_->correct
-                    (
-                        *masterFaceZonePatchPtr_,
-                        *slaveFaceZonePatchPtr_,
-                        alg_,
-                        dir_,
-                        fieldName_,
-                        orthotropic_,
-                        nonLinearGeometry::nonLinearNames_[nonLinear_],
-                        slaveFaceNormals,
-                        slaveToMasterGgiInterpolatorPtr_
-                        );
-
-                frictionContactModelPtr_->correct
-                    (
-                        normalContactModelPtr_->slavePressure(),
-                        *masterFaceZonePatchPtr_,
-                        *slaveFaceZonePatchPtr_,
-                        alg_,
-                        dir_,
-                        interpolationMethod_,
-                        fieldName_,
-                        orthotropic_,
-                        nonLinearGeometry::nonLinearNames_[nonLinear_],
-                        slaveFaceNormals
-                        );
-            }
-
-            // set boundary conditions
-            bool incremental(fieldName_ == "DU");
-
-            if (!master_)
-            {
-                // set refValue, refGrad and valueFraction
-
-                // refValue
-                refValue() =
-                    normalContactModelPtr_->slaveDisp()
-                    + frictionContactModelPtr_->slaveDisp();
-
-                //refGrad - set traction
-                refGrad() =
-                    tractionBoundaryGradient::snGrad
-                    (
-                        frictionContactModelPtr_->slaveTraction()
-                        + normalContactModelPtr_->slavePressure(),
-                        scalarField(patch().size(),0.0),
-                        fieldName_,
-                        "U",
-                        patch(),
-                        orthotropic_,
-                        nonLinear_,
-                        incremental
-                    );
-
-                //valueFraction
-                valueFraction() =
-                    normalContactModelPtr_->slaveValueFrac()
-                    + frictionContactModelPtr_->slaveValueFrac();
-            }
-            else
-            {
-                // master is always traction condition
-                // interpolate traction from slave
-                // Dirichlet-Neumann uses lagged traction
-                // penalty uses same as for slave traction
-
-                if (rigidMaster_)
-                {
-                    // set to master to traction free if it is rigid
-                    refGrad() =
-                        tractionBoundaryGradient::snGrad
-                        (
-                            vectorField(patch().size(),vector::zero),
-                            scalarField(patch().size(),0.0),
-                            fieldName_,
-                            "U",
-                            patch(),
-                            orthotropic_,
-                            nonLinear_,
-                            incremental
-                        );
-                }
-                else
-                {
-                    refGrad() = tractionBoundaryGradient::snGrad
-                    (
-                        interpolateSlaveToMaster
-                        (
-                            -frictionContactModelPtr_->slaveTraction()
-                            -normalContactModelPtr_->slavePressure()
-                        ),
-                        scalarField(patch().size(),0.0),
-                        fieldName_,
-                        "U",
-                        patch(),
-                        orthotropic_,
-                        nonLinear_,
-                        incremental
-                    );
-                }
-            }
-        } // if correction freqeuncy
-    } // if contactActive
-
-    // if the contact is not active then the patches behave as traction free
-    else
-    {
-        // set refGrad to traction free for master and slave
-        bool incremental(fieldName_ == "DU");
-
-        refGrad() =
-            tractionBoundaryGradient::snGrad
-            (
-                vectorField(patch().size(),vector::zero),
-                scalarField(patch().size(),0.0),
-                fieldName_,
-                "U",
-                patch(),
-                orthotropic_,
-                nonLinear_,
-                incremental
-            );
-    }
-	*/
 
     solidTractionFvPatchVectorField::updateCoeffs();
 }
@@ -2445,7 +2479,7 @@ const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc
 {
     if (!QcsPtr_)
     {
- //       calcQcs();
+        calcQcs();
     }
 
     return (*QcsPtr_)[shadowI];
@@ -2456,7 +2490,7 @@ const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc() const
 {
     if (!QcPtr_)
     {
-//        calcQc();
+        calcQc();
     }
 
     return *QcPtr_;
@@ -2572,102 +2606,77 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
     }
 	*/
 }
-// * * * * * * * * * * * * * * * * * * * * * * END General * * * * * * * * * * * * * * * * * * * * //
 
-/* //- Increment of dissipated energy due to friction
-tmp<scalarField> solidGeneralContactFvPatchVectorField::Qc() const
+void Foam::solidGeneralContactFvPatchVectorField::calcBbOffset() const
 {
-    tmp<scalarField> tQc(new scalarField(patch().size(), 0.0));
-    scalarField& Qc = tQc();
-
-    // Integrate energy using trapezoidal rule
-    // 0.5*averageForce*incrementOfDisplacement
-
-    // displacement increment
-    const vectorField& curDU = *this;
-
-    // average force
-    const fvPatchField<tensor>& gradField =
-        patch().lookupPatchField<volTensorField, tensor>
-        (
-            "grad(" + fieldName_ + ")"
-        );
-
-    // current Cauchy traction for nonlinear
-    bool incremental(fieldName_ == "DU");
-
-    const vectorField curTrac =
-        tractionBoundaryGradient::traction
-        (
-            gradField,
-            fieldName_,
-            "U",
-            patch(),
-            orthotropic_,
-            nonLinear_,
-            incremental
-        );
-
-    vectorField Sf = patch().Sf();
-    if
-    (
-        nonLinear_ != nonLinearGeometry::OFF
-     && nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN
-    )
+    if (bbOffset_ != 0)
     {
-        // current areas
-        const fvPatchField<tensor>& gradU =
-            patch().lookupPatchField<volTensorField, tensor>("grad(U)");
-        tensorField F = I + gradField + gradU;
-        tensorField Finv = inv(F);
-        scalarField J = det(F);
-        Sf = J*(Finv & Sf);
-    }
-    const scalarField magSf = mag(Sf);
-
-    const vectorField curForce = magSf*curTrac;
-
-    const fvPatchField<symmTensor>& oldSigma =
-        patch().lookupPatchField<volSymmTensorField, symmTensor>("sigma_0");
-
-    vectorField oldSf = patch().Sf();
-    if (nonLinear_ != nonLinearGeometry::OFF)
-    {
-        // current areas
-        //tensorField F = I + gradField;
-        if (nonLinear_ == nonLinearGeometry::TOTAL_LAGRANGIAN)
-        {
-            const fvPatchField<tensor>& gradU =
-                patch().lookupPatchField<volTensorField, tensor>("grad(U)");
-            tensorField F = I + gradU;
-            tensorField Finv = inv(F);
-            scalarField J = det(F);
-            // rotate initial reference area to area of previous time-step
-            oldSf = J*(Finv & Sf);
-        }
-        else if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
-        {
-            tensorField F = I + gradField;
-            tensorField Finv = inv(F);
-            scalarField J = det(F);
-            // rotate current area to area of previous time-step
-            oldSf = (F & Sf)/J;
-        }
-        else
-        {
-            FatalError << "solidContact::Qc() nonLinear type not known!"
-                << exit(FatalError);
-        }
+        FatalErrorIn
+        (
+            "Foam::scalar Foam::solidGeneralContactFvPatchVectorField::"
+            "calcBbOffset() const"
+        )   << "already set" << abort(FatalError);
     }
 
-    const vectorField oldForce = oldSf & oldSigma;
-    const vectorField avForce = 0.5*(oldForce + curForce);
+    // We will set the BB offset to five times the average dimension of the
+    // smallest face on the zone
 
-    // Increment of dissiptaed frictional energy for this timestep
-    Qc = mag(0.5*(avForce & curDU));
+    scalar minDim = GREAT;
 
-    return tQc;
-} */
+    if (patch().size() > 0)
+    {
+        minDim = min(sqrt(patch().magSf()));
+    }
+
+    bbOffset_ = 5.0*returnReduce(minDim, minOp<scalar>());
+
+    if (debug)
+    {
+        Info<< nl << "The bbOffset is " << bbOffset_ << endl;
+    }
+}
+
+Foam::scalar Foam::solidGeneralContactFvPatchVectorField::bbOffset() const
+{
+    if (bbOffset_ == 0)
+    {
+        calcBbOffset();
+    }
+
+    return bbOffset_;
+}
+
+
+const Foam::vectorField&
+Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
+(
+    const label shadowI
+) const
+{
+    if (!curPatchTractionPtr_)
+    {
+        makeCurPatchTractions();
+    }
+
+    return (*curPatchTractionPtr_)[shadowI];
+}
+
+
+Foam::vectorField&
+Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
+(
+    const label shadowI
+)
+{
+    if (!curPatchTractionPtr_)
+    {
+        makeCurPatchTractions();
+    }
+
+    return (*curPatchTractionPtr_)[shadowI];
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * END General * * * * * * * * * * * * * * * * * * * * //
 
 
 // Write
@@ -2733,78 +2742,7 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
     }
 	//****************************END general***************************************//
 	
-    // solidTractionFvPatchVectorField::write(os);
-
-    os.writeKeyword("master") << master_ << token::END_STATEMENT << nl;
-    os.writeKeyword("shadowPatch")
-        << patch().boundaryMesh().mesh().boundary()[shadowPatchID_].name()
-        << token::END_STATEMENT << nl;
-    os.writeKeyword("orthotropic") << orthotropic_
-                                   << token::END_STATEMENT << nl;
-    os.writeKeyword("nonLinear")
-        << nonLinearGeometry::nonLinearNames_[nonLinear_]
-        << token::END_STATEMENT << nl;
-    os.writeKeyword("contactActive")
-        << contactActive_ << token::END_STATEMENT << nl;
-
-    if (master_)
-      {
-        os.writeKeyword("rigidMaster")
-            << rigidMaster_ << token::END_STATEMENT << nl;
-        if (contactActive_)
-          {
-            os.writeKeyword("normalContactModel")
-                << normalContactModelPtr_->type()
-                << token::END_STATEMENT << nl;
-            if (normalContactModelPtr_)
-            {
-                normalContactModelPtr_->writeDict(os);
-            }
-            os.writeKeyword("frictionContactModel")
-                << frictionContactModelPtr_->type()
-                << token::END_STATEMENT << nl;
-            if (frictionContactModelPtr_)
-            {
-                frictionContactModelPtr_->writeDict(os);
-            }
-            os.writeKeyword("interpolationMethod")
-                << interpolationMethod_ << token::END_STATEMENT << nl;
-            os.writeKeyword("projectionAlgo")
-                << intersection::algorithmNames_[alg_]
-                << token::END_STATEMENT << nl;
-            os.writeKeyword("projectionDir")
-                << intersection::directionNames_[dir_]
-                << token::END_STATEMENT << nl;
-            os.writeKeyword("correctionFrequency")
-                << correctionFreq_ << token::END_STATEMENT << nl;
-          }
-      }
-
-    // set stickSlipFieldPtr_, it should be automatically written
-    if (!master_ && contactActive_)
-      {
-        // apologies - I couldn't think of a tidy way to
-        // pass around this field so I cast away the const-ness
-        volScalarField* unConstStickSlipFieldPtr_ =
-          const_cast<volScalarField*>(stickSlipFieldPtr_);
-
-        if (!frictionContactModelPtr_)
-          {
-            // pointer gets dropped sometimes, not sure what the problem is
-            // FatalError << "fricContactModel is NULL for slave"
-            //              << exit(FatalError);
-            Warning << "fricContactModel is NULL for slave" << nl
-                    << "stickSlip field not written"
-                    << endl;
-          }
-        else
-          {
-            unConstStickSlipFieldPtr_->boundaryField()[patch().index()] =
-              frictionContactModelPtr_->stickSlipFaces();
-          }
-      }
-
-    //Info << "done" << endl;
+    
 }
 
 Foam::label Foam::solidGeneralContactFvPatchVectorField::findShadowID
@@ -2940,9 +2878,7 @@ Foam::solidGeneralContactFvPatchVectorField::frictionModel
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-makePatchTypeField(fvPatchVectorField, solidGeneralContactFvPatchVectorField);
-
+makePatchTypeField(fvPatchVectorField, solidGeneralContactFvPatchVectorField)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

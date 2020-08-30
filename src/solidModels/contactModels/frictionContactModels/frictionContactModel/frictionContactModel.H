@@ -194,10 +194,6 @@ public:
         ) = 0;
 		
 		
-		//- It is the start of a new time step
-        virtual void newTimeStep() const
-        {}
-
         //- Return slave friction displacement
         virtual const vectorField& slaveDisp() const = 0;
 
@@ -240,6 +236,21 @@ public:
 
         //- Write model dictionary
         virtual void writeDict(Ostream& os) const {};
+		
+		
+		//*******************************Start solidGeneralContact declaration *************************
+		//- It is the start of a new time step
+        virtual void newTimeStep() const
+        {}
+		
+		//- Return slave friction traction for master.
+        //  This has the same size as the slave patch
+        virtual const vectorField& slaveTractionForMaster() const
+        {
+            return slaveTraction();
+        }
+		
+		//*******************************End solidGeneralContact declaration *************************
 };
 
 

@@ -216,12 +216,8 @@ public:
                               PrimitivePatch< face, List, pointField >
                               >* ggiInterpolatorPtr
             ) = 0;
-			
-			
-		//- It is the start of a new time step
-        virtual void newTimeStep() const
-        {}
-
+				
+		
         //- Return slave displacement
         virtual const vectorField& slaveDisp() const = 0;
 
@@ -263,6 +259,17 @@ public:
 
         //- Write model dictionary
         virtual void writeDict(Ostream& os) const {};
+		
+		//*******************************Start solidGeneralContact declaration *************************
+		
+		//- It is the start of a new time step
+        virtual void newTimeStep() const
+        {}
+		
+		/*//- Return area in contact of slave patch
+        virtual const scalarField& areaInContact() const = 0;
+		*/
+		//*******************************End solidGeneralContact declaration *************************
 };
 
 
