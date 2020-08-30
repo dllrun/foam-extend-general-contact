@@ -1422,6 +1422,10 @@ Foam::solidGeneralContactFvPatchVectorField::
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+// * * * * * * * * * * * * * * * Public Member Functions  * * * * * * * * * * * * * //
+
+//**************************************************** START General**********************************************
+
 const Foam::List<Foam::label>&
 Foam::solidGeneralContactFvPatchVectorField::shadowZoneIndices() const
 {
@@ -1455,6 +1459,16 @@ Foam::solidGeneralContactFvPatchVectorField::shadowPatchNames() const
     return *shadowPatchNamesPtr_;
 }
 
+const Foam::List<Foam::word>&
+Foam::solidGeneralContactFvPatchVectorField::shadowZoneNames() const
+{
+    if (!shadowZoneNamesPtr_)
+    {
+        calcShadowZoneNames();
+    }
+
+    return *shadowZoneNamesPtr_;
+}
 
 Foam::label Foam::solidGeneralContactFvPatchVectorField::zoneIndex() const
 {
@@ -1604,36 +1618,39 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex() const
 }
 
 // Map from self
-void solidGeneralContactFvPatchVectorField::autoMap
+void Foam::solidGeneralContactFvPatchVectorField::autoMap
 (
     const fvPatchFieldMapper& m
 )
 {
-//     if (normalContactModelPtr_ == NULL)
-//     {
-//         FatalErrorIn("solidGeneralContactFvPatchVectorField::autoMap")
-//             << "NULL contact normal law"
-//             << abort(FatalError);
-//     }
-
-//     if (frictionContactModelPtr_ == NULL)
-//     {
-//         FatalErrorIn("solidGeneralContactFvPatchVectorField::autoMap")
-//             << "NULL contact friction law"
-//             << abort(FatalError);
-//     }
+    FatalErrorIn
+    (
+        "void Foam::solidGeneralContactFvPatchVectorField::autoMap"
+        "("
+        "    const fvPatchFieldMapper& m"
+        ")"
+    )   << "member mapping not implemented" << endl;
 
     directionMixedFvPatchVectorField::autoMap(m);
 }
 
 
 // Reverse-map the given fvPatchField onto this fvPatchField
-void solidGeneralContactFvPatchVectorField::rmap
+void Foam::solidGeneralContactFvPatchVectorField::rmap
 (
     const fvPatchField<vector>& ptf,
     const labelList& addr
 )
 {
+    FatalErrorIn
+    (
+        "void Foam::solidGeneralContactFvPatchVectorField::rmap"
+        "("
+        "    const fvPatchField<vector>& ptf,"
+        "    const labelList& addr"
+        ")"
+    )   << "member mapping not implemented" << endl;
+	
     directionMixedFvPatchVectorField::rmap(ptf, addr);
 
     // not sure if pointers are mapped correctly
@@ -1648,6 +1665,31 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
     {
         return;
     }
+	
+	boolList activeContactPairs(shadowPatchNames().size(), false);
+	
+	    // if it is a new time step then reset iCorr
+/*    if (curTimeIndex_ != db().time().timeIndex())
+    {
+        curTimeIndex_ = db().time().timeIndex();
+
+        // Delete friction heat rate to force its recalculation when thermal
+        // boundaries ask for it
+        deleteDemandDrivenData(QcPtr_);
+        deleteDemandDrivenData(QcsPtr_);
+
+        if (globalMaster())
+        {
+            forAll(activeContactPairs, shadowI)
+            {
+                // Let the contact models know that it is a new time-step, in
+                // case they need to update anything
+                normalModel(shadowI).newTimeStep();
+                frictionModel(shadowI).newTimeStep();
+            }
+        }
+    }
+	*/
 
     if (contactActive_)
     {
@@ -2772,12 +2814,12 @@ Foam::label Foam::solidGeneralContactFvPatchVectorField::findShadowID
 const Foam::List<Foam::label>&
 Foam::solidGeneralContactFvPatchVectorField::shadowPatchIndices() const
 {
-/*
+
     if (!shadowPatchIndicesPtr_)
     {
         calcShadowPatchNames();
     }
-*/
+
     return *shadowPatchIndicesPtr_;
 }
 
