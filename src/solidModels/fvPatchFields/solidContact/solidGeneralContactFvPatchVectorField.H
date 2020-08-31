@@ -296,11 +296,13 @@ class solidGeneralContactFvPatchVectorField
         void makeCurPatchTractions() const;
 
         //- Calculate rate of dissipated friction energy
-        void calcQc() const;
-
+    /*    void calcQc() const;
+		*/
+		
         //- Calculate rate of dissipated friction energy for each contact
         //  pair
-        void calcQcs() const;
+     /*   void calcQcs() const;
+		*/
 
         //- Calculate the bounding box offset
         void calcBbOffset() const;
@@ -629,15 +631,17 @@ public:
 
         
             //- Evaluate the patch field
-            virtual void evaluate
+        /*    virtual void evaluate
             (
                 const Pstream::commsTypes commsType=Pstream::blocking
                 );
+			*/
 
             //- Return patch-normal gradient
             //- with non-orthogonal correction regardless of whether snGrad
             //- is corrected or not
-            virtual tmp<Field<vector> > snGrad() const;
+         /*   virtual tmp<Field<vector> > snGrad() const;  
+		 */
 
 
         // Member functions

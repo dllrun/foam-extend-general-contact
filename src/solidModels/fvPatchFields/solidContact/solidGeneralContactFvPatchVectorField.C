@@ -2005,7 +2005,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 	}
 	
 //**************************************************** END General**********************************************
-
+       Info<<"Here I am (RANJAN)"<<endl;
 
     solidTractionFvPatchVectorField::updateCoeffs();
 }
@@ -2477,28 +2477,30 @@ const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc
     const label shadowI
 ) const
 {
-    if (!QcsPtr_)
+ /*   if (!QcsPtr_)
     {
         calcQcs();
     }
 
     return (*QcsPtr_)[shadowI];
+	*/
 }
 
 
 const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc() const
 {
-    if (!QcPtr_)
+/*    if (!QcPtr_)
     {
         calcQc();
     }
 
     return *QcPtr_;
+	*/
 }
 
 
-void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
-{
+//void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
+//{
 /*    const boolList& locSlave = localSlave();
 
     QcsPtr_ = new List<scalarField>(locSlave.size());
@@ -2605,7 +2607,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
         Qc = mag(curTraction & (curPatchSlip/deltaT));
     }
 	*/
-}
+//}
 
 void Foam::solidGeneralContactFvPatchVectorField::calcBbOffset() const
 {
@@ -2655,7 +2657,7 @@ Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
 {
     if (!curPatchTractionPtr_)
     {
-        makeCurPatchTractions();
+ //       makeCurPatchTractions();
     }
 
     return (*curPatchTractionPtr_)[shadowI];
@@ -2670,7 +2672,7 @@ Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
 {
     if (!curPatchTractionPtr_)
     {
-        makeCurPatchTractions();
+ //       makeCurPatchTractions();
     }
 
     return (*curPatchTractionPtr_)[shadowI];
