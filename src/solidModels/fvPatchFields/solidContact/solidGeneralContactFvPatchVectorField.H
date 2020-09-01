@@ -296,13 +296,13 @@ class solidGeneralContactFvPatchVectorField
         void makeCurPatchTractions() const;
 
         //- Calculate rate of dissipated friction energy
-    /*    void calcQc() const;
-		*/
+        void calcQc() const;
+		
 		
         //- Calculate rate of dissipated friction energy for each contact
         //  pair
-     /*   void calcQcs() const;
-		*/
+        void calcQcs() const;
+		
 
         //- Calculate the bounding box offset
         void calcBbOffset() const;

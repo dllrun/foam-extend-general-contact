@@ -412,7 +412,269 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
 
         shadowZoneIndices[shadowI] = zone.index();
     }
-} 
+}
+
+void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
+{
+    if (QcPtr_)
+    {
+        FatalErrorIn("solidGeneralContactFvPatchVectorField::calcQc")
+            << "QcPtr_ already set!" << abort(FatalError);
+    }
+
+    QcPtr_ = new scalarField(patch().size(), 0.0);
+
+    scalarField& Qc = *QcPtr_;
+
+    // For now, we assume traction is constant over time-step
+    // Todo: use trapezoidal rule
+    vectorField curTraction(Qc.size(), vector::zero);
+
+    // sigma/sigmaCauchy is up-to-date as Qc is called after momentum loop
+    // has converged and sigma has been updated and mesh moved
+    if
+    (
+        db().objectRegistry::foundObject<volSymmTensorField>
+        (
+            "sigmaCauchy"
+        )
+    )
+    {
+        const symmTensorField& sigma =
+            db().objectRegistry::lookupObject<volSymmTensorField>
+            (
+                "sigmaCauchy"
+            ).boundaryField()[patch().index()];
+
+        curTraction = patch().nf() & sigma;
+    }
+    else
+    {
+        const symmTensorField& sigma =
+            db().objectRegistry::lookupObject<volSymmTensorField>
+            (
+                "sigma"
+            ).boundaryField()[patch().index()];
+
+        curTraction = patch().nf() & sigma;
+    }
+
+
+    // Accumulate Qc for from all shadows
+
+    const scalar deltaT = patch().boundaryMesh().mesh().time().deltaT().value();
+
+    const volVectorField& field =
+        db().objectRegistry::lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    const boolList& locSlave = localSlave();
+
+    forAll(locSlave, shadowI)
+    {
+        vectorField curPatchSlip(patch().size(), vector::zero);
+
+        // Calculate slip
+        if (locSlave[shadowI])
+        {
+			//*********************** start ERROR (frictionContactModel has no member slip) ***********************
+            //curPatchSlip = frictionModel(shadowI).slip();
+			//*********************** end ERROR (frictionContactModel has no member slip) ***********************
+        }
+        else
+        {
+            const solidGeneralContactFvPatchVectorField& shadowPatchField =
+            refCast<const solidGeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[shadowPatchIndices()[shadowI]]
+            );
+
+            const label locShadowID =
+                shadowPatchField.findShadowID(patch().index());
+			
+			//*********************** start ERROR (frictionContactModel has no member slip) ***********************
+            /*
+			vectorField shadowPatchSlip =
+                shadowPatchField.frictionModel(locShadowID).slip();
+				*/
+			//*********************** end ERROR (frictionContactModel has no member slip) ***********************
+			
+			//*********************** start ERROR (shadowPatchSlip not declared in this scope) ***********************
+            /*
+			vectorField shadowZoneSlip =
+                zoneField
+                (
+                    shadowZoneIndices()[shadowI],
+                    shadowPatchIndices()[shadowI],
+                    shadowPatchSlip
+                );
+			*/	
+			//*********************** end ERROR (shadowPatchSlip not declared in this scope) ***********************
+
+            // Interpolate from shadow to the current patch
+            // Face-to-face
+			
+			//******************* start ERROR (primitivePatchInterpolation has no member slaveToMaster) ********************
+            /*
+			vectorField curZoneSlip =
+                shadowPatchField.zoneToZone(locShadowID).slaveToMaster
+                (
+                    shadowZoneSlip
+                );
+			*/
+			//******************* end ERROR (primitivePatchInterpolation has no member slaveToMaster) ********************
+			
+			//*********************** start ERROR (curZoneSlip not declared in this scope) ***********************
+            /*
+			curPatchSlip =
+                patchField
+                (
+                    patch().index(),
+                    zoneIndex(),
+                    curZoneSlip
+                );
+				*/
+			//*********************** end ERROR (curZoneSlip not declared in this scope) ***********************
+        }
+
+        // Heat flux rate: rate of dissipated frictional energy
+        // The dot product of the traction vectors and the slip vectors
+        // gives the dissipated frictional energy rate per unit area, which
+        // is always positive
+        Qc += mag(curTraction & (curPatchSlip/deltaT));
+    }
+}
+
+void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
+{
+    const boolList& locSlave = localSlave();
+
+    QcsPtr_ = new List<scalarField>(locSlave.size());
+
+    bool sigmaCauchyFound =
+        db().foundObject<volSymmTensorField>
+        (
+            "sigmaCauchy"
+        );
+
+    const scalar deltaT = patch().boundaryMesh().mesh().time().deltaT().value();
+
+    const volVectorField& field =
+        db().lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    forAll(locSlave, shadowI)
+    {
+        scalarField& Qc = (*QcsPtr_)[shadowI];
+        Qc.setSize(patch().size(), 0.0);
+
+        // For now, we assume traction is constant over time-step
+        // Todo: use trapezoidal rule
+        vectorField curTraction(Qc.size(), vector::zero);
+
+        // sigma/sigmaCauchy is up-to-date as Qc is called after momentum loop
+        // has converged and sigma has been updated and mesh moved
+        if (sigmaCauchyFound)
+        {
+            const symmTensorField& sigma =
+                db().lookupObject<volSymmTensorField>
+                (
+                    "sigmaCauchy"
+                ).boundaryField()[patch().index()];
+
+            curTraction = patch().nf() & sigma;
+        }
+        else
+        {
+            const symmTensorField& sigma =
+            db().lookupObject<volSymmTensorField>
+            (
+                "sigma"
+            ).boundaryField()[patch().index()];
+
+            curTraction = patch().nf() & sigma;
+        }
+
+        // Calculate Qc for shadowI
+
+        vectorField curPatchSlip(Qc.size(), vector::zero);
+
+        // Calculate slip
+        if (locSlave[shadowI])
+        {
+			//*********************** start ERROR (frictionContactModel has no member slip) ***********************
+            //curPatchSlip = frictionModel(shadowI).slip();
+			//*********************** end ERROR (frictionContactModel has no member slip) ***********************
+        }
+        else
+        {
+            const solidGeneralContactFvPatchVectorField& shadowPatchField =
+            refCast<const solidGeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[shadowPatchIndices()[shadowI]]
+            );
+
+            const label locShadowID =
+            shadowPatchField.findShadowID(patch().index());
+
+            //*********************** start ERROR (frictionContactModel has no member slip) ***********************
+            /*
+			vectorField shadowPatchSlip =
+                shadowPatchField.frictionModel(locShadowID).slip();
+				*/
+			//*********************** end ERROR (frictionContactModel has no member slip) ***********************
+			
+			//*********************** start ERROR (shadowPatchSlip not declared in this scope) ***********************
+            /*
+			vectorField shadowZoneSlip =
+                zoneField
+                (
+                    shadowZoneIndices()[shadowI],
+                    shadowPatchIndices()[shadowI],
+                    shadowPatchSlip
+                );
+			*/	
+			//*********************** end ERROR (shadowPatchSlip not declared in this scope) ***********************
+
+            // Interpolate from shadow to the current patch
+            // Face-to-face
+			//******************* start ERROR (primitivePatchInterpolation has no member slaveToMaster) ********************
+            /*
+			vectorField curZoneSlip =
+                shadowPatchField.zoneToZone(locShadowID).slaveToMaster
+                (
+                    shadowZoneSlip
+                );
+			*/
+			//******************* end ERROR (primitivePatchInterpolation has no member slaveToMaster) *******************
+			
+				
+			//*********************** start ERROR (curZoneSlip not declared in this scope) ***********************
+            /*
+			curPatchSlip =
+            patchField
+            (
+                patch().index(),
+                zoneIndex(),
+                curZoneSlip
+            );
+			*/	
+			//*********************** end ERROR (curZoneSlip not declared in this scope) ***********************
+        }
+
+        // Heat flux rate: rate of dissipated frictional energy
+        // The dot product of the traction vectors and the slip vectors
+        // gives the dissipated frictional energy rate per unit area, which
+        // is always positive
+        Qc = mag(curTraction & (curPatchSlip/deltaT));
+    }
+}
+
+ 
 // *************************************** END general ****************************
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -1993,7 +2255,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             masterZoneTraction
                         );
 					*/
-					//*********************** start ERROR (masterZoneTraction not declared in scope) ************************
+					//*********************** end ERROR (masterZoneTraction not declared in scope) ************************
 					
                     curPatchTraction += curPatchTractions(shadowI);
 				}				
@@ -2477,25 +2739,25 @@ const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc
     const label shadowI
 ) const
 {
- /*   if (!QcsPtr_)
+    if (!QcsPtr_)
     {
         calcQcs();
     }
 
     return (*QcsPtr_)[shadowI];
-	*/
+	
 }
 
 
 const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc() const
 {
-/*    if (!QcPtr_)
+    if (!QcPtr_)
     {
         calcQc();
     }
 
     return *QcPtr_;
-	*/
+	
 }
 
 
