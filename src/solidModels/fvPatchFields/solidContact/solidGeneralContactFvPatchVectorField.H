@@ -532,6 +532,9 @@ public:
             //- Return the current patch traction for shadowI
             vectorField& curPatchTractions(const label shadowI);
 			
+			// testing masterToSlave function
+			vectorField masterToSlave(const label shadowI);  
+			
 	
 		// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 

@@ -414,6 +414,299 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
     }
 }
 
+void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
+{
+  /*  if (!normalModels_.empty())
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::"
+            "calcNormalModel() const"
+        )   << "normalModels already set" << abort(FatalError);
+    }
+
+    normalModels_.setSize(shadowPatchNames().size());
+
+    const boolList& locSlave = localSlave();
+
+    forAll(normalModels_, shadowI)
+    {
+        // Only the local slave creates the contact model
+        if (locSlave[shadowI])
+        {
+            // Calculate normal contact forces
+            normalModels_.set
+            (
+                shadowI,
+                normalContactModel::New
+                (
+                    word(dict().lookup("normalContactModel")),
+                    patch().boundaryMesh()[shadowPatchIndices()[shadowI]],
+                    dict(),
+                    shadowPatchIndices()[shadowI], // master
+                    patch().index(), // slave
+                    shadowZone(shadowI), // master
+                    zone() // slave
+                )
+            );
+        }
+    }
+*/
+}
+
+Foam::normalContactModel&
+Foam::solidGeneralContactFvPatchVectorField::normalModel(const label shadowI)
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("normalModel(const label shadowI)")
+            << "Only the local slave can call the contact model"
+            << abort(FatalError);
+    }
+
+    if (normalModelsPtrL_.empty())
+    {
+        //calcNormalModels();
+    }
+
+    return normalModelsPtrL_[shadowI];
+}
+
+const Foam::normalContactModel&
+Foam::solidGeneralContactFvPatchVectorField::normalModel
+(
+    const label shadowI
+) const
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("normalModel(const label shadowI)")
+            << "Only the local slave can call the contact model"
+            << abort(FatalError);
+    }
+
+    if (normalModelsPtrL_.empty())
+    {
+        //calcNormalModels();
+    }
+
+    return normalModelsPtrL_[shadowI];
+}
+
+
+void Foam::solidGeneralContactFvPatchVectorField::calcFrictionModels() const
+{
+/*  
+  if (!frictionModels_.empty())
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::"
+            "calcFrictionModel(shadowI) const"
+        )   << "frictionModelPtr_[shadowI] already set" << abort(FatalError);
+    }
+
+    frictionModels_.setSize(shadowPatchNames().size());
+
+    const boolList& locSlave = localSlave();
+
+    forAll(frictionModels_, shadowI)
+    {
+        if (locSlave[shadowI])
+        {
+            frictionModels_.set
+                (
+                    shadowI,
+                    frictionContactModel::New
+                    (
+                        word(dict().lookup("frictionContactModel")),
+                        patch().boundaryMesh()[shadowPatchIndices()[shadowI]],
+                        dict(),
+                        shadowPatchIndices()[shadowI], // master
+                        patch().index() // slave
+                    )
+                );
+        }
+    }
+	*/
+}
+
+Foam::frictionContactModel&
+Foam::solidGeneralContactFvPatchVectorField::frictionModel(const label shadowI)
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("frictionModel(const label shadowI)")
+            << "Only the local slave can call the contact model"
+            << abort(FatalError);
+    }
+
+    if (frictionModelsPtrL_.empty())
+    {
+        //calcFrictionModels();
+    }
+
+    return frictionModelsPtrL_[shadowI];
+}
+
+
+const Foam::frictionContactModel&
+Foam::solidGeneralContactFvPatchVectorField::frictionModel
+(
+    const label shadowI
+) const
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("frictionModel(const label shadowI)")
+            << "Only the local slave can call the contact model"
+            << abort(FatalError);
+    }
+
+    if (frictionModelsPtrL_.empty())
+    {
+        //calcFrictionModels();
+    }
+
+    return frictionModelsPtrL_[shadowI];
+}
+
+void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex() const
+{
+    if (zoneIndex_ != -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex()"
+            "const"
+        )   << "zoneIndex_ already set" << abort(FatalError);
+    }
+
+    const fvMesh& mesh = patch().boundaryMesh().mesh();
+
+    word zoneName = patch().name() + "FaceZone";
+
+    faceZoneID zone(zoneName, mesh.faceZones());
+
+    if (!zone.active())
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex()"
+            "const"
+        )   << "Face zone name " << zoneName
+            << " not found.  Please check your zone definition." << nl
+            << "Current faceZones are:" << mesh.faceZones().names()
+            << abort(FatalError);
+    }
+
+    zoneIndex_ = zone.index();
+}
+
+void Foam::solidGeneralContactFvPatchVectorField::calcZone() const
+{
+    if (zonePtr_)
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::calcZone() const"
+        )   << "zonePtr_ already set" << abort(FatalError);
+    }
+
+    const fvMesh& mesh = patch().boundaryMesh().mesh();
+
+    // Note: the main mesh will either be in the initial configuration or the
+    // updated configuration
+    zonePtr_ =
+        new standAlonePatch
+        (
+            mesh.faceZones()[zoneIndex()]().localFaces(),
+            mesh.faceZones()[zoneIndex()]().localPoints()
+        );
+}
+
+Foam::label Foam::solidGeneralContactFvPatchVectorField::zoneIndex() const
+{
+    if (zoneIndex_ == -1)
+    {
+        calcZoneIndex();
+    }
+
+    return zoneIndex_;
+}
+
+const Foam::standAlonePatch&
+Foam::solidGeneralContactFvPatchVectorField::zone() const
+{
+    if (!zonePtr_)
+    {
+        calcZone();
+    }
+
+    return *zonePtr_;
+}
+
+
+Foam::standAlonePatch& Foam::solidGeneralContactFvPatchVectorField::zone()
+{
+    if (!zonePtr_)
+    {
+        calcZone();
+    }
+
+    return *zonePtr_;
+}
+
+const Foam::standAlonePatch&
+Foam::solidGeneralContactFvPatchVectorField::shadowZone
+(
+    const label shadowI
+) const
+{
+    const volVectorField& field =
+        db().objectRegistry::lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    const solidGeneralContactFvPatchVectorField& shadowPatchField =
+        refCast<const solidGeneralContactFvPatchVectorField>
+        (
+            field.boundaryField()[shadowPatchIndices()[shadowI]]
+        );
+
+    return shadowPatchField.zone();
+}
+
+
+Foam::standAlonePatch&
+Foam::solidGeneralContactFvPatchVectorField::shadowZone
+(
+    const label shadowI
+)
+{
+    const volVectorField& field =
+        db().objectRegistry::lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    // Const cast away the const-ness
+    solidGeneralContactFvPatchVectorField& shadowPatchField =
+        const_cast<solidGeneralContactFvPatchVectorField&>
+        (
+            refCast<const solidGeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[shadowPatchIndices()[shadowI]]
+            )
+        );
+
+    return shadowPatchField.zone();
+}
+
+//Here I am update 
+
+
 void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
 {
     if (QcPtr_)
@@ -547,132 +840,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
     }
 }
 
-void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
-{
-    const boolList& locSlave = localSlave();
 
-    QcsPtr_ = new List<scalarField>(locSlave.size());
-
-    bool sigmaCauchyFound =
-        db().foundObject<volSymmTensorField>
-        (
-            "sigmaCauchy"
-        );
-
-    const scalar deltaT = patch().boundaryMesh().mesh().time().deltaT().value();
-
-    const volVectorField& field =
-        db().lookupObject<volVectorField>
-        (
-            dimensionedInternalField().name()
-        );
-
-    forAll(locSlave, shadowI)
-    {
-        scalarField& Qc = (*QcsPtr_)[shadowI];
-        Qc.setSize(patch().size(), 0.0);
-
-        // For now, we assume traction is constant over time-step
-        // Todo: use trapezoidal rule
-        vectorField curTraction(Qc.size(), vector::zero);
-
-        // sigma/sigmaCauchy is up-to-date as Qc is called after momentum loop
-        // has converged and sigma has been updated and mesh moved
-        if (sigmaCauchyFound)
-        {
-            const symmTensorField& sigma =
-                db().lookupObject<volSymmTensorField>
-                (
-                    "sigmaCauchy"
-                ).boundaryField()[patch().index()];
-
-            curTraction = patch().nf() & sigma;
-        }
-        else
-        {
-            const symmTensorField& sigma =
-            db().lookupObject<volSymmTensorField>
-            (
-                "sigma"
-            ).boundaryField()[patch().index()];
-
-            curTraction = patch().nf() & sigma;
-        }
-
-        // Calculate Qc for shadowI
-
-        vectorField curPatchSlip(Qc.size(), vector::zero);
-
-        // Calculate slip
-        if (locSlave[shadowI])
-        {
-			//*********************** start ERROR (frictionContactModel has no member slip) ***********************
-            //curPatchSlip = frictionModel(shadowI).slip();
-			//*********************** end ERROR (frictionContactModel has no member slip) ***********************
-        }
-        else
-        {
-            const solidGeneralContactFvPatchVectorField& shadowPatchField =
-            refCast<const solidGeneralContactFvPatchVectorField>
-            (
-                field.boundaryField()[shadowPatchIndices()[shadowI]]
-            );
-
-            const label locShadowID =
-            shadowPatchField.findShadowID(patch().index());
-
-            //*********************** start ERROR (frictionContactModel has no member slip) ***********************
-            /*
-			vectorField shadowPatchSlip =
-                shadowPatchField.frictionModel(locShadowID).slip();
-				*/
-			//*********************** end ERROR (frictionContactModel has no member slip) ***********************
-			
-			//*********************** start ERROR (shadowPatchSlip not declared in this scope) ***********************
-            /*
-			vectorField shadowZoneSlip =
-                zoneField
-                (
-                    shadowZoneIndices()[shadowI],
-                    shadowPatchIndices()[shadowI],
-                    shadowPatchSlip
-                );
-			*/	
-			//*********************** end ERROR (shadowPatchSlip not declared in this scope) ***********************
-
-            // Interpolate from shadow to the current patch
-            // Face-to-face
-			//******************* start ERROR (primitivePatchInterpolation has no member slaveToMaster) ********************
-            /*
-			vectorField curZoneSlip =
-                shadowPatchField.zoneToZone(locShadowID).slaveToMaster
-                (
-                    shadowZoneSlip
-                );
-			*/
-			//******************* end ERROR (primitivePatchInterpolation has no member slaveToMaster) *******************
-			
-				
-			//*********************** start ERROR (curZoneSlip not declared in this scope) ***********************
-            /*
-			curPatchSlip =
-            patchField
-            (
-                patch().index(),
-                zoneIndex(),
-                curZoneSlip
-            );
-			*/	
-			//*********************** end ERROR (curZoneSlip not declared in this scope) ***********************
-        }
-
-        // Heat flux rate: rate of dissipated frictional energy
-        // The dot product of the traction vectors and the slip vectors
-        // gives the dissipated frictional energy rate per unit area, which
-        // is always positive
-        Qc = mag(curTraction & (curPatchSlip/deltaT));
-    }
-}
 
  
 // *************************************** END general ****************************
@@ -1242,16 +1410,6 @@ Foam::solidGeneralContactFvPatchVectorField::
 
 //**************************************************** START General**********************************************
 
-const Foam::List<Foam::label>&
-Foam::solidGeneralContactFvPatchVectorField::shadowZoneIndices() const
-{
-    if (!shadowZoneIndicesPtr_)
-    {
-        calcShadowZoneNames();
-    }
-
-    return *shadowZoneIndicesPtr_;
-}
 
 Foam::label Foam::solidGeneralContactFvPatchVectorField::globalMasterIndex()
 const
@@ -1275,6 +1433,17 @@ Foam::solidGeneralContactFvPatchVectorField::shadowPatchNames() const
     return *shadowPatchNamesPtr_;
 }
 
+const Foam::List<Foam::label>&
+Foam::solidGeneralContactFvPatchVectorField::shadowPatchIndices() const
+{
+    if (!shadowPatchIndicesPtr_)
+    {
+        calcShadowPatchNames();
+    }
+
+    return *shadowPatchIndicesPtr_;
+}	
+
 const Foam::List<Foam::word>&
 Foam::solidGeneralContactFvPatchVectorField::shadowZoneNames() const
 {
@@ -1286,264 +1455,15 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZoneNames() const
     return *shadowZoneNamesPtr_;
 }
 
-Foam::label Foam::solidGeneralContactFvPatchVectorField::zoneIndex() const
+const Foam::List<Foam::label>&
+Foam::solidGeneralContactFvPatchVectorField::shadowZoneIndices() const
 {
-    if (zoneIndex_ == -1)
+    if (!shadowZoneIndicesPtr_)
     {
-        calcZoneIndex();
+        calcShadowZoneNames();
     }
 
-    return zoneIndex_;
-}
-
-
-const Foam::standAlonePatch&
-Foam::solidGeneralContactFvPatchVectorField::zone() const
-{
-    if (!zonePtr_)
-    {
-        calcZone();
-    }
-
-    return *zonePtr_;
-}
-
-
-Foam::standAlonePatch& Foam::solidGeneralContactFvPatchVectorField::zone()
-{
-    if (!zonePtr_)
-    {
-        calcZone();
-    }
-
-    return *zonePtr_;
-}
-
-
-const Foam::standAlonePatch&
-Foam::solidGeneralContactFvPatchVectorField::shadowZone
-(
-    const label shadowI
-) const
-{
-    const volVectorField& field =
-        db().objectRegistry::lookupObject<volVectorField>
-        (
-            dimensionedInternalField().name()
-        );
-
-    const solidGeneralContactFvPatchVectorField& shadowPatchField =
-        refCast<const solidGeneralContactFvPatchVectorField>
-        (
-            field.boundaryField()[shadowPatchIndices()[shadowI]]
-        );
-
-    return shadowPatchField.zone();
-}
-
-
-Foam::standAlonePatch&
-Foam::solidGeneralContactFvPatchVectorField::shadowZone
-(
-    const label shadowI
-)
-{
-    const volVectorField& field =
-        db().objectRegistry::lookupObject<volVectorField>
-        (
-            dimensionedInternalField().name()
-        );
-
-    // Const cast away the const-ness
-    solidGeneralContactFvPatchVectorField& shadowPatchField =
-        const_cast<solidGeneralContactFvPatchVectorField&>
-        (
-            refCast<const solidGeneralContactFvPatchVectorField>
-            (
-                field.boundaryField()[shadowPatchIndices()[shadowI]]
-            )
-        );
-
-    return shadowPatchField.zone();
-}
-
-void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
-{
-    // Create zone-to-zone interpolation
-    if (!zoneToZones_.empty())
-    {
-        FatalErrorIn
-        (
-            "void solidGeneralContactFvPatchVectorField::calcZoneToZones()"
-            "const"
-        )   << "Zone to zone interpolation already calculated"
-            << abort(FatalError);
-    }
-
-    zoneToZones_.setSize(shadowPatchNames().size());
-
-    const boolList& locSlave = localSlave();
-
-    forAll(zoneToZones_, shadowI)
-    {
-        // Only the local slave creates the interpolator
-        if (locSlave[shadowI])
-        {
-			//*****(start ERROR, may be GGIInterpolation type works)**********
-			/*
-            zoneToZones_.set
-                (
-                    shadowI,
-                    new primitivePatchInterpolation //(ERROR so I made a Replacement of newGgiStandAlonePatchInterpolation)
-                    (
-                        shadowZone(shadowI), // master
-                        zone(), // slave
-                        tensorField(0),
-                        tensorField(0),
-                        vectorField(0), // Slave-to-master separation.
-                        true,           // global data
-                        0,              // Non-overlapping face tolerances
-                        0,              //
-                        true,           // Rescale weighting factors.
-                        ggiInterpolation::AABB   // (ERROR so I made a Replacement of newGgiInterpolation)
-                        //newGgiInterpolation::BB_OCTREE
-                        //newGgiInterpolation::THREE_D_DISTANCE
-                        //newGgiInterpolation::N_SQUARED
-                    )
-                );
-				*/
-				//*****(end ERROR, may be GGIInterpolation type works)**********
-        }
-    }
-}
-
-//(start ERROR Replacement of newGgiStandAlonePatchInterpolation)
-const Foam::PrimitivePatchInterpolation<standAlonePatch>&     //(Replacement with primitivePatchInterpolation& work)
-Foam::solidGeneralContactFvPatchVectorField::zoneToZone
-(
-    const label shadowI
-) const
-{
-    if (!localSlave()[shadowI])
-    {
-        FatalErrorIn("zoneToZone(const label shadowI)")
-            << "Only the local slave can call the zoneToZone interpolator"
-            << abort(FatalError);
-    }
-
-    if (zoneToZones_.empty())
-    {
-        word zoneName =
-            patch().boundaryMesh().mesh().faceZones()[zoneIndex()].name();
-
-        if (debug)
-        {
-            Info<< "Initializing the GGI interpolators for " << zoneName
-                << endl;
-        }
-
-        calcZoneToZones();
-    }
-
-    return zoneToZones_[shadowI];
-}
-//********(end ERROR Replacement of newGgiStandAlonePatchInterpolation)
-
-//(Replacement primitivePatchInterpolation& works)
-Foam::PrimitivePatchInterpolation<standAlonePatch>&  //********(start ERROR Replacement of newGgiStandAlonePatchInterpolation)
-Foam::solidGeneralContactFvPatchVectorField::zoneToZone(const label shadowI)
-{
-    if (!localSlave()[shadowI])
-    {
-        FatalErrorIn("zoneToZone(const label shadowI)")
-            << "Only the local slave can call the zoneToZone interpolator"
-            << abort(FatalError);
-    }
-
-    if (zoneToZones_.empty())
-    {
-        word zoneName =
-            patch().boundaryMesh().mesh().faceZones()[zoneIndex()].name();
-
-        if (debug)
-        {
-            Info<< "Initializing the GGI interpolators for " << zoneName
-                << endl;
-        }
-
-        calcZoneToZones();
-    }
-
-    return zoneToZones_[shadowI];
-}
-
-//********(end ERROR Replacement of newGgiStandAlonePatchInterpolation)
-
-
-void Foam::solidGeneralContactFvPatchVectorField::calcZone() const
-{
-    if (zonePtr_)
-    {
-        FatalErrorIn
-        (
-            "void Foam::solidGeneralContactFvPatchVectorField::calcZone() const"
-        )   << "zonePtr_ already set" << abort(FatalError);
-    }
-
-    const fvMesh& mesh = patch().boundaryMesh().mesh();
-
-    // Note: the main mesh will either be in the initial configuration or the
-    // updated configuration
-    zonePtr_ =
-        new standAlonePatch
-        (
-            mesh.faceZones()[zoneIndex()]().localFaces(),
-            mesh.faceZones()[zoneIndex()]().localPoints()
-        );
-}
-
-
-bool Foam::solidGeneralContactFvPatchVectorField::globalMaster() const
-{
-    if (!globalMasterPtr_)
-    {
-        calcGlobalMaster();
-    }
-
-    return *globalMasterPtr_;
-}
-
-
-void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex() const
-{
-    if (zoneIndex_ != -1)
-    {
-        FatalErrorIn
-        (
-            "void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex()"
-            "const"
-        )   << "zoneIndex_ already set" << abort(FatalError);
-    }
-
-    const fvMesh& mesh = patch().boundaryMesh().mesh();
-
-    word zoneName = patch().name() + "FaceZone";
-
-    faceZoneID zone(zoneName, mesh.faceZones());
-
-    if (!zone.active())
-    {
-        FatalErrorIn
-        (
-            "void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex()"
-            "const"
-        )   << "Face zone name " << zoneName
-            << " not found.  Please check your zone definition." << nl
-            << "Current faceZones are:" << mesh.faceZones().names()
-            << abort(FatalError);
-    }
-
-    zoneIndex_ = zone.index();
+    return *shadowZoneIndicesPtr_;
 }
 
 // Map from self
@@ -1563,7 +1483,6 @@ void Foam::solidGeneralContactFvPatchVectorField::autoMap
     solidTractionFvPatchVectorField::autoMap(m);
 }
 
-
 // Reverse-map the given fvPatchField onto this fvPatchField
 void Foam::solidGeneralContactFvPatchVectorField::rmap
 (
@@ -1579,14 +1498,11 @@ void Foam::solidGeneralContactFvPatchVectorField::rmap
         "    const labelList& addr"
         ")"
     )   << "member mapping not implemented" << endl;
-	
-    solidTractionFvPatchVectorField::rmap(ptf, addr);
 
-    // not sure if pointers are mapped correctly
+    solidTractionFvPatchVectorField::rmap(ptf, addr);
+	// not sure if pointers are mapped correctly
     // be careful when there are topological changes to the patch
 }
-
-//Info << "TEST By RANJAN" << nl << endl;
 
 void solidGeneralContactFvPatchVectorField::updateCoeffs()
 {
@@ -1811,12 +1727,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             patchDD
                         );
 					
-					// Not sure if this is correct but 
-					PrimitivePatchInterpolation<standAlonePatch>& masterToSlave();
-					/*{
-					 return zoneDD[shadowI];   //(const label shadowI)
-						}*/
-						
+											
 					
 					//*********************** start ERROR (primitivePatchInterpolationHasNoMember.png) **************************
                     // Master patch DD interpolated to the slave patch
@@ -1943,6 +1854,369 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
     solidTractionFvPatchVectorField::updateCoeffs();
 }
+
+const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc() const
+{
+    if (!QcPtr_)
+    {
+        calcQc();
+    }
+
+    return *QcPtr_;
+}
+
+//- Increment of dissipated energy due to friction for each pair
+const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc
+(
+    const label shadowI
+) const
+{
+    if (!QcsPtr_)
+    {
+        calcQcs();
+    }
+
+    return (*QcsPtr_)[shadowI];
+}
+
+void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
+{
+    const boolList& locSlave = localSlave();
+
+    QcsPtr_ = new List<scalarField>(locSlave.size());
+
+    bool sigmaCauchyFound =
+        db().foundObject<volSymmTensorField>
+        (
+            "sigmaCauchy"
+        );
+
+    const scalar deltaT = patch().boundaryMesh().mesh().time().deltaT().value();
+
+    const volVectorField& field =
+        db().lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    forAll(locSlave, shadowI)
+    {
+        scalarField& Qc = (*QcsPtr_)[shadowI];
+        Qc.setSize(patch().size(), 0.0);
+
+        // For now, we assume traction is constant over time-step
+        // Todo: use trapezoidal rule
+        vectorField curTraction(Qc.size(), vector::zero);
+
+        // sigma/sigmaCauchy is up-to-date as Qc is called after momentum loop
+        // has converged and sigma has been updated and mesh moved
+        if (sigmaCauchyFound)
+        {
+            const symmTensorField& sigma =
+                db().lookupObject<volSymmTensorField>
+                (
+                    "sigmaCauchy"
+                ).boundaryField()[patch().index()];
+
+            curTraction = patch().nf() & sigma;
+        }
+        else
+        {
+            const symmTensorField& sigma =
+            db().lookupObject<volSymmTensorField>
+            (
+                "sigma"
+            ).boundaryField()[patch().index()];
+
+            curTraction = patch().nf() & sigma;
+        }
+
+        // Calculate Qc for shadowI
+
+        vectorField curPatchSlip(Qc.size(), vector::zero);
+
+        // Calculate slip
+        if (locSlave[shadowI])
+        {
+			//*********************** start ERROR (frictionContactModel has no member slip) ***********************
+            //curPatchSlip = frictionModel(shadowI).slip();
+			//*********************** end ERROR (frictionContactModel has no member slip) ***********************
+        }
+        else
+        {
+            const solidGeneralContactFvPatchVectorField& shadowPatchField =
+            refCast<const solidGeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[shadowPatchIndices()[shadowI]]
+            );
+
+            const label locShadowID =
+            shadowPatchField.findShadowID(patch().index());
+
+            //*********************** start ERROR (frictionContactModel has no member slip) ***********************
+            /*
+			vectorField shadowPatchSlip =
+                shadowPatchField.frictionModel(locShadowID).slip();
+				*/
+			//*********************** end ERROR (frictionContactModel has no member slip) ***********************
+			
+			//*********************** start ERROR (shadowPatchSlip not declared in this scope) ***********************
+            /*
+			vectorField shadowZoneSlip =
+                zoneField
+                (
+                    shadowZoneIndices()[shadowI],
+                    shadowPatchIndices()[shadowI],
+                    shadowPatchSlip
+                );
+			*/	
+			//*********************** end ERROR (shadowPatchSlip not declared in this scope) ***********************
+
+            // Interpolate from shadow to the current patch
+            // Face-to-face
+			//******************* start ERROR (primitivePatchInterpolation has no member slaveToMaster) ********************
+            /*
+			vectorField curZoneSlip =
+                shadowPatchField.zoneToZone(locShadowID).slaveToMaster
+                (
+                    shadowZoneSlip
+                );
+			*/
+			//******************* end ERROR (primitivePatchInterpolation has no member slaveToMaster) *******************
+			
+				
+			//*********************** start ERROR (curZoneSlip not declared in this scope) ***********************
+            /*
+			curPatchSlip =
+            patchField
+            (
+                patch().index(),
+                zoneIndex(),
+                curZoneSlip
+            );
+			*/	
+			//*********************** end ERROR (curZoneSlip not declared in this scope) ***********************
+        }
+
+        // Heat flux rate: rate of dissipated frictional energy
+        // The dot product of the traction vectors and the slip vectors
+        // gives the dissipated frictional energy rate per unit area, which
+        // is always positive
+        Qc = mag(curTraction & (curPatchSlip/deltaT));
+    }
+}
+
+
+void Foam::solidGeneralContactFvPatchVectorField::calcBbOffset() const
+{
+    if (bbOffset_ != 0)
+    {
+        FatalErrorIn
+        (
+            "Foam::scalar Foam::solidGeneralContactFvPatchVectorField::"
+            "calcBbOffset() const"
+        )   << "already set" << abort(FatalError);
+    }
+
+    // We will set the BB offset to five times the average dimension of the
+    // smallest face on the zone
+
+    scalar minDim = GREAT;
+
+    if (patch().size() > 0)
+    {
+        minDim = min(sqrt(patch().magSf()));
+    }
+
+    bbOffset_ = 5.0*returnReduce(minDim, minOp<scalar>());
+
+    if (debug)
+    {
+        Info<< nl << "The bbOffset is " << bbOffset_ << endl;
+    }
+}
+
+Foam::scalar Foam::solidGeneralContactFvPatchVectorField::bbOffset() const
+{
+    if (bbOffset_ == 0)
+    {
+        calcBbOffset();
+    }
+
+    return bbOffset_;
+}
+
+
+const Foam::vectorField&
+Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
+(
+    const label shadowI
+) const
+{
+    if (!curPatchTractionPtr_)
+    {
+        makeCurPatchTractions();
+    }
+
+    return (*curPatchTractionPtr_)[shadowI];
+}
+
+
+Foam::vectorField&
+Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
+(
+    const label shadowI
+)
+{
+    if (!curPatchTractionPtr_)
+    {
+        makeCurPatchTractions();
+    }
+
+    return (*curPatchTractionPtr_)[shadowI];
+}
+
+
+
+void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
+{
+    // Create zone-to-zone interpolation
+    if (!zoneToZones_.empty())
+    {
+        FatalErrorIn
+        (
+            "void solidGeneralContactFvPatchVectorField::calcZoneToZones()"
+            "const"
+        )   << "Zone to zone interpolation already calculated"
+            << abort(FatalError);
+    }
+
+    zoneToZones_.setSize(shadowPatchNames().size());
+
+    const boolList& locSlave = localSlave();
+
+    forAll(zoneToZones_, shadowI)
+    {
+        // Only the local slave creates the interpolator
+        if (locSlave[shadowI])
+        {
+			//*****(start ERROR, may be GGIInterpolation type works)**********
+			/*
+            zoneToZones_.set
+                (
+                    shadowI,
+                    new primitivePatchInterpolation //(ERROR so I made a Replacement of newGgiStandAlonePatchInterpolation)
+                    (
+                        shadowZone(shadowI), // master
+                        zone(), // slave
+                        tensorField(0),
+                        tensorField(0),
+                        vectorField(0), // Slave-to-master separation.
+                        true,           // global data
+                        0,              // Non-overlapping face tolerances
+                        0,              //
+                        true,           // Rescale weighting factors.
+                        ggiInterpolation::AABB   // (ERROR so I made a Replacement of newGgiInterpolation)
+                        //newGgiInterpolation::BB_OCTREE
+                        //newGgiInterpolation::THREE_D_DISTANCE
+                        //newGgiInterpolation::N_SQUARED
+                    )
+                );
+				*/
+				//*****(end ERROR, may be GGIInterpolation type works)**********
+        }
+    }
+}
+
+//(start ERROR Replacement of newGgiStandAlonePatchInterpolation)
+const Foam::PrimitivePatchInterpolation<standAlonePatch>&     //(Replacement with primitivePatchInterpolation& work)
+Foam::solidGeneralContactFvPatchVectorField::zoneToZone
+(
+    const label shadowI
+) const
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("zoneToZone(const label shadowI)")
+            << "Only the local slave can call the zoneToZone interpolator"
+            << abort(FatalError);
+    }
+
+    if (zoneToZones_.empty())
+    {
+        word zoneName =
+            patch().boundaryMesh().mesh().faceZones()[zoneIndex()].name();
+
+        if (debug)
+        {
+            Info<< "Initializing the GGI interpolators for " << zoneName
+                << endl;
+        }
+
+        calcZoneToZones();
+    }
+
+    return zoneToZones_[shadowI];
+}
+//********(end ERROR Replacement of newGgiStandAlonePatchInterpolation)
+
+//(Replacement primitivePatchInterpolation& works)
+Foam::PrimitivePatchInterpolation<standAlonePatch>&  //********(start ERROR Replacement of newGgiStandAlonePatchInterpolation)
+Foam::solidGeneralContactFvPatchVectorField::zoneToZone(const label shadowI)
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("zoneToZone(const label shadowI)")
+            << "Only the local slave can call the zoneToZone interpolator"
+            << abort(FatalError);
+    }
+
+    if (zoneToZones_.empty())
+    {
+        word zoneName =
+            patch().boundaryMesh().mesh().faceZones()[zoneIndex()].name();
+
+        if (debug)
+        {
+            Info<< "Initializing the GGI interpolators for " << zoneName
+                << endl;
+        }
+
+        calcZoneToZones();
+    }
+
+    return zoneToZones_[shadowI];
+}
+
+//********(end ERROR Replacement of newGgiStandAlonePatchInterpolation)
+
+
+
+
+bool Foam::solidGeneralContactFvPatchVectorField::globalMaster() const
+{
+    if (!globalMasterPtr_)
+    {
+        calcGlobalMaster();
+    }
+
+    return *globalMasterPtr_;
+}
+
+
+					// Not sure if this is correct but 
+					vectorField masterToSlave(const label shadowI)  
+					//PrimitivePatchInterpolation<standAlonePatch>& masterToSlave();
+					{
+						masterToSlaveObj = vectorField zoneDD[const label shadowI];
+					 return  masterToSlaveObj;  //(const label shadowI)
+						};
+
+
+
+//Info << "TEST By RANJAN" << nl << endl;
+
+
 
 
 // Interpolate traction from slave to master
@@ -2337,283 +2611,6 @@ bool solidGeneralContactFvPatchVectorField::checkPatchAndFaceZones
   return true;
 }
 
-/*
-void solidGeneralContactFvPatchVectorField::evaluate(const Pstream::commsTypes)
-{
-    if (!this->updated())
-    {
-        this->updateCoeffs();
-    }
-
-    vectorField normalValue = transform(valueFraction(), refValue());
-
-    //- non-orthogonal correction vectors needed to calculate gradValue
-    const fvPatchField<tensor>& gradField =
-        patch().lookupPatchField<volTensorField, tensor>
-        (
-            "grad(" + fieldName_ + ")"
-        );
-    vectorField n = patch().nf();
-    vectorField delta = patch().delta();
-    vectorField k = delta - n*(n&delta);
-
-    vectorField gradValue =
-      this->patchInternalField()
-      + (k&gradField.patchInternalField())
-      + refGrad()/this->patch().deltaCoeffs();
-
-    Field<vector> transformGradValue =
-      transform(I - valueFraction(), gradValue);
-
-    Field<vector>::operator=(normalValue + transformGradValue);
-
-    fvPatchField<vector>::evaluate();
-}
-
-Foam::tmp<Foam::Field<vector> > solidGeneralContactFvPatchVectorField::
-snGrad() const
-{
-    vectorField pif = this->patchInternalField();
-
-    vectorField normalValue = transform(valueFraction(), refValue());
-
-    //- non-orthogonal correction vectors needed to calculate gradValue
-    const fvPatchField<tensor>& gradField =
-        patch().lookupPatchField<volTensorField, tensor>
-        (
-            "grad(" + fieldName_ + ")"
-        );
-    vectorField n = patch().nf();
-    vectorField delta = patch().delta();
-    vectorField k = delta - n*(n&delta);
-
-    vectorField gradValue =
-      this->patchInternalField()
-      + (k&gradField.patchInternalField())
-      + refGrad()/this->patch().deltaCoeffs();
-
-    vectorField transformGradValue =
-      transform(I - valueFraction(), gradValue);
-
-    return
-      (
-       (normalValue + transformGradValue)
-       - (pif + (k&gradField.patchInternalField()))
-       )*this->patch().deltaCoeffs();
-}
-*/
-
-
-//* * * * * * * * * * * * * * * * * * * * * * * * * START General  * * * * * * * * * * * * * * * * * * * * *//
-//- Increment of dissipated energy due to friction for each pair
-const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc
-(
-    const label shadowI
-) const
-{
-    if (!QcsPtr_)
-    {
-        calcQcs();
-    }
-
-    return (*QcsPtr_)[shadowI];
-	
-}
-
-
-const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc() const
-{
-    if (!QcPtr_)
-    {
-        calcQc();
-    }
-
-    return *QcPtr_;
-	
-}
-
-
-//void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
-//{
-/*    const boolList& locSlave = localSlave();
-
-    QcsPtr_ = new List<scalarField>(locSlave.size());
-
-    bool sigmaCauchyFound =
-        db().foundObject<volSymmTensorField>
-        (
-            "sigmaCauchy"
-        );
-
-    const scalar deltaT = patch().boundaryMesh().mesh().time().deltaT().value();
-
-    const volVectorField& field =
-        db().lookupObject<volVectorField>
-        (
-            dimensionedInternalField().name()
-        );
-
-    forAll(locSlave, shadowI)
-    {
-        scalarField& Qc = (*QcsPtr_)[shadowI];
-        Qc.setSize(patch().size(), 0.0);
-
-        // For now, we assume traction is constant over time-step
-        // Todo: use trapezoidal rule
-        vectorField curTraction(Qc.size(), vector::zero);
-
-        // sigma/sigmaCauchy is up-to-date as Qc is called after momentum loop
-        // has converged and sigma has been updated and mesh moved
-        if (sigmaCauchyFound)
-        {
-            const symmTensorField& sigma =
-                db().lookupObject<volSymmTensorField>
-                (
-                    "sigmaCauchy"
-                ).boundaryField()[patch().index()];
-
-            curTraction = patch().nf() & sigma;
-        }
-        else
-        {
-            const symmTensorField& sigma =
-            db().lookupObject<volSymmTensorField>
-            (
-                "sigma"
-            ).boundaryField()[patch().index()];
-
-            curTraction = patch().nf() & sigma;
-        }
-
-        // Calculate Qc for shadowI
-
-        vectorField curPatchSlip(Qc.size(), vector::zero);
-
-        // Calculate slip
-        if (locSlave[shadowI])
-        {
-            curPatchSlip = frictionModel(shadowI).slip();
-        }
-        else
-        {
-            const solidGeneralContactFvPatchVectorField& shadowPatchField =
-            refCast<const solidGeneralContactFvPatchVectorField>
-            (
-                field.boundaryField()[shadowPatchIndices()[shadowI]]
-            );
-
-            const label locShadowID =
-            shadowPatchField.findShadowID(patch().index());
-
-            vectorField shadowPatchSlip =
-            shadowPatchField.frictionModel(locShadowID).slip();
-
-            vectorField shadowZoneSlip =
-            zoneField
-            (
-                shadowZoneIndices()[shadowI],
-                shadowPatchIndices()[shadowI],
-                shadowPatchSlip
-            );
-
-            // Interpolate from shadow to the current patch
-            // Face-to-face
-
-            vectorField curZoneSlip =
-            shadowPatchField.zoneToZone(locShadowID).slaveToMaster
-            (
-                shadowZoneSlip
-            );
-
-            curPatchSlip =
-            patchField
-            (
-                patch().index(),
-                zoneIndex(),
-                curZoneSlip
-            );
-        }
-
-        // Heat flux rate: rate of dissipated frictional energy
-        // The dot product of the traction vectors and the slip vectors
-        // gives the dissipated frictional energy rate per unit area, which
-        // is always positive
-        Qc = mag(curTraction & (curPatchSlip/deltaT));
-    }
-	*/
-//}
-
-void Foam::solidGeneralContactFvPatchVectorField::calcBbOffset() const
-{
-    if (bbOffset_ != 0)
-    {
-        FatalErrorIn
-        (
-            "Foam::scalar Foam::solidGeneralContactFvPatchVectorField::"
-            "calcBbOffset() const"
-        )   << "already set" << abort(FatalError);
-    }
-
-    // We will set the BB offset to five times the average dimension of the
-    // smallest face on the zone
-
-    scalar minDim = GREAT;
-
-    if (patch().size() > 0)
-    {
-        minDim = min(sqrt(patch().magSf()));
-    }
-
-    bbOffset_ = 5.0*returnReduce(minDim, minOp<scalar>());
-
-    if (debug)
-    {
-        Info<< nl << "The bbOffset is " << bbOffset_ << endl;
-    }
-}
-
-Foam::scalar Foam::solidGeneralContactFvPatchVectorField::bbOffset() const
-{
-    if (bbOffset_ == 0)
-    {
-        calcBbOffset();
-    }
-
-    return bbOffset_;
-}
-
-
-const Foam::vectorField&
-Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
-(
-    const label shadowI
-) const
-{
-    if (!curPatchTractionPtr_)
-    {
- //       makeCurPatchTractions();
-    }
-
-    return (*curPatchTractionPtr_)[shadowI];
-}
-
-
-Foam::vectorField&
-Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
-(
-    const label shadowI
-)
-{
-    if (!curPatchTractionPtr_)
-    {
- //       makeCurPatchTractions();
-    }
-
-    return (*curPatchTractionPtr_)[shadowI];
-}
-
-// * * * * * * * * * * * * * * * * * * * * * * END General * * * * * * * * * * * * * * * * * * * * //
-
 
 // Write
 void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
@@ -2729,108 +2726,6 @@ void Foam::solidGeneralContactFvPatchVectorField::makeCurPatchTractions() const
 }
 
 
-const Foam::List<Foam::label>&
-Foam::solidGeneralContactFvPatchVectorField::shadowPatchIndices() const
-{
-
-    if (!shadowPatchIndicesPtr_)
-    {
-        calcShadowPatchNames();
-    }
-
-    return *shadowPatchIndicesPtr_;
-}
-
-/* const Foam::boolList&
-Foam::solidGeneralContactFvPatchVectorField::localSlave() const
-{
-    if (!localSlavePtr_)
-    {
-//        calcLocalSlave();
-    }
-
-    return *localSlavePtr_;
-} */
-
-Foam::normalContactModel&
-Foam::solidGeneralContactFvPatchVectorField::normalModel(const label shadowI)
-{
-    if (!localSlave()[shadowI])
-    {
-        FatalErrorIn("normalModel(const label shadowI)")
-            << "Only the local slave can call the contact model"
-            << abort(FatalError);
-    }
-
-    if (normalModelsPtrL_.empty())
-    {
-        //calcNormalModels();
-    }
-
-    return normalModelsPtrL_[shadowI];
-}
-
-
-const Foam::normalContactModel&
-Foam::solidGeneralContactFvPatchVectorField::normalModel
-(
-    const label shadowI
-) const
-{
-    if (!localSlave()[shadowI])
-    {
-        FatalErrorIn("normalModel(const label shadowI)")
-            << "Only the local slave can call the contact model"
-            << abort(FatalError);
-    }
-
-    if (normalModelsPtrL_.empty())
-    {
-        //calcNormalModels();
-    }
-
-    return normalModelsPtrL_[shadowI];
-}
-
-Foam::frictionContactModel&
-Foam::solidGeneralContactFvPatchVectorField::frictionModel(const label shadowI)
-{
-    if (!localSlave()[shadowI])
-    {
-        FatalErrorIn("frictionModel(const label shadowI)")
-            << "Only the local slave can call the contact model"
-            << abort(FatalError);
-    }
-
-    if (frictionModelsPtrL_.empty())
-    {
-        //calcFrictionModels();
-    }
-
-    return frictionModelsPtrL_[shadowI];
-}
-
-
-const Foam::frictionContactModel&
-Foam::solidGeneralContactFvPatchVectorField::frictionModel
-(
-    const label shadowI
-) const
-{
-    if (!localSlave()[shadowI])
-    {
-        FatalErrorIn("frictionModel(const label shadowI)")
-            << "Only the local slave can call the contact model"
-            << abort(FatalError);
-    }
-
-    if (frictionModelsPtrL_.empty())
-    {
-        //calcFrictionModels();
-    }
-
-    return frictionModelsPtrL_[shadowI];
-}
 
 
 
