@@ -140,6 +140,137 @@ standardPenalty::standardPenalty
 
 // * * * * * * * * * * * * * * Member Functions * * * * * * * * * * * * * * * //
 
+
+//*******************Overloaded correct function for solidGeneralContact*******************
+
+void standardPenalty::correct
+(
+    const vectorField& slavePatchFaceNormals,
+    const scalarField& slavePointPenetration,
+    const vectorField& slaveDU,
+    const vectorField& masterDUInterpToSlave
+)
+{
+    // Preliminaries
+    const fvMesh& mesh = mesh_;
+    const label slavePatchIndex = slavePatchID();
+
+    // Calculate area in contact for slave patch
+
+    const faceList& slavePatchLocalFaces =
+        mesh.boundaryMesh()[slavePatchIndex].localFaces();
+
+    const pointField& slavePatchLocalPoints =
+        mesh.boundaryMesh()[slavePatchIndex].localPoints();
+
+    scalarField slavePatchLocalFaceAreas(slavePatchLocalFaces.size(), 0.0);
+
+    scalarField& areaInContact = this->areaInContact();
+    forAll(slavePatchLocalFaces, faceI)
+    {
+        areaInContact[faceI] =
+            slavePatchLocalFaces[faceI].areaInContact
+            (
+                slavePatchLocalPoints,
+                slavePointPenetration
+            );
+
+        if (areaInContact[faceI] < -SMALL)
+        {
+            const labelList& labels = slavePatchLocalFaces[faceI];
+            scalarField vertexValue(labels.size());
+            forAll(labels, i)
+            {
+                vertexValue[i] = slavePointPenetration[labels[i]];
+            }
+
+            FatalErrorIn(type())
+                << "areaInContact is less than zero!" << nl
+                << "areaInContact[" << faceI << "] = " << areaInContact[faceI]
+                << nl
+                << "vertexValue = " << vertexValue << nl
+                << endl;
+        }
+
+        slavePatchLocalFaceAreas[faceI] =
+            mag(slavePatchLocalFaces[faceI].normal(slavePatchLocalPoints));
+    }
+
+    // Calculate the point pressures
+    // We will also record the average and minium penetrations
+
+    const scalar penaltyFac = penaltyFactor();
+    scalarField totalSlavePointPressure(slavePointPenetration.size(), 0.0);
+    averagePenetration_ = 0.0;
+    minPenetration_ = 0.0;
+    int nPointsInContact = 0;
+
+    forAll(totalSlavePointPressure, pointI)
+    {
+        // Take copy of penetration
+        const scalar d = slavePointPenetration[pointI];
+
+        // Note: penetration is negative for points in contact
+        {
+            // The force is linearly proportional the penetration, like a spring
+            if (d < epsilon0_)
+            {
+                totalSlavePointPressure[pointI] =
+                    max(penaltyFac*(epsilon0_ - d), 0.0);
+
+                averagePenetration_ += d;
+                minPenetration_ = min(minPenetration_, d);
+                nPointsInContact++;
+            }
+            else
+            {
+                totalSlavePointPressure[pointI] = 0.0;
+            }
+        }
+    }
+
+    // Find global minimum penetration
+    // IB 11/2018
+    reduce(minPenetration_, minOp<scalar>());
+
+    // Update the average penetration
+    reduce(averagePenetration_, sumOp<scalar>());
+    reduce(nPointsInContact, sumOp<label>());
+    if (nPointsInContact > 0)
+    {
+        averagePenetration_ /= nPointsInContact;
+    }
+    else
+    {
+        averagePenetration_ = 0.0;
+    }
+
+
+    // Interpolate point pressures to the faces
+
+    // Create local patch interpolation: No need to interpolate using the entire
+    // face zone patch
+    primitivePatchInterpolation localSlaveInterpolator
+    (
+        mesh.boundaryMesh()[slavePatchIndex]
+    );
+
+    // Interpolate point pressures to the face centres and apply in the negative
+    // normal direction
+    vectorField newSlaveTraction =
+        localSlaveInterpolator.pointToFaceInterpolate<scalar>
+        (
+            totalSlavePointPressure
+        )*(-slavePatchFaceNormals);
+
+    // Under-relax pressure/traction
+    // Note: slavePressure_ is really a traction vector
+    slavePressure() =
+        relaxFac_*newSlaveTraction + (1.0 - relaxFac_)*slavePressure();
+}
+
+//******************* End Overloaded General Contact********************
+
   void standardPenalty::correct
   (
    const PrimitivePatch<face, List, pointField>& masterFaceZonePatch,

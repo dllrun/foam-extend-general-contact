@@ -158,6 +158,18 @@ public:
 
 
     // Member Functions
+	
+		//*******************Overloaded correct function for solidGeneralContact*******************
+		    //- Correct contact model
+        virtual void correct
+        (
+            const vectorField& slavePatchFaceNormals,
+            const scalarField& slavePointPenetration,
+            const vectorField& slaveDU,
+            const vectorField& masterDUInterpToSlave
+        );
+		//******************* End Overloaded General Contact********************
+		
 
 
         //- Correct contact model

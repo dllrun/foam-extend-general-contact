@@ -217,6 +217,15 @@ public:
                               >* ggiInterpolatorPtr
             ) = 0;
 				
+				
+		//- Correct contact model
+        virtual void correct
+        (
+            const vectorField& slavePatchFaceNormals,
+            const scalarField& slavePointPenetration,
+            const vectorField& slaveDU,
+            const vectorField& masterDUInterpToSlave
+        ) = 0;
 		
         //- Return slave displacement
         virtual const vectorField& slaveDisp() const = 0;

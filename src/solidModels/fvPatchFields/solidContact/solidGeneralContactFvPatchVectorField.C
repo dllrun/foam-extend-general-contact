@@ -1750,7 +1750,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					
 					//********************* end ERROR (primitivePatchInterpolationHasNoMember.png) *****************************
 					
-					/*
+					
 					FatalError
                         << "Disabled: use jasakSolidContact" << abort(FatalError);
                      normalModel(shadowI).correct
@@ -1760,7 +1760,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                          shadowPatchDD,
                          patchDDInterpToShadowPatch
                      );
-					 */
+					 
 					
 					// *********** start ERROR(patchDDInterpToShadowPatch was not declared in this scope)*************
 					/*
