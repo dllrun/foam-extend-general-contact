@@ -31,6 +31,8 @@ $(cohesiveLaws)/multiMaterialCohesiveLaw/multiMaterialCohesiveLaw.C
 $(cohesiveLaws)/dugdaleCohesiveLaw/dugdaleCohesiveLaw.C
 $(cohesiveLaws)/linearCohesiveLaw/linearCohesiveLaw.C
 
+numerics/newGGIInterpolation/newGGIInterpolationName.C
+
 contactModels = contactModels
 $(contactModels)/normalContactModels/normalContactModel/normalContactModel.C
 $(contactModels)/normalContactModels/normalContactModel/newNormalContactModel.C

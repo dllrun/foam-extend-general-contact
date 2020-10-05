@@ -416,7 +416,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
 
 void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
 {
-  /*  if (!normalModels_.empty())
+  /*  if (!normalModelsPtrL_.empty())
     {
         FatalErrorIn
         (
@@ -425,17 +425,17 @@ void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
         )   << "normalModels already set" << abort(FatalError);
     }
 
-    normalModels_.setSize(shadowPatchNames().size());
+    normalModelsPtrL_.setSize(shadowPatchNames().size());
 
     const boolList& locSlave = localSlave();
 
-    forAll(normalModels_, shadowI)
+    forAll(normalModelsPtrL_, shadowI)
     {
         // Only the local slave creates the contact model
         if (locSlave[shadowI])
         {
             // Calculate normal contact forces
-            normalModels_.set
+            normalModelsPtrL_.set
             (
                 shadowI,
                 normalContactModel::New
@@ -497,7 +497,7 @@ Foam::solidGeneralContactFvPatchVectorField::normalModel
 void Foam::solidGeneralContactFvPatchVectorField::calcFrictionModels() const
 {
 /*  
-  if (!frictionModels_.empty())
+  if (!frictionModelsPtrL_.empty())
     {
         FatalErrorIn
         (
@@ -506,15 +506,15 @@ void Foam::solidGeneralContactFvPatchVectorField::calcFrictionModels() const
         )   << "frictionModelPtr_[shadowI] already set" << abort(FatalError);
     }
 
-    frictionModels_.setSize(shadowPatchNames().size());
+    frictionModelsPtrL_.setSize(shadowPatchNames().size());
 
     const boolList& locSlave = localSlave();
 
-    forAll(frictionModels_, shadowI)
+    forAll(frictionModelsPtrL_, shadowI)
     {
         if (locSlave[shadowI])
         {
-            frictionModels_.set
+            frictionModelsPtrL_.set
                 (
                     shadowI,
                     frictionContactModel::New
@@ -868,6 +868,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     frictionModelsPtrL_(0),
     zonePtr_(NULL),
     zoneToZones_(0),
+	zoneToZonesNewGgi_(0),
 	alg_(Foam::intersection::VISIBLE),
     dir_(Foam::intersection::CONTACT_SPHERE),
 	curTimeIndex_(-1),
@@ -923,6 +924,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     frictionModelsPtrL_(NULL), //(ptf.frictionModelsPtrL_),
     zonePtr_(NULL),
     zoneToZones_(0),
+	zoneToZonesNewGgi_(0),
     alg_(ptf.alg_),
     dir_(ptf.dir_),
     curTimeIndex_(ptf.curTimeIndex_),
@@ -997,7 +999,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
     }
 
-    if (!ptf.zoneToZones_.empty())
+    if (!ptf.zoneToZonesNewGgi_.empty())
     {
         // I will not copy the GGI interpolators
         // They can be re-created when required
@@ -1057,6 +1059,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     frictionModelsPtrL_(0),
     zonePtr_(0),
     zoneToZones_(0),
+	zoneToZonesNewGgi_(0),
     alg_(Foam::intersection::VISIBLE),
     dir_(Foam::intersection::CONTACT_SPHERE),
     curTimeIndex_(-1),
@@ -1140,6 +1143,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     frictionModelsPtrL_(NULL),   //(ptf.frictionModelsPtrL_),
     zonePtr_(NULL),
     zoneToZones_(0),
+	zoneToZonesNewGgi_(0),
     alg_(ptf.alg_),
     dir_(ptf.dir_),
     curTimeIndex_(ptf.curTimeIndex_),
@@ -1202,7 +1206,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
     }
 
-    if (!ptf.zoneToZones_.empty())
+    if (!ptf.zoneToZonesNewGgi_.empty())
     {
         // I will not copy the GGI interpolators
         // They can be re-created when required
@@ -1259,6 +1263,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     frictionModelsPtrL_(NULL), //(ptf.frictionModelsPtrL_),
     zonePtr_(NULL),
     zoneToZones_(0),
+	zoneToZonesNewGgi_(0),
     alg_(ptf.alg_),
     dir_(ptf.dir_),
     curTimeIndex_(ptf.curTimeIndex_),
@@ -1331,7 +1336,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
     }
 
-    if (!ptf.zoneToZones_.empty())
+    if (!ptf.zoneToZonesNewGgi_.empty())
     {
         // I will not copy the GGI interpolators
         // They can be re-created when required
@@ -1396,6 +1401,7 @@ Foam::solidGeneralContactFvPatchVectorField::
     deleteDemandDrivenData(zonePtr_);
 
     zoneToZones_.clear();
+	zoneToZonesNewGgi_.clear();
 
     deleteDemandDrivenData(curPatchTractionPtr_);
     deleteDemandDrivenData(QcPtr_);
@@ -1731,27 +1737,30 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					
 					//*********************** start ERROR (primitivePatchInterpolationHasNoMember.png) **************************
                     // Master patch DD interpolated to the slave patch
-                    /*
+                    
 					const vectorField patchDDInterpToShadowPatch =
                         patchField
                         (
                             shadowPatchIndices()[shadowI],
                             shadowZoneIndices()[shadowI],
-                            masterToSlave(zoneDD)    //zoneToZone(shadowI).masterToSlave(zoneDD)()
+							//checking shadowZone(shadowI) instead of zoneToZone(shadowI)
+                            //zoneToZone(shadowI).masterToSlave(zoneDD)()
+							zoneToZoneNewGgi(shadowI).masterToSlave(zoneDD)()
                         );
-					*/
+					
 					//********************* end ERROR (primitivePatchInterpolationHasNoMember.png) *****************************
 					
-					
+					/*
 					FatalError
                         << "Disabled: use jasakSolidContact" << abort(FatalError);
-                    // normalModel(shadowI).correct
-                    // (
-                    //     shadowPatchFaceNormals,
-                    //     zoneToZone(shadowI),
-                    //     shadowPatchDD,
-                    //     patchDDInterpToShadowPatch
-                    // );
+                     normalModel(shadowI).correct
+                     (
+                         shadowPatchFaceNormals,
+                         zoneToZone(shadowI),
+                         shadowPatchDD,
+                         patchDDInterpToShadowPatch
+                     );
+					 */
 					
 					// *********** start ERROR(patchDDInterpToShadowPatch was not declared in this scope)*************
 					/*
@@ -2081,7 +2090,7 @@ Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
 void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
 {
     // Create zone-to-zone interpolation
-    if (!zoneToZones_.empty())
+    if (!zoneToZonesNewGgi_.empty())
     {
         FatalErrorIn
         (
@@ -2091,18 +2100,18 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
             << abort(FatalError);
     }
 
-    zoneToZones_.setSize(shadowPatchNames().size());
+    zoneToZonesNewGgi_.setSize(shadowPatchNames().size());
 
     const boolList& locSlave = localSlave();
 
-    forAll(zoneToZones_, shadowI)
+    forAll(zoneToZonesNewGgi_, shadowI)
     {
         // Only the local slave creates the interpolator
         if (locSlave[shadowI])
         {
 			//*****(start ERROR, may be GGIInterpolation type works)**********
 			/*
-            zoneToZones_.set
+            zoneToZonesNewGgi_.set
                 (
                     shadowI,
                     new primitivePatchInterpolation //(ERROR so I made a Replacement of newGgiStandAlonePatchInterpolation)
@@ -2129,20 +2138,23 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
 }
 
 //(start ERROR Replacement of newGgiStandAlonePatchInterpolation)
-const Foam::PrimitivePatchInterpolation<standAlonePatch>&     //(Replacement with primitivePatchInterpolation& work)
-Foam::solidGeneralContactFvPatchVectorField::zoneToZone
+
+//********(end ERROR Replacement of newGgiStandAlonePatchInterpolation)
+
+const Foam::newGgiStandAlonePatchInterpolation&
+Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi
 (
     const label shadowI
 ) const
-{
-    if (!localSlave()[shadowI])
+{   
+   if (!localSlave()[shadowI])
     {
-        FatalErrorIn("zoneToZone(const label shadowI)")
-            << "Only the local slave can call the zoneToZone interpolator"
+        FatalErrorIn("zoneToZoneNewGgi(const label shadowI)")
+            << "Only the local slave can call the zoneToZoneNewGgi interpolator"
             << abort(FatalError);
     }
 
-    if (zoneToZones_.empty())
+    if (zoneToZonesNewGgi_.empty())
     {
         word zoneName =
             patch().boundaryMesh().mesh().faceZones()[zoneIndex()].name();
@@ -2156,13 +2168,11 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZone
         calcZoneToZones();
     }
 
-    return zoneToZones_[shadowI];
+    return zoneToZonesNewGgi_[shadowI];
 }
-//********(end ERROR Replacement of newGgiStandAlonePatchInterpolation)
 
-//(Replacement primitivePatchInterpolation& works)
-Foam::PrimitivePatchInterpolation<standAlonePatch>&  //********(start ERROR Replacement of newGgiStandAlonePatchInterpolation)
-Foam::solidGeneralContactFvPatchVectorField::zoneToZone(const label shadowI)
+Foam::newGgiStandAlonePatchInterpolation&
+Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi(const label shadowI)
 {
     if (!localSlave()[shadowI])
     {
@@ -2171,7 +2181,7 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZone(const label shadowI)
             << abort(FatalError);
     }
 
-    if (zoneToZones_.empty())
+    if (zoneToZonesNewGgi_.empty())
     {
         word zoneName =
             patch().boundaryMesh().mesh().faceZones()[zoneIndex()].name();
@@ -2185,8 +2195,10 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZone(const label shadowI)
         calcZoneToZones();
     }
 
-    return zoneToZones_[shadowI];
+    return zoneToZonesNewGgi_[shadowI];
 }
+
+
 
 //********(end ERROR Replacement of newGgiStandAlonePatchInterpolation)
 
@@ -2204,13 +2216,38 @@ bool Foam::solidGeneralContactFvPatchVectorField::globalMaster() const
 }
 
 
-					// Not sure if this is correct but 
-					vectorField masterToSlave(const label shadowI)  
+					// Compare 
+					/*				//shadowPatchFaceNormals
+					const vectorField patchDDInterpToShadowPatch =
+                        patchField
+                        (
+                            shadowPatchIndices()[shadowI],
+                            shadowZoneIndices()[shadowI],
+                           //shadowZone(shadowI).faceNormals()
+							zoneToZone(shadowI).masterToSlave(zoneDD)()
+                        );
+						*/
+				
+				// Not sure if this is correct but
+				/*
+				vectorField masterToSlave(const label shadowI, const vectorField zoneDD)  
+					//PrimitivePatchInterpolation<standAlonePatch>& masterToSlave();
+					{						
+						vectorField masterToSlaveObj = vectorField zoneDD[const label shadowI];
+					 return masterToSlaveObj;  //(const label shadowI)
+						};
+						*/
+						
+				/*	vectorField masterToSlave(const label shadowI)  
 					//PrimitivePatchInterpolation<standAlonePatch>& masterToSlave();
 					{
-						masterToSlaveObj = vectorField zoneDD[const label shadowI];
-					 return  masterToSlaveObj;  //(const label shadowI)
+						const vectorField DDzoneDD [const label shadowI] = zoneField(zoneIndex(),patch().index(),patchDD);
+						// const vectorField DDzoneDD = zoneField(zoneIndex(),patch().index(),patchDD);
+						// masterToSlaveObj = vectorField DDzoneDD [const label shadowI];
+					 return DDzoneDD;  
 						};
+						*/
+						
 
 
 

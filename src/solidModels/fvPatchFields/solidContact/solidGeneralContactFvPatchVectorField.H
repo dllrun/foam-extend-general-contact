@@ -62,6 +62,7 @@ Author
 #include "Switch.H"
 #include "NamedEnum.H"
 #include "standAlonePatch.H"					  //Check standAlonePatch vs primitivePatchInterpolation
+#include "newGgiInterpolation.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -114,6 +115,9 @@ class solidGeneralContactFvPatchVectorField
         //- List of zone-to-zone interpolators
 		//(Replacement to PtrList<primitivePatchInterpolation> works) PrimitivePatchInterpolation<standAlonePatch> 
         mutable PtrList<PrimitivePatchInterpolation<standAlonePatch>> zoneToZones_;
+		
+		//- List of zone-to-zone interpolators
+        mutable PtrList<newGgiStandAlonePatchInterpolation> zoneToZonesNewGgi_;
 
         //- Global face zones in the mesh
         mutable labelList* globalFaceZonesPtr_;
@@ -514,13 +518,19 @@ public:
             (
                 const label shadowI
             ) const;
+			
+			//- Return const reference to patch-to-patch interpolation
+            const newGgiStandAlonePatchInterpolation& zoneToZoneNewGgi
+            (
+                const label shadowI
+            ) const;
 
-            //- Return reference to patch-to-patch interpolation (Replacement of newGgiStandAlonePatchInterpolation class)
-			// (Also, replacement of primitivePatchInterpolation&)
-            PrimitivePatchInterpolation<standAlonePatch>& zoneToZone
+			//- Return reference to patch-to-patch interpolation
+            newGgiStandAlonePatchInterpolation& zoneToZoneNewGgi
             (
                 const label shadowI
             );
+			
 
             //- Given the patch index of a shadow, return the position in the
             // shadow list of the current patch
