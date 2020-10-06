@@ -217,7 +217,9 @@ public:
                               >* ggiInterpolatorPtr
             ) = 0;
 				
-				
+		
+		//*******************Overloaded correct function for solidGeneralContact*******************
+		/*		
 		//- Correct contact model
         virtual void correct
         (
@@ -226,6 +228,8 @@ public:
             const vectorField& slaveDU,
             const vectorField& masterDUInterpToSlave
         ) = 0;
+		*/
+		//******************* End Overloaded General Contact********************
 		
         //- Return slave displacement
         virtual const vectorField& slaveDisp() const = 0;

@@ -160,6 +160,7 @@ public:
     // Member Functions
 	
 		//*******************Overloaded correct function for solidGeneralContact*******************
+		/*
 		    //- Correct contact model
         virtual void correct
         (
@@ -168,6 +169,7 @@ public:
             const vectorField& slaveDU,
             const vectorField& masterDUInterpToSlave
         );
+		*/
 		//******************* End Overloaded General Contact********************
 		
 

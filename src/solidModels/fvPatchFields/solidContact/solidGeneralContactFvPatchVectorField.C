@@ -803,21 +803,20 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
                     shadowPatchIndices()[shadowI],
                     shadowPatchSlip
                 );
-			*/	
-			//*********************** end ERROR (shadowPatchSlip not declared in this scope) ***********************
+			
 
             // Interpolate from shadow to the current patch
             // Face-to-face
 			
-			//******************* start ERROR (primitivePatchInterpolation has no member slaveToMaster) ********************
-            /*
+			
 			vectorField curZoneSlip =
-                shadowPatchField.zoneToZone(locShadowID).slaveToMaster
+                shadowPatchField.zoneToZoneNewGgi(locShadowID).slaveToMaster
                 (
                     shadowZoneSlip
                 );
-			*/
-			//******************* end ERROR (primitivePatchInterpolation has no member slaveToMaster) ********************
+			
+			*/	
+			//*********************** end ERROR (shadowPatchSlip not declared in this scope) ***********************
 			
 			//*********************** start ERROR (curZoneSlip not declared in this scope) ***********************
             /*
@@ -1733,9 +1732,8 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             patchDD
                         );
 					
-											
 					
-					//*********************** start ERROR (primitivePatchInterpolationHasNoMember.png) **************************
+			
                     // Master patch DD interpolated to the slave patch
                     
 					const vectorField patchDDInterpToShadowPatch =
@@ -1747,10 +1745,9 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             //zoneToZone(shadowI).masterToSlave(zoneDD)()
 							zoneToZoneNewGgi(shadowI).masterToSlave(zoneDD)()
                         );
+										
 					
-					//********************* end ERROR (primitivePatchInterpolationHasNoMember.png) *****************************
-					
-					
+					/*
 					FatalError
                         << "Disabled: use jasakSolidContact" << abort(FatalError);
                      normalModel(shadowI).correct
@@ -1760,7 +1757,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                          shadowPatchDD,
                          patchDDInterpToShadowPatch
                      );
-					 
+					 */
 					
 					// *********** start ERROR(patchDDInterpToShadowPatch was not declared in this scope)*************
 					/*
@@ -1826,16 +1823,14 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         );
 				
 					// Face-to-face
-					//********************** start ERROR (primitivePatchInterpolationHasNoMember.png) ***********************
-                    /*vectorField masterZoneTraction =
-                        localMasterField.zoneToZone
+					vectorField masterZoneTraction =
+                        localMasterField.zoneToZoneNewGgi
                         (
                             masterShadowI
                         ).slaveToMaster(shadowZoneTraction);
-						*/
+						
 					
-					//*********************** end ERROR (primitivePatchInterpolationHasNoMember.png) ************************
-
+					
                     // We store master patch traction as thermalGeneralContact
                     // uses it
 					//*********************** start ERROR (masterZoneTraction not declared in scope) ************************
@@ -1978,20 +1973,20 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
                     shadowPatchIndices()[shadowI],
                     shadowPatchSlip
                 );
-			*/	
-			//*********************** end ERROR (shadowPatchSlip not declared in this scope) ***********************
+			
 
             // Interpolate from shadow to the current patch
             // Face-to-face
-			//******************* start ERROR (primitivePatchInterpolation has no member slaveToMaster) ********************
-            /*
+			
+            
 			vectorField curZoneSlip =
-                shadowPatchField.zoneToZone(locShadowID).slaveToMaster
+                shadowPatchField.zoneToZoneNewGgi(locShadowID).slaveToMaster
                 (
                     shadowZoneSlip
                 );
-			*/
-			//******************* end ERROR (primitivePatchInterpolation has no member slaveToMaster) *******************
+			
+			*/	
+			//*********************** end ERROR (shadowPatchSlip not declared in this scope) ***********************
 			
 				
 			//*********************** start ERROR (curZoneSlip not declared in this scope) ***********************
@@ -2110,11 +2105,11 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
         if (locSlave[shadowI])
         {
 			//*****(start ERROR, may be GGIInterpolation type works)**********
-			/*
+			
             zoneToZonesNewGgi_.set
                 (
                     shadowI,
-                    new primitivePatchInterpolation //(ERROR so I made a Replacement of newGgiStandAlonePatchInterpolation)
+                    new newGgiStandAlonePatchInterpolation 
                     (
                         shadowZone(shadowI), // master
                         zone(), // slave
@@ -2125,14 +2120,13 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
                         0,              // Non-overlapping face tolerances
                         0,              //
                         true,           // Rescale weighting factors.
-                        ggiInterpolation::AABB   // (ERROR so I made a Replacement of newGgiInterpolation)
+                        newGgiInterpolation::AABB   
                         //newGgiInterpolation::BB_OCTREE
                         //newGgiInterpolation::THREE_D_DISTANCE
                         //newGgiInterpolation::N_SQUARED
                     )
                 );
-				*/
-				//*****(end ERROR, may be GGIInterpolation type works)**********
+				
         }
     }
 }

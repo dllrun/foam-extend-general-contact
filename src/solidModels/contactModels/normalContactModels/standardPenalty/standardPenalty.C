@@ -142,7 +142,7 @@ standardPenalty::standardPenalty
 
 
 //*******************Overloaded correct function for solidGeneralContact*******************
-
+/*
 void standardPenalty::correct
 (
     const vectorField& slavePatchFaceNormals,
@@ -269,6 +269,7 @@ void standardPenalty::correct
         relaxFac_*newSlaveTraction + (1.0 - relaxFac_)*slavePressure();
 }
 
+*/
 //******************* End Overloaded General Contact********************
 
   void standardPenalty::correct
