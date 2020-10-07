@@ -36,8 +36,15 @@ numerics/newGGIInterpolation/newGGIInterpolationName.C
 contactModels = contactModels
 $(contactModels)/normalContactModels/normalContactModel/normalContactModel.C
 $(contactModels)/normalContactModels/normalContactModel/newNormalContactModel.C
+
+$(contactModels)/generalNormalContactModels/generalNormalContactModel/generalNormalContactModel.C
+$(contactModels)/generalNormalContactModels/generalNormalContactModel/newGeneralNormalContactModel.C
+
 $(contactModels)/normalContactModels/iterativePenalty/iterativePenalty.C
 $(contactModels)/normalContactModels/standardPenalty/standardPenalty.C
+
+$(contactModels)/generalNormalContactModels/generalStandardPenalty/generalStandardPenalty.C
+
 $(contactModels)/normalContactModels/dirichletNeumann/dirichletNeumann.C
 $(contactModels)/frictionContactModels/frictionContactModel/frictionContactModel.C
 $(contactModels)/frictionContactModels/frictionContactModel/newFrictionContactModel.C

@@ -416,7 +416,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
 
 void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
 {
-  /*  if (!normalModelsPtrL_.empty())
+    if (!normalModelsPtrL_.empty())
     {
         FatalErrorIn
         (
@@ -434,6 +434,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
         // Only the local slave creates the contact model
         if (locSlave[shadowI])
         {
+			/*
             // Calculate normal contact forces
             normalModelsPtrL_.set
             (
@@ -449,9 +450,10 @@ void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
                     zone() // slave
                 )
             );
+			*/
         }
     }
-*/
+
 }
 
 Foam::normalContactModel&
