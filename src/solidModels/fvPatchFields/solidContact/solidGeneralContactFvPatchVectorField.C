@@ -1566,19 +1566,19 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
         }
 
 //*************************************** ERROR (NoMatchingFunctionForCall.png) *************************************
-	/*	// Clear interpolator weights
+		// Clear interpolator weights
 
         forAll(activeContactPairs, slaveI)
         {
             if (localSlave()[slaveI])
             {
-                zoneToZone(slaveI).movePoints
+                zoneToZoneNewGgi(slaveI).movePoints
                 (
                     tensorField(0), tensorField(0), vectorField(0)
                 );
             }
         }
-		*/
+		
 //*************************************** ERROR (NoMatchingFunctionForCall.png) **************************************
 
 		// Accumulated traction for the current patch
@@ -1755,7 +1755,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                      normalModel(shadowI).correct
                      (
                          shadowPatchFaceNormals,
-                         zoneToZone(shadowI),
+                         zoneToZoneNewGgi(shadowI),
                          shadowPatchDD,
                          patchDDInterpToShadowPatch
                      );
