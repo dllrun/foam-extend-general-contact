@@ -434,14 +434,14 @@ void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
         // Only the local slave creates the contact model
         if (locSlave[shadowI])
         {
-			/*
+			
             // Calculate normal contact forces
             normalModelsPtrL_.set
             (
                 shadowI,
-                normalContactModel::New
+                generalNormalContactModel::New
                 (
-                    word(dict().lookup("normalContactModel")),
+                    word(dict().lookup("generalNormalContactModel")),
                     patch().boundaryMesh()[shadowPatchIndices()[shadowI]],
                     dict(),
                     shadowPatchIndices()[shadowI], // master
@@ -450,13 +450,13 @@ void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
                     zone() // slave
                 )
             );
-			*/
+			
         }
     }
 
 }
 
-Foam::normalContactModel&
+Foam::generalNormalContactModel&
 Foam::solidGeneralContactFvPatchVectorField::normalModel(const label shadowI)
 {
     if (!localSlave()[shadowI])
@@ -474,7 +474,7 @@ Foam::solidGeneralContactFvPatchVectorField::normalModel(const label shadowI)
     return normalModelsPtrL_[shadowI];
 }
 
-const Foam::normalContactModel&
+const Foam::generalNormalContactModel&
 Foam::solidGeneralContactFvPatchVectorField::normalModel
 (
     const label shadowI
@@ -2668,7 +2668,7 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
 
     if (localSlave()[shadowI])
     {
-        os.writeKeyword("normalContactModel")
+        os.writeKeyword("generalNormalContactModel")
             << normalModel(shadowI).type() << token::END_STATEMENT << nl;
         normalModel(shadowI).writeDict(os);
 
@@ -2696,7 +2696,7 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
         const label localSlaveID =
             localSlaveField.findShadowID(patch().index());
 
-        os.writeKeyword("normalContactModel")
+        os.writeKeyword("generalNormalContactModel")
             << localSlaveField.normalModel(localSlaveID).type()
             << token::END_STATEMENT << nl;
         localSlaveField.normalModel(localSlaveID).writeDict(os);
