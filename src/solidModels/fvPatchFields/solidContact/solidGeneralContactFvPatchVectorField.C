@@ -468,7 +468,7 @@ Foam::solidGeneralContactFvPatchVectorField::normalModel(const label shadowI)
 
     if (normalModelsPtrL_.empty())
     {
-        //calcNormalModels();
+        calcNormalModels();
     }
 
     return normalModelsPtrL_[shadowI];
@@ -489,7 +489,7 @@ Foam::solidGeneralContactFvPatchVectorField::normalModel
 
     if (normalModelsPtrL_.empty())
     {
-        //calcNormalModels();
+        calcNormalModels();
     }
 
     return normalModelsPtrL_[shadowI];
@@ -1565,7 +1565,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
             moveFaceZonesToDeformedConfiguration();
         }
 
-//*************************************** ERROR (NoMatchingFunctionForCall.png) *************************************
+
 		// Clear interpolator weights
 
         forAll(activeContactPairs, slaveI)
@@ -1579,7 +1579,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
             }
         }
 		
-//*************************************** ERROR (NoMatchingFunctionForCall.png) **************************************
+
 
 		// Accumulated traction for the current patch
         vectorField curPatchTraction(patch().size(), vector::zero);
@@ -1836,14 +1836,14 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                     // We store master patch traction as thermalGeneralContact
                     // uses it
 					//*********************** start ERROR (masterZoneTraction not declared in scope) ************************
-                    /*curPatchTractions(shadowI) =
+                    curPatchTractions(shadowI) =
                         patchField
                         (
                             patch().index(),
                             zoneIndex(),
                             masterZoneTraction
                         );
-					*/
+					
 					//*********************** end ERROR (masterZoneTraction not declared in scope) ************************
 					
                     curPatchTraction += curPatchTractions(shadowI);
@@ -2106,7 +2106,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
         // Only the local slave creates the interpolator
         if (locSlave[shadowI])
         {
-			//*****(start ERROR, may be GGIInterpolation type works)**********
+			
 			
             zoneToZonesNewGgi_.set
                 (
@@ -2133,9 +2133,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
     }
 }
 
-//(start ERROR Replacement of newGgiStandAlonePatchInterpolation)
 
-//********(end ERROR Replacement of newGgiStandAlonePatchInterpolation)
 
 const Foam::newGgiStandAlonePatchInterpolation&
 Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi
@@ -2196,10 +2194,6 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi(const label shadow
 
 
 
-//********(end ERROR Replacement of newGgiStandAlonePatchInterpolation)
-
-
-
 
 bool Foam::solidGeneralContactFvPatchVectorField::globalMaster() const
 {
@@ -2212,38 +2206,7 @@ bool Foam::solidGeneralContactFvPatchVectorField::globalMaster() const
 }
 
 
-					// Compare 
-					/*				//shadowPatchFaceNormals
-					const vectorField patchDDInterpToShadowPatch =
-                        patchField
-                        (
-                            shadowPatchIndices()[shadowI],
-                            shadowZoneIndices()[shadowI],
-                           //shadowZone(shadowI).faceNormals()
-							zoneToZone(shadowI).masterToSlave(zoneDD)()
-                        );
-						*/
-				
-				// Not sure if this is correct but
-				/*
-				vectorField masterToSlave(const label shadowI, const vectorField zoneDD)  
-					//PrimitivePatchInterpolation<standAlonePatch>& masterToSlave();
-					{						
-						vectorField masterToSlaveObj = vectorField zoneDD[const label shadowI];
-					 return masterToSlaveObj;  //(const label shadowI)
-						};
-						*/
-						
-				/*	vectorField masterToSlave(const label shadowI)  
-					//PrimitivePatchInterpolation<standAlonePatch>& masterToSlave();
-					{
-						const vectorField DDzoneDD [const label shadowI] = zoneField(zoneIndex(),patch().index(),patchDD);
-						// const vectorField DDzoneDD = zoneField(zoneIndex(),patch().index(),patchDD);
-						// masterToSlaveObj = vectorField DDzoneDD [const label shadowI];
-					 return DDzoneDD;  
-						};
-						*/
-						
+					
 
 
 
