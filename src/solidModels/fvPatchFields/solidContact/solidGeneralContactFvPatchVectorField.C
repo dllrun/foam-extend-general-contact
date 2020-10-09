@@ -498,7 +498,7 @@ Foam::solidGeneralContactFvPatchVectorField::normalModel
 
 void Foam::solidGeneralContactFvPatchVectorField::calcFrictionModels() const
 {
-/*  
+  
   if (!frictionModelsPtrL_.empty())
     {
         FatalErrorIn
@@ -530,7 +530,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcFrictionModels() const
                 );
         }
     }
-	*/
+	
 }
 
 Foam::generalFrictionContactModel&
@@ -545,7 +545,7 @@ Foam::solidGeneralContactFvPatchVectorField::frictionModel(const label shadowI)
 
     if (frictionModelsPtrL_.empty())
     {
-        //calcFrictionModels();
+        calcFrictionModels();
     }
 
     return frictionModelsPtrL_[shadowI];
@@ -567,7 +567,7 @@ Foam::solidGeneralContactFvPatchVectorField::frictionModel
 
     if (frictionModelsPtrL_.empty())
     {
-        //calcFrictionModels();
+        calcFrictionModels();
     }
 
     return frictionModelsPtrL_[shadowI];
@@ -1745,6 +1745,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         );
 										
 					
+					// *************** start ERROR (noMatchingFunctionCall)******************
 					/*
 					FatalError
                         << "Disabled: use jasakSolidContact" << abort(FatalError);
@@ -1757,7 +1758,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                      );
 					 */
 					
-
+					// *************** end ERROR (noMatchingFunctionCall)******************
 					
 					frictionModel(shadowI).correct
                     (
