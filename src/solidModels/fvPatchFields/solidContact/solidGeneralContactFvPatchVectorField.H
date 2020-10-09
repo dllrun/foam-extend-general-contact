@@ -37,7 +37,7 @@ Description
     and the slave gets the pointer to it.
     The treatment of the normal contact and tangential contact can be specified
     individually at run-time using the generalNormalContactModel and
-    frictionContactModel. 
+    generalFrictionContactModel. 
 
 SourceFiles
     solidGenContactFvPatchVectorField.C       //0. check name
@@ -55,7 +55,7 @@ Author
 #include "solidTractionFvPatchVectorField.H"
 #include "nonLinearGeometry.H"
 #include "generalNormalContactModel.H"
-#include "frictionContactModel.H"
+#include "generalFrictionContactModel.H"
 #include "primitivePatchInterpolation.H"
 #include "patchToPatchInterpolation.H"
 #include "ggiInterpolation.H"                     //3. check name
@@ -107,7 +107,7 @@ class solidGeneralContactFvPatchVectorField
         mutable PtrList<generalNormalContactModel> normalModelsPtrL_;
 
         //- List of friction contact models
-        mutable PtrList<frictionContactModel> frictionModelsPtrL_;
+        mutable PtrList<generalFrictionContactModel> frictionModelsPtrL_;
 
         // Master face zone kept in deformed configuration
         mutable standAlonePatch* zonePtr_;
@@ -162,7 +162,7 @@ class solidGeneralContactFvPatchVectorField
 
         //- contact normallaw pointer
         generalNormalContactModel* normalContactModelPtr_;
-        frictionContactModel* frictionContactModelPtr_;
+        generalFrictionContactModel* frictionContactModelPtr_;
 
         //- shadow patch ID
         const label shadowPatchID_;
@@ -492,10 +492,10 @@ public:
             const generalNormalContactModel& normalModel(const label shadowI) const;
 
             //- Return reference to the friction contact model
-            frictionContactModel& frictionModel(const label shadowI);
+            generalFrictionContactModel& frictionModel(const label shadowI);
 
             //- Return const reference to the friction contact model
-            const frictionContactModel& frictionModel
+            const generalFrictionContactModel& frictionModel
             (
                 const label shadowI
             ) const;
@@ -564,7 +564,7 @@ public:
             }
 
             //- Return contact normal friction pointer   //ALERT: global Version uses reference var
-            frictionContactModel* frictionContactModelPtr() const
+            generalFrictionContactModel* frictionContactModelPtr() const
             {
                 return frictionContactModelPtr_;
             }

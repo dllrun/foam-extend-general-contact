@@ -519,9 +519,9 @@ void Foam::solidGeneralContactFvPatchVectorField::calcFrictionModels() const
             frictionModelsPtrL_.set
                 (
                     shadowI,
-                    frictionContactModel::New
+                    generalFrictionContactModel::New
                     (
-                        word(dict().lookup("frictionContactModel")),
+                        word(dict().lookup("generalFrictionContactModel")),
                         patch().boundaryMesh()[shadowPatchIndices()[shadowI]],
                         dict(),
                         shadowPatchIndices()[shadowI], // master
@@ -533,7 +533,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcFrictionModels() const
 	*/
 }
 
-Foam::frictionContactModel&
+Foam::generalFrictionContactModel&
 Foam::solidGeneralContactFvPatchVectorField::frictionModel(const label shadowI)
 {
     if (!localSlave()[shadowI])
@@ -552,7 +552,7 @@ Foam::solidGeneralContactFvPatchVectorField::frictionModel(const label shadowI)
 }
 
 
-const Foam::frictionContactModel&
+const Foam::generalFrictionContactModel&
 Foam::solidGeneralContactFvPatchVectorField::frictionModel
 (
     const label shadowI
@@ -774,9 +774,9 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
         // Calculate slip
         if (locSlave[shadowI])
         {
-			//*********************** start ERROR (frictionContactModel has no member slip) ***********************
-            //curPatchSlip = frictionModel(shadowI).slip();
-			//*********************** end ERROR (frictionContactModel has no member slip) ***********************
+			
+            curPatchSlip = frictionModel(shadowI).slip();
+			
         }
         else
         {
@@ -789,15 +789,14 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
             const label locShadowID =
                 shadowPatchField.findShadowID(patch().index());
 			
-			//*********************** start ERROR (frictionContactModel has no member slip) ***********************
-            /*
+			
+            
 			vectorField shadowPatchSlip =
                 shadowPatchField.frictionModel(locShadowID).slip();
-				*/
-			//*********************** end ERROR (frictionContactModel has no member slip) ***********************
+				
 			
-			//*********************** start ERROR (shadowPatchSlip not declared in this scope) ***********************
-            /*
+			
+            
 			vectorField shadowZoneSlip =
                 zoneField
                 (
@@ -817,11 +816,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
                     shadowZoneSlip
                 );
 			
-			*/	
-			//*********************** end ERROR (shadowPatchSlip not declared in this scope) ***********************
 			
-			//*********************** start ERROR (curZoneSlip not declared in this scope) ***********************
-            /*
+            
 			curPatchSlip =
                 patchField
                 (
@@ -829,8 +825,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
                     zoneIndex(),
                     curZoneSlip
                 );
-				*/
-			//*********************** end ERROR (curZoneSlip not declared in this scope) ***********************
+				
+			
         }
 
         // Heat flux rate: rate of dissipated frictional energy
@@ -1761,8 +1757,8 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                      );
 					 */
 					
-					// *********** start ERROR(patchDDInterpToShadowPatch was not declared in this scope)*************
-					/*
+
+					
 					frictionModel(shadowI).correct
                     (
                         normalModel(shadowI).slavePressure(),
@@ -1771,8 +1767,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         shadowPatchDD,
                         patchDDInterpToShadowPatch
                     );
-					*/
-					// *********** end ERROR(patchDDInterpToShadowPatch was not declared in this scope)*************
+					
 					
 					// Accumulate traction
 
@@ -1835,7 +1830,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					
                     // We store master patch traction as thermalGeneralContact
                     // uses it
-					//*********************** start ERROR (masterZoneTraction not declared in scope) ************************
+					
                     curPatchTractions(shadowI) =
                         patchField
                         (
@@ -1844,8 +1839,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             masterZoneTraction
                         );
 					
-					//*********************** end ERROR (masterZoneTraction not declared in scope) ************************
-					
+										
                     curPatchTraction += curPatchTractions(shadowI);
 				}				
 			} // if contact pair is active
@@ -1944,9 +1938,9 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
         // Calculate slip
         if (locSlave[shadowI])
         {
-			//*********************** start ERROR (frictionContactModel has no member slip) ***********************
-            //curPatchSlip = frictionModel(shadowI).slip();
-			//*********************** end ERROR (frictionContactModel has no member slip) ***********************
+			
+            curPatchSlip = frictionModel(shadowI).slip();
+			
         }
         else
         {
@@ -1959,15 +1953,12 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
             const label locShadowID =
             shadowPatchField.findShadowID(patch().index());
 
-            //*********************** start ERROR (frictionContactModel has no member slip) ***********************
-            /*
+                        
 			vectorField shadowPatchSlip =
                 shadowPatchField.frictionModel(locShadowID).slip();
-				*/
-			//*********************** end ERROR (frictionContactModel has no member slip) ***********************
+				
 			
-			//*********************** start ERROR (shadowPatchSlip not declared in this scope) ***********************
-            /*
+            
 			vectorField shadowZoneSlip =
                 zoneField
                 (
@@ -1987,12 +1978,10 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
                     shadowZoneSlip
                 );
 			
-			*/	
-			//*********************** end ERROR (shadowPatchSlip not declared in this scope) ***********************
-			
+						
 				
-			//*********************** start ERROR (curZoneSlip not declared in this scope) ***********************
-            /*
+			
+            
 			curPatchSlip =
             patchField
             (
@@ -2000,8 +1989,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
                 zoneIndex(),
                 curZoneSlip
             );
-			*/	
-			//*********************** end ERROR (curZoneSlip not declared in this scope) ***********************
+				
+			
         }
 
         // Heat flux rate: rate of dissipated frictional energy
@@ -2635,7 +2624,7 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
             << normalModel(shadowI).type() << token::END_STATEMENT << nl;
         normalModel(shadowI).writeDict(os);
 
-        os.writeKeyword("frictionContactModel")
+        os.writeKeyword("generalFrictionContactModel")
             << frictionModel(shadowI).type() << token::END_STATEMENT << nl;
         frictionModel(shadowI).writeDict(os);
     }
@@ -2664,7 +2653,7 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
             << token::END_STATEMENT << nl;
         localSlaveField.normalModel(localSlaveID).writeDict(os);
 
-        os.writeKeyword("frictionContactModel")
+        os.writeKeyword("generalFrictionContactModel")
             << localSlaveField.frictionModel(localSlaveID).type()
             << token::END_STATEMENT << nl;
         localSlaveField.frictionModel(localSlaveID).writeDict(os);
