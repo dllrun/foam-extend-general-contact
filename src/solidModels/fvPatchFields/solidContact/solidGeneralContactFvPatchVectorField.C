@@ -627,6 +627,59 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZone() const
         );
 }
 
+//**************************start definition from solid4Foam **********************************************
+void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
+{
+	/*
+    if (debug)
+    {
+        InfoIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const"
+        )   << patch().name() << " : making the shadow zones" << endl;
+    }
+
+    if (!master_)
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::"
+            "calcShadowZonesNewGgi() const"
+        )   << "Trying to create shadow zones on a slave" << abort(FatalError);
+    }
+
+    if (!shadowZones_.empty())
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::"
+            "calcShadowZonesNewGgi() const"
+        )   << "pointer already set" << abort(FatalError);
+    }
+
+    const wordList& shadPatchNames = shadowPatchNames();
+
+    shadowZones_.setSize(shadPatchNames.size());
+
+    forAll(shadowZones_, shadPatchI)
+    {
+        // Note: the main mesh will either be in the initial configuration or
+        // the updated configuration
+        shadowZones_.set
+        (
+            shadPatchI,
+            new globalPolyPatch
+            (
+                shadPatchNames[shadPatchI],
+                patch().boundaryMesh().mesh()
+            )
+        );
+    }
+	*/
+}
+
+//**************************END definition from solid4Foam **********************************************
+
 Foam::label Foam::solidGeneralContactFvPatchVectorField::zoneIndex() const
 {
     if (zoneIndex_ == -1)
@@ -1769,9 +1822,9 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					 
 					 
 					 /* TEST with
-					 shadowZones()[shadPatchI].globalPointToPatch
+					 shadowZonesNewGgi()[shadPatchI].globalPointToPatch
 									(
-										zoneToZones()[shadPatchI].slavePointDistanceToIntersection()
+										zoneToZonesNewGgi()[shadPatchI].slavePointDistanceToIntersection()
 									),
 									
 									*/
@@ -2141,7 +2194,146 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
     }
 }
 
+// ******************* Definition from solid4foam***********************************************
 
+const Foam::PtrList<Foam::globalPolyPatch>&
+Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi() const
+{
+   
+   if (master_)
+    {
+        if (shadowZonesNewGgi_.empty())
+        {
+            calcShadowZonesNewGgi();
+        }
+
+        return shadowZonesNewGgi_;
+    }
+    else
+    {
+        const volVectorField& field =
+            db().lookupObject<volVectorField>
+            (
+                this->dimensionedInternalField().name()
+            );
+
+        const solidGeneralContactFvPatchVectorField& shadowPatchField =
+            refCast<const solidGeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[shadowPatchIndices()[0]]
+            );
+
+        return shadowPatchField.shadowZonesNewGgi();
+    }
+	
+}
+
+
+Foam::PtrList<Foam::globalPolyPatch>&
+Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi()
+{
+	/*
+    if (master_)
+    {
+        if (shadowZonesNewGgi_.empty())
+        {
+            calcShadowZonesNewGgi();
+        }
+
+        return shadowZonesNewGgi_;
+    }
+    else
+    {
+        const volVectorField& field =
+            db().lookupObject<volVectorField>
+            (
+                this->dimensionedInternalField().name()
+            );
+
+        solidGeneralContactFvPatchVectorField& shadowPatchField =
+            const_cast<solidGeneralContactFvPatchVectorField&>
+            (
+                refCast<const solidGeneralContactFvPatchVectorField>
+                (
+                    field.boundaryField()[shadowPatchIndices()[0]]
+                )
+            );
+
+        return shadowPatchField.shadowZonesNewGgi();
+    }
+	*/
+}
+// ******************* End efinition from solid4foam***********************************************
+
+// ******************* Definition from solid4foam***********************************************
+const Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
+Foam::solidGeneralContactFvPatchVectorField::zoneToZonesNewGgi() const
+{
+    if (master_)
+    {
+        if (zoneToZones_.empty())
+        {
+            calcZoneToZones();
+        }
+
+       // return zoneToZones_;    // This needs to be FIXED later 
+    }
+    else
+    {
+        const volVectorField& field =
+            db().lookupObject<volVectorField>
+            (
+                this->dimensionedInternalField().name()
+            );
+
+        const solidGeneralContactFvPatchVectorField& shadowPatchField =
+            refCast<const solidGeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[shadowPatchIndices()[0]]
+            );
+
+        return shadowPatchField.zoneToZonesNewGgi();
+    }
+}
+
+
+Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
+Foam::solidGeneralContactFvPatchVectorField::zoneToZonesNewGgi()
+{
+    if (master_)
+    {
+        if (zoneToZones_.empty())
+        {
+            calcZoneToZones();
+        }
+
+        // return zoneToZones_;    // This needs to be FIXED later 
+    }
+    else
+    {
+        // We will const_cast the shadow patch so we can delete the weights when
+        // the zones move
+        const volVectorField& field =
+            db().lookupObject<volVectorField>
+            (
+                this->dimensionedInternalField().name()
+            );
+
+        solidGeneralContactFvPatchVectorField& shadowPatchField =
+            const_cast<solidGeneralContactFvPatchVectorField&>
+            (
+                refCast<const solidGeneralContactFvPatchVectorField>
+                (
+                    field.boundaryField()[shadowPatchIndices()[0]]
+                )
+            );
+
+        return shadowPatchField.zoneToZonesNewGgi();
+    }
+
+}
+
+// ****************************** end definition from solid4foam*********************************
 
 const Foam::newGgiStandAlonePatchInterpolation&
 Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi

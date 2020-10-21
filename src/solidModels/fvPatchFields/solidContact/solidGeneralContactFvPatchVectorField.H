@@ -116,6 +116,10 @@ class solidGeneralContactFvPatchVectorField
 		// mutable globalPolyPatch* zonePtr_;
 		// **************** end solid4Foam ****************
 		
+		//- Shadow face zones kept in deformed configuration
+        //  Stored by the master patch
+        mutable PtrList<globalPolyPatch> shadowZonesNewGgi_;
+		
         
 
         //- List of zone-to-zone interpolators
@@ -296,6 +300,11 @@ class solidGeneralContactFvPatchVectorField
 
         //- Calculate zone
         void calcZone() const;
+		
+		// ************************ declaration from solid4Foam********************
+		//- Create the shadow zones
+        void calcShadowZonesNewGgi() const;
+		//************************** end declaration from solid4Foam******************
 
         //- Calculate zone old points
         void calcOldZonePoints() const;
@@ -519,7 +528,18 @@ public:
             standAlonePatch& shadowZone(const label shadowI);
 			
 			
+			
 			// **************** based on solid4Foam ****************
+			
+		
+			/*
+			//- Return const reference to deformed master zone
+            const PtrList<globalPolyPatch>& shadowZone(const label shadowI) const;
+
+            //- Return reference to deformed master zone
+            PtrList<globalPolyPatch>& shadowZone(const label shadowI);
+			*/			
+			
 			//- Return const reference to deformed shadow zones
             const PtrList<globalPolyPatch>& shadowZonesNewGgi() const;
 
