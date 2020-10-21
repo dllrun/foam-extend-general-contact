@@ -2232,7 +2232,7 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi() const
 Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi()
 {
-	/*
+	
     if (master_)
     {
         if (shadowZonesNewGgi_.empty())
@@ -2261,7 +2261,6 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi()
 
         return shadowPatchField.shadowZonesNewGgi();
     }
-	*/
 }
 // ******************* End efinition from solid4foam***********************************************
 
