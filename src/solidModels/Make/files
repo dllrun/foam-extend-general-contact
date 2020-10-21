@@ -32,6 +32,7 @@ $(cohesiveLaws)/dugdaleCohesiveLaw/dugdaleCohesiveLaw.C
 $(cohesiveLaws)/linearCohesiveLaw/linearCohesiveLaw.C
 
 numerics/newGGIInterpolation/newGGIInterpolationName.C
+numerics/globalPolyPatch/globalPolyPatch.C
 
 contactModels = contactModels
 $(contactModels)/normalContactModels/normalContactModel/normalContactModel.C

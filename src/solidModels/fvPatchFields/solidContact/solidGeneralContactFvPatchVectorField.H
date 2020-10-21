@@ -63,6 +63,7 @@ Author
 #include "NamedEnum.H"
 #include "standAlonePatch.H"					  //Check standAlonePatch vs primitivePatchInterpolation
 #include "newGgiInterpolation.H"
+#include "globalPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -110,7 +111,12 @@ class solidGeneralContactFvPatchVectorField
         mutable PtrList<generalFrictionContactModel> frictionModelsPtrL_;
 
         // Master face zone kept in deformed configuration
-        mutable standAlonePatch* zonePtr_;
+         mutable standAlonePatch* zonePtr_;
+		// **************** based on solid4Foam ****************
+		// mutable globalPolyPatch* zonePtr_;
+		// **************** end solid4Foam ****************
+		
+        
 
         //- List of zone-to-zone interpolators
 		//(Replacement to PtrList<primitivePatchInterpolation> works) PrimitivePatchInterpolation<standAlonePatch> 
@@ -511,6 +517,15 @@ public:
 
             //- Return reference to deformed master zone
             standAlonePatch& shadowZone(const label shadowI);
+			
+			
+			// **************** based on solid4Foam ****************
+			//- Return const reference to deformed shadow zones
+            const PtrList<globalPolyPatch>& shadowZonesNewGgi() const;
+
+            //- Return reference to deformed shadow zones
+            PtrList<globalPolyPatch>& shadowZonesNewGgi();
+			//********************* end solid4Foam ******************
 
             //- Return const reference to patch-to-patch interpolation (Replacement of newGgiStandAlonePatchInterpolation)
 			// (Also, replacement of primitivePatchInterpolation&) PrimitivePatchInterpolation<standAlonePatch> 
@@ -530,6 +545,16 @@ public:
             (
                 const label shadowI
             );
+			
+			
+			// **************** based on solid4Foam ****************
+			//- Return const reference to patch-to-patch interpolation
+            const PtrList<newGgiStandAlonePatchInterpolation>&
+                zoneToZonesNewGgi() const;
+
+            //- Return reference to patch-to-patch interpolation
+            PtrList<newGgiStandAlonePatchInterpolation>& zoneToZonesNewGgi();
+			//********************* end solid4Foam ******************
 			
 
             //- Given the patch index of a shadow, return the position in the

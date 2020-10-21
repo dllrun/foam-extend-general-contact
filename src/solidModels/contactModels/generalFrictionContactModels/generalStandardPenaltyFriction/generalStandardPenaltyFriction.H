@@ -104,7 +104,7 @@ class generalStandardPenaltyFriction
 public:
 
     //- Runtime type information
-    TypeName("standardPenalty");
+    TypeName("generalStandardPenalty");
 
 
     // Constructors

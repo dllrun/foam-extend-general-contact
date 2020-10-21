@@ -1673,7 +1673,10 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         (
                             shadowPatchIndices()[shadowI],
                             shadowZoneIndices()[shadowI],
-                            shadowZone(shadowI).faceNormals()
+							// **************** based on solid4Foam ****************
+							 shadowZone(shadowI).faceNormals()
+							// **************** end solid4Foam ****************
+                            //shadowZonesNewGgi(shadowI).faceNormals()
                         );
 
                     // Interpolate the master displacement increment to the
@@ -1746,17 +1749,32 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 										
 					
 					// *************** start ERROR (noMatchingFunctionCall)******************
-					/*
+					
+					
 					FatalError
                         << "Disabled: use jasakSolidContact" << abort(FatalError);
                      normalModel(shadowI).correct
                      (
                          shadowPatchFaceNormals,
-                         zoneToZoneNewGgi(shadowI),
+                        shadowZonesNewGgi()[shadowI].globalPointToPatch
+									(
+										zoneToZonesNewGgi()[shadowI].slavePointDistanceToIntersection()
+									), 
+					// zoneToZoneNewGgi(shadowI),
                          shadowPatchDD,
                          patchDDInterpToShadowPatch
-                     );
-					 */
+                     ); 
+					
+					
+					 
+					 
+					 /* TEST with
+					 shadowZones()[shadPatchI].globalPointToPatch
+									(
+										zoneToZones()[shadPatchI].slavePointDistanceToIntersection()
+									),
+									
+									*/
 					
 					// *************** end ERROR (noMatchingFunctionCall)******************
 					
