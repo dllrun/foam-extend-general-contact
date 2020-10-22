@@ -630,7 +630,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZone() const
 //**************************start definition from solid4Foam **********************************************
 void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
 {
-	/*
+	
     if (debug)
     {
         InfoIn
@@ -648,7 +648,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
         )   << "Trying to create shadow zones on a slave" << abort(FatalError);
     }
 
-    if (!shadowZones_.empty())
+    if (!shadowZonesNewGgi_.empty())
     {
         FatalErrorIn
         (
@@ -659,13 +659,13 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
 
     const wordList& shadPatchNames = shadowPatchNames();
 
-    shadowZones_.setSize(shadPatchNames.size());
+    shadowZonesNewGgi_.setSize(shadPatchNames.size());
 
-    forAll(shadowZones_, shadPatchI)
+    forAll(shadowZonesNewGgi_, shadPatchI)
     {
         // Note: the main mesh will either be in the initial configuration or
         // the updated configuration
-        shadowZones_.set
+        shadowZonesNewGgi_.set
         (
             shadPatchI,
             new globalPolyPatch
@@ -675,7 +675,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
             )
         );
     }
-	*/
+	
 }
 
 //**************************END definition from solid4Foam **********************************************
@@ -1801,7 +1801,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         );
 										
 					
-					// *************** start ERROR (noMatchingFunctionCall)******************
+					
 					
 					
 					FatalError
@@ -1822,14 +1822,14 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					 
 					 
 					 /* TEST with
-					 shadowZonesNewGgi()[shadPatchI].globalPointToPatch
+					 shadowZones()[shadPatchI].globalPointToPatch
 									(
-										zoneToZonesNewGgi()[shadPatchI].slavePointDistanceToIntersection()
+										zoneToZones()[shadPatchI].slavePointDistanceToIntersection()
 									),
 									
 									*/
 					
-					// *************** end ERROR (noMatchingFunctionCall)******************
+					
 					
 					frictionModel(shadowI).correct
                     (
@@ -2270,12 +2270,12 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZonesNewGgi() const
 {
     if (master_)
     {
-        if (zoneToZones_.empty())
+        if (zoneToZonesNewGgi_.empty())
         {
             calcZoneToZones();
         }
 
-       // return zoneToZones_;    // This needs to be FIXED later 
+        return zoneToZonesNewGgi_;    // This needs to be FIXED later 
     }
     else
     {
@@ -2301,12 +2301,12 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZonesNewGgi()
 {
     if (master_)
     {
-        if (zoneToZones_.empty())
+        if (zoneToZonesNewGgi_.empty())
         {
             calcZoneToZones();
         }
 
-        // return zoneToZones_;    // This needs to be FIXED later 
+         return zoneToZonesNewGgi_;    // This needs to be FIXED later 
     }
     else
     {
