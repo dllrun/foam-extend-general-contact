@@ -520,25 +520,28 @@ public:
 
             //- Return reference to deformed master zone
             standAlonePatch& zone();
-
+			
+			// ********************Original solidGeneralContact **********************
+			
             //- Return const reference to deformed master zone
             const standAlonePatch& shadowZone(const label shadowI) const;
 
             //- Return reference to deformed master zone
             standAlonePatch& shadowZone(const label shadowI);
 			
+			// ********************Original solidGeneralContact **********************
 			
 			
 			// **************** based on solid4Foam ****************
 			
-		
 			/*
+			// Testing shadowZone only based on solid4Foam
 			//- Return const reference to deformed master zone
-            const PtrList<globalPolyPatch>& shadowZone(const label shadowI) const;
+            const globalPolyPatch& shadowZone(const label shadowI) const;
 
             //- Return reference to deformed master zone
-            PtrList<globalPolyPatch>& shadowZone(const label shadowI);
-			*/			
+            globalPolyPatch& shadowZone(const label shadowI);
+			*/		
 			
 			//- Return const reference to deformed shadow zones
             const PtrList<globalPolyPatch>& shadowZonesNewGgi() const;

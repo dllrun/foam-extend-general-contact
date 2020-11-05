@@ -50,6 +50,7 @@ bool Foam::solidGeneralContactFvPatchVectorField::movingMesh() const
 {
     // If the deformation gradient "F" and the displacement increment DU" are
     // found then we can assume it is a moving mesh (updated Lagrangian) case
+	Info<<"Here I am in movingMesh()"<<__LINE__<<endl;
     if
     (
         db().foundObject<volVectorField>("DU")
@@ -270,6 +271,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMasterIndex() const
 
 void Foam::solidGeneralContactFvPatchVectorField::calcLocalSlave() const
 {
+	Info<<"Here I am (1.RANJAN)"<<endl;
     if (localSlavePtr_)
     {
         FatalErrorIn
@@ -282,6 +284,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcLocalSlave() const
     localSlavePtr_ = new boolList(shadowPatchNames().size(), false);
 
     boolList& localSlave = *localSlavePtr_;
+	Info<<"Here I am (2.RANJAN)"<<endl;
 
     forAll(localSlave, shadowI)
     {
@@ -299,12 +302,14 @@ void Foam::solidGeneralContactFvPatchVectorField::calcLocalSlave() const
 const Foam::boolList&
 Foam::solidGeneralContactFvPatchVectorField::localSlave() const
 {
+	Info<<"Here I am (3.RANJAN)"<<endl;
     if (!localSlavePtr_)
     {
         calcLocalSlave();
     }
 
     return *localSlavePtr_;
+	Info<<"Here I am (4.RANJAN)"<<endl;
 }
 
 void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
@@ -935,6 +940,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
 // ******************************************** START General *****************************************
 {
+	Info<<"Here I am - c1(p,iF) RANJAN"<<endl;
     if (debug)
     {
         InfoIn
@@ -992,6 +998,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 	
 // ******************************************** START General *****************************************
 {
+	Info<<"Here I am - c2(ptf,p,iF,mapper) RANJAN"<<endl;
     if (debug)
     {
         InfoIn
@@ -1018,7 +1025,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         globalMasterIndexPtr_ = new label(*ptf.globalMasterIndexPtr_);
     }
-
+	
+	Info<<"Here I am (8.RANJAN)"<<endl;
     if (ptf.localSlavePtr_)
     {
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
@@ -1141,6 +1149,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 	// ********************************************** START General ********************************************
 	
 	{
+		Info<<"Here I am - c3(p,iF,dict) RANJAN"<<endl;
+		
     Info<< "Creating " << solidGeneralContactFvPatchVectorField::typeName
         << " patch" << endl;
 
@@ -1202,6 +1212,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     QcsPtr_(NULL)
 //    bbOffset_(ptf.bbOffset_)
 {
+	Info<<"Here I am - c4(ptf) RANJAN"<<endl;
     if (debug)
     {
         InfoIn
@@ -1225,7 +1236,9 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         globalMasterIndexPtr_ = new label(*ptf.globalMasterIndexPtr_);
     }
-
+	
+	Info<<"Here I am (5.RANJAN)"<<endl;
+	
     if (ptf.localSlavePtr_)
     {
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
@@ -1331,6 +1344,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
 //**************************************************** START General**********************************************
 {
+	Info<<"Here I am - c5(ptf,iF) RANJAN"<<endl;
     if (debug)
     {
         InfoIn
@@ -1355,7 +1369,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         globalMasterIndexPtr_ = new label(*ptf.globalMasterIndexPtr_);
     }
-
+	
+	Info<<"Here I am (6. RANJAN)"<<endl;
     if (ptf.localSlavePtr_)
     {
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
@@ -1562,10 +1577,13 @@ void Foam::solidGeneralContactFvPatchVectorField::rmap
 
 void solidGeneralContactFvPatchVectorField::updateCoeffs()
 {
+	Info<<"Here I am up(RANJAN)"<<__LINE__<<endl;
     if (this->updated())
     {
         return;
     }
+	
+	Info<<"Here I am up(RANJAN)"<<__LINE__<<endl;
 
 //**************************************************** START General**********************************************	
 	boolList activeContactPairs(shadowPatchNames().size(), false);
@@ -1573,6 +1591,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 	    // if it is a new time step then reset iCorr
     if (curTimeIndex_ != db().time().timeIndex())
     {
+		Info<<"Here I am up(RANJAN)"<<__LINE__<<endl;
         curTimeIndex_ = db().time().timeIndex();
 
         // Delete friction heat rate to force its recalculation when thermal
@@ -1582,6 +1601,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
         if (globalMaster())
         {
+			Info<<"Here I am up4(RANJAN)"<<endl;
             forAll(activeContactPairs, shadowI)
             {
                 // Let the contact models know that it is a new time-step, in
@@ -1602,6 +1622,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
     if (rigidMaster_)
     {
+		Info<<"Here I am up5(RANJAN)"<<endl;
         // Set to master to traction free to mimic a rigid patch
         traction() = vector::zero;
     }	
@@ -1610,6 +1631,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 	// Move all global face zones to the deformed configuration
         if (globalMaster())
         {
+			Info<<"Here I am up6(RANJAN)"<<endl;
            // Move the master and slave zone to the deformed configuration
             moveFaceZonesToDeformedConfiguration();
         }
@@ -1619,8 +1641,10 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
         forAll(activeContactPairs, slaveI)
         {
+			Info<<"Here I am up7(RANJAN)"<<endl;
             if (localSlave()[slaveI])
             {
+				Info<<"Here I am up8(RANJAN)"<<endl;
                 zoneToZoneNewGgi(slaveI).movePoints
                 (
                     tensorField(0), tensorField(0), vectorField(0)
@@ -1636,6 +1660,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 		// Only the local masters calculates the contact force and the local
         // master interpolates this force
         const boolList& locSlave = localSlave();
+		Info<<"Here I am (1.RANJAN)"<<endl;
 
         // Create master bounding box used for quick check
         boundBox masterBb(zone().localPoints(), false);
@@ -1645,6 +1670,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
         const scalar bbOff = bbOffset();
 		if (masterBb.minDim() < bbOff)
         {
+			Info<<"Here I am up9(RANJAN)"<<endl;
             const vector bbDiag = masterBb.max() - masterBb.min();
 
             if (bbDiag.x() < bbOff)
@@ -1669,6 +1695,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 		
 		forAll(activeContactPairs, shadowI)
         {
+			Info<<"Here I am up10(RANJAN)"<<endl;
             // Perform quick check to find potential contacting pairs
             // The quick check is based on the bounding box (BB) of the contact
             // pairs: if the BBs of pair intersect then we will designate the
@@ -1704,6 +1731,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 			
 			if (masterBb.overlaps(shadowBb))
             {
+				Info<<"Here I am up11(RANJAN)"<<endl;
                 activeContactPairs[shadowI] = true;
             }
 			
@@ -1714,6 +1742,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
             if (activeContactPairs[shadowI])
             {
+				Info<<"Here I am up12(RANJAN)"<<endl;
 				if (locSlave[shadowI])
                 {
                     // Correct normal and friction contact models for the
@@ -1748,6 +1777,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					
 					if (movingMesh())
                     {
+						Info<<"Here I am up13(RANJAN)"<<endl;
                         // Updated Lagrangian, we will directly lookup the
                         // displacement increment
 
@@ -1760,6 +1790,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                     }
 					else
                     {
+						Info<<"Here I am up14(RANJAN)"<<endl;
                         // We will lookup the total displacement and old total
                         // displacement
 
@@ -1913,6 +1944,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					
 										
                     curPatchTraction += curPatchTractions(shadowI);
+					Info<<"Here I am up15(RANJAN)"<<endl;
 				}				
 			} // if contact pair is active
 		} // forAll contact pairs
@@ -1922,7 +1954,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 	}
 	
 //**************************************************** END General**********************************************
-       Info<<"Here I am (RANJAN)"<<endl;
+       Info<<"Here I am up16(RANJAN)"<<endl;
 
     solidTractionFvPatchVectorField::updateCoeffs();
 }
@@ -2822,7 +2854,8 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
     // Write the dict from the first contact model
 
     const label shadowI = 0;
-
+	
+	Info<<"Here I am (7.RANJAN)"<<endl;
     if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
         FatalError  << "solidGeneralContactFvPatchVectorField::write: localSlavePtr_ NOT defined:" 
                     << "Cannot write slave information because no slave identified!"  
