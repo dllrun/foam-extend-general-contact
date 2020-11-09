@@ -1206,10 +1206,12 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
     if (dict.found("gradient"))
     {
+		Info<<"Here I am - c3(p,iF,dict) line "<<__LINE__<<endl;
         gradient() = vectorField("gradient", dict, p.size());
     }
     else
     {
+		Info<<"Here I am - c3(p,iF,dict) line "<<__LINE__<<endl;
         gradient() = vector::zero;
     }
 
