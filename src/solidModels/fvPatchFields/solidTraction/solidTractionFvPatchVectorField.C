@@ -205,13 +205,16 @@ void solidTractionFvPatchVectorField::rmap
 // Update the coefficients associated with the patch field
 void solidTractionFvPatchVectorField::updateCoeffs()
 {
+	Info<<"Here I am in solidTraction's updateCoeffs()"<<__LINE__<<endl;
     if (updated())
     {
+		Info<<"Here I am in solidTraction's updateCoeffs()"<<__LINE__<<endl;
         return;
     }
 
     bool incremental(fieldName_ == "DU");
-
+	
+	Info<<"Here I am in solidTraction's updateCoeffs()"<<__LINE__<<endl;
     gradient() = tractionBoundaryGradient::snGrad
     (
         traction_,
@@ -223,8 +226,11 @@ void solidTractionFvPatchVectorField::updateCoeffs()
         nonLinear_,
         incremental
     );
-
+	Info<<"Here I am in solidTraction's updateCoeffs()"<<__LINE__<<endl;
+	
     fixedGradientFvPatchVectorField::updateCoeffs();
+	
+	Info<<"Here I am in solidTraction's updateCoeffs()"<<__LINE__<<endl;
 }
 
 

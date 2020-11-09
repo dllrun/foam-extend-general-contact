@@ -1217,10 +1217,12 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
     if (dict.found("value"))
     {
+		Info<<"Here I am - c3(p,iF,dict) line "<<__LINE__<<endl;
         Field<vector>::operator=(vectorField("value", dict, p.size()));
     }
     else
     {
+		Info<<"Here I am - c3(p,iF,dict) line "<<__LINE__<<endl;
         Field<vector>::operator=
         (
             patchInternalField() + gradient()/patch().deltaCoeffs()
@@ -2017,6 +2019,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
        Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
 
     solidTractionFvPatchVectorField::updateCoeffs();
+	Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
 }
 
 const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc() const
