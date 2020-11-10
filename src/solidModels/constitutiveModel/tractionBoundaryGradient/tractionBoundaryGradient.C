@@ -271,6 +271,7 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
     const bool incremental
 )
 {
+	Info<<"Here I am in tractionBoundaryGradient's updateCoeffs()"<<__LINE__<<endl;
     // Create result
     tmp<vectorField> tgradient(new vectorField(traction.size(), vector::zero));
     vectorField& gradient = tgradient();
@@ -278,6 +279,7 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
     // Orthotropic material
     if (orthotropic)
     {
+		Info<<"Here I am in tractionBoundaryGradient's updateCoeffs()"<<__LINE__<<endl;
         // Get mechanical properties
         const constitutiveModel& rheology =
             patch.boundaryMesh().mesh().objectRegistry::
@@ -381,6 +383,7 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
     }
     else
     {
+		Info<<"Here I am in tractionBoundaryGradient's updateCoeffs()"<<__LINE__<<endl;
         // Standard isotropic solvers
 
         // Lookup material properties from the solver
@@ -401,7 +404,9 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
         // }
 
         vectorField n = patch.nf();
-
+		
+		Info<<"Here I am in tractionBoundaryGradient's updateCoeffs()"<<__LINE__<<endl;
+		
         // gradient of the field
         const fvPatchTensorField& gradField =
             patch.lookupPatchField<volTensorField, tensor>
@@ -409,7 +414,7 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
                 "grad(" + workingFieldName + ")"
             );
 
-
+		Info<<"Here I am in tractionBoundaryGradient's updateCoeffs()"<<__LINE__<<endl;
         vectorField Traction(n.size(), vector::zero);
 
         // Total Lagrangian, small strain
