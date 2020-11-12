@@ -43,7 +43,7 @@ solidTractionFvPatchVectorField
 )
 :
     fixedGradientFvPatchVectorField(p, iF),
-    fieldName_("undefined"),
+    fieldName_(dimensionedInternalField().name()), // fieldName_("undefined"),
     traction_(p.size(), vector::zero),
     pressure_(p.size(), 0.0),
     nonLinear_(nonLinearGeometry::OFF),
