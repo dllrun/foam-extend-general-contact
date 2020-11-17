@@ -303,6 +303,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcLocalSlave() const
 		Info<<"Here I am in calcLocalSlave()"<<__LINE__<<endl;
         if (patch().index() < shadowPatchIndices()[shadowI])
         {
+			Info<<"Here I am in calcLocalSlave()"<<__LINE__<<endl;
             localSlave[shadowI] = true;
 
             Info<< "solidGeneralContact: "
@@ -318,6 +319,7 @@ Foam::solidGeneralContactFvPatchVectorField::localSlave() const
 	Info<<"Here I am in localSlave()"<<__LINE__<<endl;
     if (!localSlavePtr_)
     {
+		Info<<"Here I am in localSlave()"<<__LINE__<<endl;
         calcLocalSlave();
     }
 
@@ -990,7 +992,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
 // ******************************************** START General *****************************************
 {
-	Info<<"Here I am - c1(p,iF) RANJAN"<<endl;
+	Info<<"Here I am - c1(p,iF) "<<__LINE__<<endl;
     if (debug)
     {
         InfoIn
@@ -1398,7 +1400,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
 //**************************************************** START General**********************************************
 {
-	Info<<"Here I am - c5(ptf,iF)"<<endl;
+	Info<<"Here I am in c5(ptf,iF)"<<__LINE__<<endl;
     if (debug)
     {
         InfoIn
@@ -1423,10 +1425,10 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         globalMasterIndexPtr_ = new label(*ptf.globalMasterIndexPtr_);
     }
-	
-	Info<<"Here I am (6. RANJAN)"<<endl;
+		
     if (ptf.localSlavePtr_)
     {
+		Info<<"Here I am above localSlave in c5(ptf,iF)"<<__LINE__<<endl;
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
     }
 
@@ -1497,7 +1499,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 Foam::solidGeneralContactFvPatchVectorField::
 ~solidGeneralContactFvPatchVectorField()
 {
-	Info<<"Here I am in destructor"<<__LINE__<<endl;
+	Info<<"Here I am in destructor "<<__LINE__<<endl;
     if (debug)
     {
         InfoIn
@@ -1706,7 +1708,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
             if (localSlave()[slaveI])
             {
-				Info<<"Here I am up8(RANJAN)"<<endl;
+				Info<<"Here I am below localSlave in updateCoeffs()"<<__LINE__<<endl;
                 zoneToZoneNewGgi(slaveI).movePoints
                 (
                     tensorField(0), tensorField(0), vectorField(0)
@@ -1722,7 +1724,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 		// Only the local masters calculates the contact force and the local
         // master interpolates this force
         const boolList& locSlave = localSlave();
-		Info<<"Here I am (1.RANJAN)"<<endl;
+		Info<<"Here I am below localSlave in updateCoeffs()"<<__LINE__<<endl;
 
         // Create master bounding box used for quick check
         boundBox masterBb(zone().localPoints(), false);
@@ -2006,7 +2008,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					
 										
                     curPatchTraction += curPatchTractions(shadowI);
-					Info<<"Here I am up15(RANJAN)"<<endl;
+					Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
 				}				
 			} // if contact pair is active
 		} // forAll contact pairs
@@ -2959,7 +2961,7 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
 
     const label shadowI = 0;
 	
-	Info<<"Here I am (7.RANJAN)"<<endl;
+	Info<<"Here I am above localSlave in write()"<<__LINE__<<endl;
     if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
         FatalError  << "solidGeneralContactFvPatchVectorField::write: localSlavePtr_ NOT defined:" 
                     << "Cannot write slave information because no slave identified!"  
