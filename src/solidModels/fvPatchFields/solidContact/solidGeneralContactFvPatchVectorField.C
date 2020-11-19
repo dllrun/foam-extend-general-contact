@@ -2961,6 +2961,8 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
 
     const label shadowI = 0;
 	
+	Info<< "The current field is "<< dimensionedInternalField().name()<< endl;
+	
 	Info<<"Here I am above localSlave in write()"<<__LINE__<<endl;
     if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
         FatalError  << "solidGeneralContactFvPatchVectorField::write: localSlavePtr_ NOT defined:" 
