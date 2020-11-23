@@ -294,6 +294,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcLocalSlave() const
     }
 
     localSlavePtr_ = new boolList(shadowPatchNames().size(), false);
+	Info<<"Here I am, localSlavePtr_ is defined in line 296"<<localSlavePtr_<<endl;
 
     boolList& localSlave = *localSlavePtr_;
 	Info<<"Here I am in calcLocalSlave()"<<__LINE__<<endl;
@@ -1082,6 +1083,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     if (ptf.localSlavePtr_)
     {
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+		Info<<"Here I am, localSlavePtr_ is defined in line 1086 "<<localSlavePtr_<<endl;
     }
 
     if (ptf.shadowPatchNamesPtr_)
@@ -1298,6 +1300,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     if (ptf.localSlavePtr_)
     {
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+		Info<<"Here I am, localSlavePtr_ is defined in line 1302"<<localSlavePtr_<<endl;
     }
 
     if (ptf.shadowPatchNamesPtr_)
@@ -1428,8 +1431,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 		
     if (ptf.localSlavePtr_)
     {
-		Info<<"Here I am above localSlave in c5(ptf,iF)"<<__LINE__<<endl;
-        localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+	    localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+		Info<<"Here I am, localSlavePtr_ is defined in line 1436"<<localSlavePtr_<<endl;
     }
 
     if (ptf.shadowPatchNamesPtr_)
@@ -1511,6 +1514,7 @@ Foam::solidGeneralContactFvPatchVectorField::
 
     deleteDemandDrivenData(globalMasterPtr_);
     deleteDemandDrivenData(globalMasterIndexPtr_);
+	Info<<"Here I am, localSlavePtr_ is undefined "<<localSlavePtr_<<endl;
     deleteDemandDrivenData(localSlavePtr_);
     deleteDemandDrivenData(shadowPatchNamesPtr_);
     deleteDemandDrivenData(shadowPatchIndicesPtr_);
@@ -2960,6 +2964,29 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
     // Write the dict from the first contact model
 
     const label shadowI = 0;
+	
+	if
+        (
+            dimensionedInternalField().name() == "D"
+         || dimensionedInternalField().name() == "DD"
+        )
+        { 
+			/*
+            Info<< "Writing deformed zones to VTK" << endl;
+            const word timeName =
+                patch().boundaryMesh().mesh().time().timeName();
+
+            zone().globalPatch().writeVTK("zone_" + timeName);
+
+            forAll(shadowZones(), shadI)
+            {
+                shadowZones()[shadI].globalPatch().writeVTK
+                (
+                    "shadowZone_" + timeName
+                );
+            }
+			*/
+        }
 	
 	Info<< "The current field is "<< dimensionedInternalField().name()<< endl;
 	
