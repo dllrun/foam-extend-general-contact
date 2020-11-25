@@ -68,7 +68,7 @@ bool Foam::solidGeneralContactFvPatchVectorField::movingMesh() const
 void Foam::solidGeneralContactFvPatchVectorField::
 moveFaceZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration 
 {
-	Info<<"Here I am in moveFaceZonesToDeformedConfiguration()"<<__LINE__<<endl;
+//	Info<<"Here I am in moveFaceZonesToDeformedConfiguration()"<<__LINE__<<endl;
     // Only the master moves the zones
     if (!globalMaster())
     {
@@ -188,13 +188,13 @@ moveFaceZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration
         }
         const_cast<pointField&>(shadowZone(shadowI).points()) =
             shadowZoneNewPoints;
-		Info<<"Here I am in moveFaceZonesToDeformedConfiguration()"<<__LINE__<<endl;
+//		Info<<"Here I am in moveFaceZonesToDeformedConfiguration()"<<__LINE__<<endl;
     }
 }
 
 void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMaster() const   //// CHECK method to calculate global master
 {
-	Info<<"Here I am in calcGlobalMaster()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcGlobalMaster()"<<__LINE__<<endl;
     if (globalMasterPtr_)
     {
         FatalErrorIn
@@ -222,7 +222,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMaster() const   ///
 
 void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMasterIndex() const
 {
-	Info<<"Here I am in calcGlobalMasterIndex()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcGlobalMasterIndex()"<<__LINE__<<endl;
     if (globalMasterIndexPtr_)
     {
         FatalErrorIn
@@ -265,7 +265,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMasterIndex() const
 
     if (gMasterID != GMasterID)
     {
-		Info<<"Here I am in calcGlobalMasterIndex()"<<__LINE__<<endl;
+//		Info<<"Here I am in calcGlobalMasterIndex()"<<__LINE__<<endl;
         FatalErrorIn
         (
             "solidGeneralContactFvPatchVectorField::"
@@ -283,7 +283,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMasterIndex() const
 
 void Foam::solidGeneralContactFvPatchVectorField::calcLocalSlave() const
 {
-	Info<<"Here I am in calcLocalSlave()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcLocalSlave()"<<__LINE__<<endl;
     if (localSlavePtr_)
     {
         FatalErrorIn
@@ -294,10 +294,10 @@ void Foam::solidGeneralContactFvPatchVectorField::calcLocalSlave() const
     }
 
     localSlavePtr_ = new boolList(shadowPatchNames().size(), false);
-	Info<<"Here I am, localSlavePtr_ is defined in line 296"<<localSlavePtr_<<endl;
+	Info<<"Here I am, localSlavePtr_ is defined in line 296 "<<localSlavePtr_<<endl;
 
     boolList& localSlave = *localSlavePtr_;
-	Info<<"Here I am in calcLocalSlave()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcLocalSlave()"<<__LINE__<<endl;
 
     forAll(localSlave, shadowI)
     {
@@ -324,13 +324,13 @@ Foam::solidGeneralContactFvPatchVectorField::localSlave() const
         calcLocalSlave();
     }
 
-    return *localSlavePtr_;
 	Info<<"Here I am in localSlave()"<<__LINE__<<endl;
+    return *localSlavePtr_;
 }
 
 void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
 {
-	Info<<"Here I am in calcShadowPatchNames()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcShadowPatchNames()"<<__LINE__<<endl;
     if (shadowPatchNamesPtr_ || shadowPatchIndicesPtr_)
     {
         FatalErrorIn
@@ -398,7 +398,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
 
  void Foam::solidGeneralContactFvPatchVectorField::calcShadowZoneNames() const
 {
-	Info<<"Here I am in calcShadowZoneNames()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcShadowZoneNames()"<<__LINE__<<endl;
     if (shadowZoneNamesPtr_ || shadowZoneIndicesPtr_)
     {
 		Info<<"Here I am in calcShadowZoneNames()"<<__LINE__<<endl;
@@ -444,7 +444,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
 
 void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
 {
-	Info<<"Here I am in calcNormalModels()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcNormalModels()"<<__LINE__<<endl;
     if (!normalModelsPtrL_.empty())
     {
         FatalErrorIn
@@ -489,7 +489,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
 Foam::generalNormalContactModel&
 Foam::solidGeneralContactFvPatchVectorField::normalModel(const label shadowI)
 {
-	Info<<"Here I am in normalModel()"<<__LINE__<<endl;
+//	Info<<"Here I am in normalModel()"<<__LINE__<<endl;
     if (!localSlave()[shadowI])
     {
         FatalErrorIn("normalModel(const label shadowI)")
@@ -512,10 +512,10 @@ Foam::solidGeneralContactFvPatchVectorField::normalModel
     const label shadowI
 ) const
 {
-	Info<<"Here I am in normalModel()"<<__LINE__<<endl;
+//	Info<<"Here I am in normalModel()"<<__LINE__<<endl;
     if (!localSlave()[shadowI])
     {
-		Info<<"Here I am in normalModel()"<<__LINE__<<endl;
+//		Info<<"Here I am in normalModel()"<<__LINE__<<endl;
         FatalErrorIn("normalModel(const label shadowI)")
             << "Only the local slave can call the contact model"
             << abort(FatalError);
@@ -533,10 +533,10 @@ Foam::solidGeneralContactFvPatchVectorField::normalModel
 
 void Foam::solidGeneralContactFvPatchVectorField::calcFrictionModels() const
 {
-  Info<<"Here I am in calcFrictionModels()"<<__LINE__<<endl;
+//  Info<<"Here I am in calcFrictionModels()"<<__LINE__<<endl;
   if (!frictionModelsPtrL_.empty())
     {
-		Info<<"Here I am in calcFrictionModels()"<<__LINE__<<endl;
+//		Info<<"Here I am in calcFrictionModels()"<<__LINE__<<endl;
         FatalErrorIn
         (
             "void Foam::solidGeneralContactFvPatchVectorField::"
@@ -574,7 +574,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcFrictionModels() const
 Foam::generalFrictionContactModel&
 Foam::solidGeneralContactFvPatchVectorField::frictionModel(const label shadowI)
 {
-	Info<<"Here I am in frictionModel()"<<__LINE__<<endl;
+//	Info<<"Here I am in frictionModel()"<<__LINE__<<endl;
     if (!localSlave()[shadowI])
     {
         FatalErrorIn("frictionModel(const label shadowI)")
@@ -598,7 +598,7 @@ Foam::solidGeneralContactFvPatchVectorField::frictionModel
     const label shadowI
 ) const
 {
-	Info<<"Here I am in frictionModel()"<<__LINE__<<endl;
+//	Info<<"Here I am in frictionModel()"<<__LINE__<<endl;
     if (!localSlave()[shadowI])
     {
         FatalErrorIn("frictionModel(const label shadowI)")
@@ -651,7 +651,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex() const
 
 void Foam::solidGeneralContactFvPatchVectorField::calcZone() const
 {
-	Info<<"Here I am in calcZone()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcZone()"<<__LINE__<<endl;
     if (zonePtr_)
     {
         FatalErrorIn
@@ -675,7 +675,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZone() const
 //**************************start definition from solid4Foam **********************************************
 void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
 {
-	Info<<"Here I am in calcShadowZonesNewGgi()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcShadowZonesNewGgi()"<<__LINE__<<endl;
     if (debug)
     {
         InfoIn
@@ -728,7 +728,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
 
 Foam::label Foam::solidGeneralContactFvPatchVectorField::zoneIndex() const
 {
-	Info<<"Here I am in zoneIndex()"<<__LINE__<<endl;
+//	Info<<"Here I am in zoneIndex()"<<__LINE__<<endl;
     if (zoneIndex_ == -1)
     {
         calcZoneIndex();
@@ -740,7 +740,7 @@ Foam::label Foam::solidGeneralContactFvPatchVectorField::zoneIndex() const
 const Foam::standAlonePatch&
 Foam::solidGeneralContactFvPatchVectorField::zone() const
 {
-	Info<<"Here I am in zone()"<<__LINE__<<endl;
+//	Info<<"Here I am in zone()"<<__LINE__<<endl;
     if (!zonePtr_)
     {
 		Info<<"Here I am in zone()"<<__LINE__<<endl;
@@ -753,7 +753,7 @@ Foam::solidGeneralContactFvPatchVectorField::zone() const
 
 Foam::standAlonePatch& Foam::solidGeneralContactFvPatchVectorField::zone()
 {
-	Info<<"Here I am in zone()"<<__LINE__<<endl;
+//	Info<<"Here I am in zone()"<<__LINE__<<endl;
     if (!zonePtr_)
     {
 		Info<<"Here I am in zone()"<<__LINE__<<endl;
@@ -769,7 +769,7 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZone
     const label shadowI
 ) const
 {
-	Info<<"Here I am in shadowZone()"<<__LINE__<<endl;
+//	Info<<"Here I am in shadowZone()"<<__LINE__<<endl;
     const volVectorField& field =
         db().objectRegistry::lookupObject<volVectorField>
         (
@@ -792,7 +792,7 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZone
     const label shadowI
 )
 {
-	Info<<"Here I am in shadowZone()"<<__LINE__<<endl;
+//	Info<<"Here I am in shadowZone()"<<__LINE__<<endl;
     const volVectorField& field =
         db().objectRegistry::lookupObject<volVectorField>
         (
@@ -817,7 +817,7 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZone
 
 void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
 {
-	Info<<"Here I am in calcQc()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcQc()"<<__LINE__<<endl;
     if (QcPtr_)
     {
         FatalErrorIn("solidGeneralContactFvPatchVectorField::calcQc")
@@ -842,7 +842,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
         )
     )
     {
-		Info<<"Here I am in calcQc()"<<__LINE__<<endl;
+//		Info<<"Here I am in calcQc()"<<__LINE__<<endl;
         const symmTensorField& sigma =
             db().objectRegistry::lookupObject<volSymmTensorField>
             (
@@ -853,7 +853,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
     }
     else
     {
-		Info<<"Here I am in calcQc()"<<__LINE__<<endl;
+//		Info<<"Here I am in calcQc()"<<__LINE__<<endl;
         const symmTensorField& sigma =
             db().objectRegistry::lookupObject<volSymmTensorField>
             (
@@ -878,7 +878,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQc() const
 
     forAll(locSlave, shadowI)
     {
-		Info<<"Here I am in calcQc()"<<__LINE__<<endl;
+//		Info<<"Here I am in calcQc()"<<__LINE__<<endl;
         vectorField curPatchSlip(patch().size(), vector::zero);
 
         // Calculate slip
@@ -1546,7 +1546,7 @@ Foam::solidGeneralContactFvPatchVectorField::
 Foam::label Foam::solidGeneralContactFvPatchVectorField::globalMasterIndex()
 const
 {
-	Info<<"Here I am in globalMasterIndex()"<<__LINE__<<endl;
+//	Info<<"Here I am in globalMasterIndex()"<<__LINE__<<endl;
     if (!globalMasterIndexPtr_)
     {
         calcGlobalMasterIndex();
@@ -1558,7 +1558,7 @@ const
 const Foam::List<Foam::word>&
 Foam::solidGeneralContactFvPatchVectorField::shadowPatchNames() const
 {
-	Info<<"Here I am in shadowPatchNames()"<<__LINE__<<endl;
+//	Info<<"Here I am in shadowPatchNames()"<<__LINE__<<endl;
     if (!shadowPatchNamesPtr_)
     {
         calcShadowPatchNames();
@@ -1570,7 +1570,7 @@ Foam::solidGeneralContactFvPatchVectorField::shadowPatchNames() const
 const Foam::List<Foam::label>&
 Foam::solidGeneralContactFvPatchVectorField::shadowPatchIndices() const
 {
-	Info<<"Here I am in shadowPatchIndices()"<<__LINE__<<endl;
+//	Info<<"Here I am in shadowPatchIndices()"<<__LINE__<<endl;
     if (!shadowPatchIndicesPtr_)
     {
         calcShadowPatchNames();
@@ -1582,7 +1582,7 @@ Foam::solidGeneralContactFvPatchVectorField::shadowPatchIndices() const
 const Foam::List<Foam::word>&
 Foam::solidGeneralContactFvPatchVectorField::shadowZoneNames() const
 {
-	Info<<"Here I am in shadowZoneNames()"<<__LINE__<<endl;
+//	Info<<"Here I am in shadowZoneNames()"<<__LINE__<<endl;
     if (!shadowZoneNamesPtr_)
     {
         calcShadowZoneNames();
@@ -1594,7 +1594,7 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZoneNames() const
 const Foam::List<Foam::label>&
 Foam::solidGeneralContactFvPatchVectorField::shadowZoneIndices() const
 {
-	Info<<"Here I am in shadowZoneIndices()"<<__LINE__<<endl;
+//	Info<<"Here I am in shadowZoneIndices()"<<__LINE__<<endl;
     if (!shadowZoneIndicesPtr_)
     {
         calcShadowZoneNames();
@@ -1609,7 +1609,7 @@ void Foam::solidGeneralContactFvPatchVectorField::autoMap
     const fvPatchFieldMapper& m
 )
 {
-	Info<<"Here I am in autoMap()"<<__LINE__<<endl;
+//	Info<<"Here I am in autoMap()"<<__LINE__<<endl;
     FatalErrorIn
     (
         "void Foam::solidGeneralContactFvPatchVectorField::autoMap"
@@ -1628,7 +1628,7 @@ void Foam::solidGeneralContactFvPatchVectorField::rmap
     const labelList& addr
 )
 {
-	Info<<"Here I am in rmap()"<<__LINE__<<endl;
+//	Info<<"Here I am in rmap()"<<__LINE__<<endl;
     FatalErrorIn
     (
         "void Foam::solidGeneralContactFvPatchVectorField::rmap"
@@ -1645,13 +1645,13 @@ void Foam::solidGeneralContactFvPatchVectorField::rmap
 
 void solidGeneralContactFvPatchVectorField::updateCoeffs()
 {
-	Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//	Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
     if (this->updated())
     {
         return;
     }
 	
-	Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//	Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
 
 //**************************************************** START General**********************************************	
 	boolList activeContactPairs(shadowPatchNames().size(), false);
@@ -1659,7 +1659,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 	    // if it is a new time step then reset iCorr
     if (curTimeIndex_ != db().time().timeIndex())
     {
-		Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//		Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
         curTimeIndex_ = db().time().timeIndex();
 
         // Delete friction heat rate to force its recalculation when thermal
@@ -1669,7 +1669,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
         if (globalMaster())
         {
-			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
             forAll(activeContactPairs, shadowI)
             {
                 // Let the contact models know that it is a new time-step, in
@@ -1690,7 +1690,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
     if (rigidMaster_)
     {
-		Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//		Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
         // Set to master to traction free to mimic a rigid patch
         traction() = vector::zero;
     }	
@@ -1699,7 +1699,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 	// Move all global face zones to the deformed configuration
         if (globalMaster())
         {
-			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
            // Move the master and slave zone to the deformed configuration
             moveFaceZonesToDeformedConfiguration();
         }
@@ -1709,10 +1709,10 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
         forAll(activeContactPairs, slaveI)
         {
-			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
             if (localSlave()[slaveI])
             {
-				Info<<"Here I am below localSlave in updateCoeffs()"<<__LINE__<<endl;
+//				Info<<"Here I am below localSlave in updateCoeffs()"<<__LINE__<<endl;
                 zoneToZoneNewGgi(slaveI).movePoints
                 (
                     tensorField(0), tensorField(0), vectorField(0)
@@ -1728,7 +1728,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 		// Only the local masters calculates the contact force and the local
         // master interpolates this force
         const boolList& locSlave = localSlave();
-		Info<<"Here I am below localSlave in updateCoeffs()"<<__LINE__<<endl;
+//		Info<<"Here I am below localSlave in updateCoeffs()"<<__LINE__<<endl;
 
         // Create master bounding box used for quick check
         boundBox masterBb(zone().localPoints(), false);
@@ -1738,7 +1738,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
         const scalar bbOff = bbOffset();
 		if (masterBb.minDim() < bbOff)
         {
-			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
             const vector bbDiag = masterBb.max() - masterBb.min();
 
             if (bbDiag.x() < bbOff)
@@ -1763,7 +1763,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 		
 		forAll(activeContactPairs, shadowI)
         {
-			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
             // Perform quick check to find potential contacting pairs
             // The quick check is based on the bounding box (BB) of the contact
             // pairs: if the BBs of pair intersect then we will designate the
@@ -1799,7 +1799,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 			
 			if (masterBb.overlaps(shadowBb))
             {
-				Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//				Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
                 activeContactPairs[shadowI] = true;
             }
 			
@@ -1810,7 +1810,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
             if (activeContactPairs[shadowI])
             {
-				Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//				Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
 				if (locSlave[shadowI])
                 {
                     // Correct normal and friction contact models for the
@@ -1845,7 +1845,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					
 					if (movingMesh())
                     {
-						Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//						Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
                         // Updated Lagrangian, we will directly lookup the
                         // displacement increment
 
@@ -1858,7 +1858,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                     }
 					else
                     {
-						Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//						Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
                         // We will lookup the total displacement and old total
                         // displacement
 
@@ -2012,7 +2012,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					
 										
                     curPatchTraction += curPatchTractions(shadowI);
-					Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//					Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
 				}				
 			} // if contact pair is active
 		} // forAll contact pairs
@@ -2022,7 +2022,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 	}
 	
 //**************************************************** END General**********************************************
-       Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+//       Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
 
     solidTractionFvPatchVectorField::updateCoeffs();
 	Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
@@ -2030,7 +2030,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
 const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc() const
 {
-	Info<<"Here I am in Qc()"<<__LINE__<<endl;
+//	Info<<"Here I am in Qc()"<<__LINE__<<endl;
     if (!QcPtr_)
     {
         calcQc();
@@ -2045,7 +2045,7 @@ const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc
     const label shadowI
 ) const
 {
-	Info<<"Here I am in Qc()"<<__LINE__<<endl;
+//	Info<<"Here I am in Qc()"<<__LINE__<<endl;
     if (!QcsPtr_)
     {
         calcQcs();
@@ -2056,7 +2056,7 @@ const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc
 
 void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
 {
-	Info<<"Here I am in calcQcs()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcQcs()"<<__LINE__<<endl;
     const boolList& locSlave = localSlave();
 
     QcsPtr_ = new List<scalarField>(locSlave.size());
@@ -2077,7 +2077,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
 
     forAll(locSlave, shadowI)
     {
-		Info<<"Here I am in calcQcs()"<<__LINE__<<endl;
+//		Info<<"Here I am in calcQcs()"<<__LINE__<<endl;
         scalarField& Qc = (*QcsPtr_)[shadowI];
         Qc.setSize(patch().size(), 0.0);
 
@@ -2089,7 +2089,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
         // has converged and sigma has been updated and mesh moved
         if (sigmaCauchyFound)
         {
-			Info<<"Here I am in calcQcs()"<<__LINE__<<endl;
+//			Info<<"Here I am in calcQcs()"<<__LINE__<<endl;
             const symmTensorField& sigma =
                 db().lookupObject<volSymmTensorField>
                 (
@@ -2100,7 +2100,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
         }
         else
         {
-			Info<<"Here I am in calcQcs()"<<__LINE__<<endl;
+//			Info<<"Here I am in calcQcs()"<<__LINE__<<endl;
             const symmTensorField& sigma =
             db().lookupObject<volSymmTensorField>
             (
@@ -2117,13 +2117,13 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
         // Calculate slip
         if (locSlave[shadowI])
         {
-			Info<<"Here I am in calcQcs()"<<__LINE__<<endl;
+//			Info<<"Here I am in calcQcs()"<<__LINE__<<endl;
             curPatchSlip = frictionModel(shadowI).slip();
 			
         }
         else
         {
-			Info<<"Here I am in calcQcs()"<<__LINE__<<endl;
+//			Info<<"Here I am in calcQcs()"<<__LINE__<<endl;
             const solidGeneralContactFvPatchVectorField& shadowPatchField =
             refCast<const solidGeneralContactFvPatchVectorField>
             (
@@ -2184,7 +2184,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcQcs() const
 
 void Foam::solidGeneralContactFvPatchVectorField::calcBbOffset() const
 {
-	Info<<"Here I am in calcBbOffset()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcBbOffset()"<<__LINE__<<endl;
     if (bbOffset_ != 0)
     {
         FatalErrorIn
@@ -2215,7 +2215,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcBbOffset() const
 
 Foam::scalar Foam::solidGeneralContactFvPatchVectorField::bbOffset() const
 {
-	Info<<"Here I am in bbOffset()"<<__LINE__<<endl;
+//	Info<<"Here I am in bbOffset()"<<__LINE__<<endl;
     if (bbOffset_ == 0)
     {
 		Info<<"Here I am in bbOffset()"<<__LINE__<<endl;
@@ -2232,7 +2232,7 @@ Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
     const label shadowI
 ) const
 {
-	Info<<"Here I am in curPatchTractions()"<<__LINE__<<endl;
+//	Info<<"Here I am in curPatchTractions()"<<__LINE__<<endl;
     if (!curPatchTractionPtr_)
     {
 		Info<<"Here I am in curPatchTractions()"<<__LINE__<<endl;
@@ -2249,7 +2249,7 @@ Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
     const label shadowI
 )
 {
-	Info<<"Here I am in curPatchTractions()"<<__LINE__<<endl;
+//	Info<<"Here I am in curPatchTractions()"<<__LINE__<<endl;
     if (!curPatchTractionPtr_)
     {
 		Info<<"Here I am in curPatchTractions()"<<__LINE__<<endl;
@@ -2263,11 +2263,11 @@ Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
 
 void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
 {
-	Info<<"Here I am in calcZoneToZones()"<<__LINE__<<endl;
+//	Info<<"Here I am in calcZoneToZones()"<<__LINE__<<endl;
     // Create zone-to-zone interpolation
     if (!zoneToZonesNewGgi_.empty())
     {
-		Info<<"Here I am in calcZoneToZones()"<<__LINE__<<endl;
+//		Info<<"Here I am in calcZoneToZones()"<<__LINE__<<endl;
         FatalErrorIn
         (
             "void solidGeneralContactFvPatchVectorField::calcZoneToZones()"
@@ -2318,7 +2318,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
 const Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi() const
 {
-   Info<<"Here I am in shadowZonesNewGgi()"<<__LINE__<<endl;
+//   Info<<"Here I am in shadowZonesNewGgi()"<<__LINE__<<endl;
    if (master_)
     {
 		Info<<"Here I am in shadowZonesNewGgi()"<<__LINE__<<endl;
@@ -2353,7 +2353,7 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi() const
 Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi()
 {
-	Info<<"Here I am in shadowZonesNewGgi()"<<__LINE__<<endl;
+//	Info<<"Here I am in shadowZonesNewGgi()"<<__LINE__<<endl;
     if (master_)
     {
 		Info<<"Here I am in shadowZonesNewGgi()"<<__LINE__<<endl;
@@ -2391,7 +2391,7 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi()
 const Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
 Foam::solidGeneralContactFvPatchVectorField::zoneToZonesNewGgi() const
 {
-	Info<<"Here I am in zoneToZonesNewGgi()"<<__LINE__<<endl;
+//	Info<<"Here I am in zoneToZonesNewGgi()"<<__LINE__<<endl;
     if (master_)
     {
 		Info<<"Here I am in zoneToZonesNewGgi()"<<__LINE__<<endl;
@@ -2426,7 +2426,7 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZonesNewGgi() const
 Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
 Foam::solidGeneralContactFvPatchVectorField::zoneToZonesNewGgi()
 {
-	Info<<"Here I am in zoneToZonesNewGgi()"<<__LINE__<<endl;
+//	Info<<"Here I am in zoneToZonesNewGgi()"<<__LINE__<<endl;
     if (master_)
     {
 		Info<<"Here I am in zoneToZonesNewGgi()"<<__LINE__<<endl;
@@ -2470,7 +2470,7 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi
     const label shadowI
 ) const
 {  
-	Info<<"Here I am in zoneToZoneNewGgi()"<<__LINE__<<endl; 
+//	Info<<"Here I am in zoneToZoneNewGgi()"<<__LINE__<<endl; 
    if (!localSlave()[shadowI])
     {
         FatalErrorIn("zoneToZoneNewGgi(const label shadowI)")
@@ -2499,7 +2499,7 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi
 Foam::newGgiStandAlonePatchInterpolation&
 Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi(const label shadowI)
 {
-	Info<<"Here I am in zoneToZoneNewGgi()"<<__LINE__<<endl;
+//	Info<<"Here I am in zoneToZoneNewGgi()"<<__LINE__<<endl;
     if (!localSlave()[shadowI])
     {
         FatalErrorIn("zoneToZone(const label shadowI)")
@@ -2530,7 +2530,7 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi(const label shadow
 
 bool Foam::solidGeneralContactFvPatchVectorField::globalMaster() const
 {
-	Info<<"Here I am in globalMaster()"<<__LINE__<<endl;
+//	Info<<"Here I am in globalMaster()"<<__LINE__<<endl;
     if (!globalMasterPtr_)
     {
 		Info<<"Here I am in globalMaster()"<<__LINE__<<endl;
@@ -2645,7 +2645,7 @@ tmp<vectorField> solidGeneralContactFvPatchVectorField::interpolateSlaveToMaster
 //  Move the contact face zone patches to the deformed position
 void solidGeneralContactFvPatchVectorField::moveFaceZonePatches()
 {
-	Info<<"Here I am in moveFaceZonePatches()"<<__LINE__<<endl;
+//	Info<<"Here I am in moveFaceZonePatches()"<<__LINE__<<endl;
       //OFstream outFile("localFaces_"+name(Pstream::myProcNo()));
       //outFile << slaveFaceZonePatchPtr_->localFaces() << endl;
 
@@ -2990,12 +2990,12 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
 	
 	Info<< "The current field is "<< dimensionedInternalField().name()<< endl;
 	
-	Info<<"Here I am above localSlave in write()"<<__LINE__<<endl;
+/*	Info<<"Here I am above localSlave in write()"<<__LINE__<<endl;
     if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
         FatalError  << "solidGeneralContactFvPatchVectorField::write: localSlavePtr_ NOT defined:" 
                     << "Cannot write slave information because no slave identified!"  
                     << exit(FatalError);;
-					
+	*/				
 
     if (localSlave()[shadowI])
     {
@@ -3331,7 +3331,7 @@ Foam::label Foam::solidGeneralContactFvPatchVectorField::findShadowID
     const label patchID
 ) const
 {
-	Info<<"Here I am in findShadowID()"<<__LINE__<<endl;
+//	Info<<"Here I am in findShadowID()"<<__LINE__<<endl;
     label shadowI = -1;
 
     const labelList shadowIDs = shadowPatchIndices();
@@ -3358,7 +3358,7 @@ Foam::label Foam::solidGeneralContactFvPatchVectorField::findShadowID
 
 void Foam::solidGeneralContactFvPatchVectorField::makeCurPatchTractions() const
 {
-	Info<<"Here I am in makeCurPatchTractions()"<<__LINE__<<endl;
+//	Info<<"Here I am in makeCurPatchTractions()"<<__LINE__<<endl;
     if (curPatchTractionPtr_)
     {
 		Info<<"Here I am in makeCurPatchTractions()"<<__LINE__<<endl;
