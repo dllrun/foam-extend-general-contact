@@ -158,7 +158,9 @@ moveFaceZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration
             (
                 shadZoneIndices[shadowI], shadowZoneD, shadowI
             );
-
+		
+		Info<<"Here I am in moveFaceZonesToDeformedConfiguration()"<<__LINE__<<endl;
+		Info<<"shadowZoneD.size(): "<<shadowZoneD.size()<<endl;
         // The zone deformed points are the initial position plus the
         // displacement
         const pointField zoneNewPoints =
@@ -1803,7 +1805,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 			
 			if (masterBb.overlaps(shadowBb))
             {
-//				Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+				Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
                 activeContactPairs[shadowI] = true;
             }
 			
@@ -1817,6 +1819,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 //				Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
 				if (locSlave[shadowI])
                 {
+					Info<<"Here I am in updateCoeffs() "<<__LINE__<<endl;
                     // Correct normal and friction contact models for the
                     // current contact pair
 
@@ -1892,7 +1895,8 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					
 			
                     // Master patch DD interpolated to the slave patch
-                    
+        Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+		Info<<"zoneDD.size(): "<<zoneDD.size()<<endl;
 					const vectorField patchDDInterpToShadowPatch =
                         patchField
                         (
@@ -2994,11 +2998,11 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
 	
 	Info<< "The current field is "<< dimensionedInternalField().name()<< endl;
 	
-	Info<<"Here I am above localSlave in write()"<<__LINE__<<endl;
+	/* Info<<"Here I am above localSlave in write()"<<__LINE__<<endl;
     if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
         FatalError  << "solidGeneralContactFvPatchVectorField::write: localSlavePtr_ NOT defined:" 
                     << "Cannot write slave information because no slave identified!"  
-                    << exit(FatalError);;
+                    << exit(FatalError);; */
 					
 
     if (localSlave()[shadowI])
