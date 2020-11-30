@@ -325,6 +325,10 @@ Foam::solidGeneralContactFvPatchVectorField::localSlave() const
     }
 
 	Info<<"Here I am in localSlave()"<<__LINE__<<endl;
+	if (localSlavePtr_)
+    {
+		Info<<"localSlavePtr_ in localSlave()"<<localSlavePtr_<<endl;
+    }
     return *localSlavePtr_;
 }
 
@@ -2990,12 +2994,12 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
 	
 	Info<< "The current field is "<< dimensionedInternalField().name()<< endl;
 	
-/*	Info<<"Here I am above localSlave in write()"<<__LINE__<<endl;
+	Info<<"Here I am above localSlave in write()"<<__LINE__<<endl;
     if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
         FatalError  << "solidGeneralContactFvPatchVectorField::write: localSlavePtr_ NOT defined:" 
                     << "Cannot write slave information because no slave identified!"  
                     << exit(FatalError);;
-	*/				
+					
 
     if (localSlave()[shadowI])
     {
@@ -3041,287 +3045,7 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
 	
 	//*********************** start solid4Foam "solidContact" ***********************
 	
-    // If the shadowPatchIndices pointer is not set then we will assume that the
-    // contact models were not created and nothing has changed; so we will just
-    // output the input dict unchanged
-  /*
-	if (shadowPatchNames_.size() == 0)
-    {
-        // Overwrite fields in the dict
-        dictionary& dict = const_cast<dictionary&>(dict_);
-
-        dict.remove("gradient");
-        dict.remove("value");
-        dict.remove("traction");
-        dict.remove("pressure");
-
-        //dict.add("gradient", gradient());
-        const vectorField& patchValue = *this;
-        //dict.add("value", patchValue);
-        //dict.add("traction", traction());
-        //dict.add("pressure", pressure());
-
-        // Write the dictionary
-        dict_.write(os, false);
-
-        gradient().writeEntry("gradient", os);
-        patchValue.writeEntry("value", os);
-        traction().writeEntry("traction", os);
-        pressure().writeEntry("pressure", os);
-
-        return;
-    }
-
-    solidTractionFvPatchVectorField::write(os);
-
-    os.writeKeyword("master")
-        << master_ << token::END_STATEMENT << nl;
-
-    const wordList& shadPatchNames = shadowPatchNames();
-    if (shadPatchNames.size() == 1)
-    {
-        os.writeKeyword("shadowPatch")
-            << shadPatchNames[0] << token::END_STATEMENT << nl;
-    }
-    else
-    {
-        shadowPatchNames().writeEntry("shadowPatches", os);
-    }
-
-    os.writeKeyword("regionOfInterest")
-        << regionOfInterest_ << token::END_STATEMENT << nl;
-    os.writeKeyword("regionOfInterestTopCorner")
-        << regionOfInterestTopCorner_ << token::END_STATEMENT << nl;
-    os.writeKeyword("regionOfInterestBottomCorner")
-        << regionOfInterestBottomCorner_ << token::END_STATEMENT << nl;
-    os.writeKeyword("writeZoneVTK")
-        << writeZoneVTK_ << token::END_STATEMENT << nl;
-    os.writeKeyword("writePointDistanceFields")
-        << writePointDistanceFields_ << token::END_STATEMENT << nl;
-    os.writeKeyword("scaleFaceTractionsNearDownstreamPatch")
-        << scaleFaceTractionsNearDownstreamPatch_ << token::END_STATEMENT << nl;
-    if (scaleFaceTractionsNearDownstreamPatch_)
-    {
-        os.writeKeyword("downstreamScaleFactor")
-            << readScalar(dict_.lookup("downstreamScaleFactor"))
-            << token::END_STATEMENT << nl;
-        os.writeKeyword("downstreamPatchName")
-            << word(dict_.lookup("downstreamPatchName")) << token::END_STATEMENT
-            << nl;
-    }
-
-    if (master_)
-    {
-        os.writeKeyword("rigidMaster") << rigidMaster_
-            << token::END_STATEMENT << nl;
-
-        if (shadowPatchNames_.size() == 1)
-        {
-            os.writeKeyword("normalContactModel")
-                << normalModels()[0].type()
-                << token::END_STATEMENT << nl;
-            normalModels()[0].writeDict(os);
-
-            os.writeKeyword("frictionContactModel")
-                << frictionModels()[0].type()
-                << token::END_STATEMENT << nl;
-            frictionModels()[0].writeDict(os);
-
-            os.writeKeyword("useNewPointDistanceMethod")
-                << dict_.lookupOrDefault<Switch>
-                (
-                    "useNewPointDistanceMethod", false
-                )
-                << token::END_STATEMENT << nl;
-
-            os.writeKeyword("projectPointsToPatchBoundary")
-                << dict_.lookupOrDefault<Switch>
-                (
-                    "projectPointsToPatchBoundary", false
-                )
-                << token::END_STATEMENT << nl;
-
-            os.writeKeyword("checkPointDistanceOrientations")
-                << dict_.lookupOrDefault<Switch>
-                (
-                    "checkPointDistanceOrientations", false
-                )
-                << token::END_STATEMENT << nl;
-
-            os.writeKeyword("usePrevCandidateMasterNeighbors")
-                << dict_.lookupOrDefault<Switch>
-                (
-                    "usePrevCandidateMasterNeighbors", false
-                )
-                << token::END_STATEMENT << nl;
-        }
-        else
-        {
-            forAll(shadowPatchNames_, shadPatchI)
-            {
-                os  << patch().name() << "_to_"
-                    << shadowPatchNames_[shadPatchI] << "_dict" << nl
-                    << '{' << endl;
-
-                os.writeKeyword("normalContactModel")
-                    << normalModels()[shadPatchI].type()
-                    << token::END_STATEMENT << nl;
-                normalModels()[shadPatchI].writeDict(os);
-
-                os.writeKeyword("frictionContactModel")
-                    << frictionModels()[shadPatchI].type()
-                    << token::END_STATEMENT << nl;
-                frictionModels()[shadPatchI].writeDict(os);
-
-                os  << '}' << endl;
-            }
-        }
-    }
-
-	*/ 
-	/*
-    if (writeZoneVTK_)
-    {
-		*/ 
-		/*
-        if
-        (
-            dimensionedInternalField().name() == "D"
-         || dimensionedInternalField().name() == "DD"
-        )
-        {
-            Info<< "Writing deformed zones to VTK" << endl;
-            const word timeName =
-                patch().boundaryMesh().mesh().time().timeName();
-
-            zone().globalPatch().writeVTK("zone_" + timeName);
-
-            forAll(shadowZones(), shadI)
-            {
-                shadowZones()[shadI].globalPatch().writeVTK
-                (
-                    "shadowZone_" + timeName
-                );
-            }
-        }
-		*/ 
-		/*
-    }
-	
-	*/ 
-	/*
-
-    // Write out point distance fields for master and slave
-    if (writePointDistanceFields_ && master())
-    {
-        if (normalModels().size() != 1)
-        {
-            FatalErrorIn
-            (
-                "void solidContactFvPatchVectorField::"
-                "write(Ostream& os) const"
-            )   << "The 'writePointDistanceFields' is currently only "
-                << "implemented for one-to-one contact"
-                << abort(FatalError);
-        }
-
-        // Take a reference to the mesh for convenience
-        const polyMesh& mesh = patch().patch().boundaryMesh().mesh();
-
-        // Create the point mesh, which is needed for the point field
-        pointMesh pMesh(mesh);
-
-        // Create the point distance fields
-
-        pointScalarField dist
-        (
-            IOobject
-            (
-                "pointDistance",
-                mesh.time().timeName(),
-                mesh,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            ),
-            pMesh,
-            dimensionedScalar("zero", dimless, 0.0)
-        );
-
-        pointVectorField distVecs
-        (
-            IOobject
-            (
-                "pointDistanceVectors",
-                mesh.time().timeName(),
-                mesh,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            ),
-            pMesh,
-            dimensionedVector("zero", dimless, vector::zero)
-        );
-
-        // Transfer the patch point distances into the dist point field
-        {
-            // Lookup the master point distance to intersection
-            const scalarField masterpd =
-                zone().globalPointToPatch
-                (
-                    zoneToZones()[0].masterPointDistanceToIntersection()
-                );
-            const vectorField masterpdVecs =
-                zone().globalPointToPatch
-                (
-                    zoneToZones()[0].masterPointDistanceVectorsToIntersection()
-                );
-
-            const labelList& masterMeshPoints = patch().patch().meshPoints();
-
-            forAll(masterpd, pI)
-            {
-                const label pointID = masterMeshPoints[pI];
-                dist[pointID] = masterpd[pI];
-                distVecs[pointID] = masterpdVecs[pI];
-            }
-        }
-
-        {
-            const scalarField slavepd =
-                shadowZones()[0].globalPointToPatch
-                (
-                    zoneToZones()[0].slavePointDistanceToIntersection()
-                );
-            const vectorField slavepdVecs =
-                shadowZones()[0].globalPointToPatch
-                (
-                    zoneToZones()[0].slavePointDistanceVectorsToIntersection()
-                );
-
-            const labelList& slaveMeshPoints =
-                patch().patch().boundaryMesh()
-                [
-                    shadowPatchIndices()[0]
-                ].meshPoints();
-
-            forAll(slavepd, pI)
-            {
-                const label pointID = slaveMeshPoints[pI];
-                dist[pointID] = slavepd[pI];
-                distVecs[pointID] = slavepdVecs[pI];
-            }
-        }
-
-        // Write the field
-        InfoIn
-        (
-            "void Foam::solidContactFvPatchVectorField::"
-            "write(Ostream& os) const"
-        )   << "Writing point distance fields: " << dist.name()
-            << " and " << distVecs.name() << endl;
-        dist.write();
-        distVecs.write();
-    }
-		*/
+    
 	//*********************** END solid4Foam "solidContact" ***********************
     
 }
