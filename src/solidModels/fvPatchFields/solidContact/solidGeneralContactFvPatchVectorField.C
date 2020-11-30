@@ -336,7 +336,7 @@ Foam::solidGeneralContactFvPatchVectorField::localSlave() const
 
 void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
 {
-//	Info<<"Here I am in calcShadowPatchNames()"<<__LINE__<<endl;
+	Info<<"Here I am in calcShadowPatchNames()"<<__LINE__<<endl;
     if (shadowPatchNamesPtr_ || shadowPatchIndicesPtr_)
     {
         FatalErrorIn
@@ -1581,6 +1581,7 @@ Foam::solidGeneralContactFvPatchVectorField::shadowPatchIndices() const
     {
         calcShadowPatchNames();
     }
+//	Info<<"Here I am in shadowPatchIndices()"<<__LINE__<<endl;
 
     return *shadowPatchIndicesPtr_;
 }	
@@ -1897,17 +1898,21 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                     // Master patch DD interpolated to the slave patch
         Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
 		Info<<"zoneDD.size(): "<<zoneDD.size()<<endl;
-					const vectorField patchDDInterpToShadowPatch =
+		Info<<"patchDD.size(): "<<patchDD.size()<<endl;
+		Info<<"shadowPatchIndices()[shadowI]: "<<shadowPatchIndices()[shadowI]<<endl;
+		Info<<"shadowZoneIndices()[shadowI]: "<<shadowZoneIndices()[shadowI]<<endl;
+		const vectorField patchDDInterpToShadowPatch =
                         patchField
                         (
                             shadowPatchIndices()[shadowI],
                             shadowZoneIndices()[shadowI],
 							//checking shadowZone(shadowI) instead of zoneToZone(shadowI)
                             //zoneToZone(shadowI).masterToSlave(zoneDD)()
-							zoneToZoneNewGgi(shadowI).masterToSlave(zoneDD)()
+							zoneToZoneNewGgi(shadowI).slaveToMaster(zoneDD)()
+							//zoneToZoneNewGgi(shadowI).masterToSlave(zoneDD)()
                         );
 										
-					
+		Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;			
 					
 					
 					

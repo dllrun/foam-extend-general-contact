@@ -339,6 +339,8 @@ newGGIInterpolation<MasterPatch, SlavePatch>::slaveToMaster
     const Field<Type>& ff
 ) const
 {
+	Info<<"Here I am in newGGIInterpolate.C line "<<__LINE__<<endl;
+	Info<<"ff.size() "<<ff.size()<<endl;
     if (ff.size() != slavePatch_.size())
     {
         FatalErrorIn
