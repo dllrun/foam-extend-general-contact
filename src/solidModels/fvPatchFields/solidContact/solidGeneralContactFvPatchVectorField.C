@@ -94,8 +94,13 @@ moveFaceZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration
 		Info<<"Here I am in moveFaceZonesToDeformedConfiguration()"<<__LINE__<<endl;
         // Assemble the zone face displacement field to move the zones
         vectorField zoneD(zone().size(), vector::zero);
+		Info<<"zoneD.size(): "<<zoneD.size()<<endl;
+		Info<<"zone().size(): "<<zone().size()<<endl;
+		
         vectorField shadowZoneD(shadowZone(shadowI).size(), vector::zero);
-
+		Info<<"shadowZoneD.size(): "<<shadowZoneD.size()<<endl;
+		Info<<"shadowZone(shadowI).size(): "<<shadowZone(shadowI).size()<<endl;
+		
         // For a non-moving mesh, we will move the zones by the total
         // displacement, whereas for a moving mesh (updated Lagrangian), we will
         // move the zones by the displacement increment
@@ -138,9 +143,14 @@ moveFaceZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration
 
             const vectorField& shadowPatchDD =
                 D.boundaryField()[shadPatchIndices[shadowI]];
-
+				
+		
             zoneD =
                 zoneField(zoneIndex(), patch().index(), patchD);
+		
+		Info<<"Here I am in moveFaceZonesToDeformedConfiguration()"<<__LINE__<<endl;
+		Info<<"zoneD.size(): "<<zoneD.size()<<endl;
+		
             shadowZoneD =
                 zoneField
                 (
@@ -296,7 +306,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcLocalSlave() const
     }
 
     localSlavePtr_ = new boolList(shadowPatchNames().size(), false);
-	Info<<"Here I am, localSlavePtr_ is defined in line 296 "<<localSlavePtr_<<endl;
+	Info<<"localSlavePtr_ in calcLocalSlave() line 296 "<<*localSlavePtr_<<endl;
 
     boolList& localSlave = *localSlavePtr_;
 //	Info<<"Here I am in calcLocalSlave()"<<__LINE__<<endl;
@@ -325,11 +335,11 @@ Foam::solidGeneralContactFvPatchVectorField::localSlave() const
 		Info<<"Here I am in localSlave()"<<__LINE__<<endl;
         calcLocalSlave();
     }
-
+// localSlavePtr_ corresponds to shadowZonesNewGgi
 	Info<<"Here I am in localSlave()"<<__LINE__<<endl;
 	if (localSlavePtr_)
     {
-		Info<<"localSlavePtr_ in localSlave()"<<localSlavePtr_<<endl;
+		Info<<"localSlavePtr_ in localSlave()"<<*localSlavePtr_<<endl;
     }
     return *localSlavePtr_;
 }
@@ -1552,12 +1562,12 @@ Foam::solidGeneralContactFvPatchVectorField::
 Foam::label Foam::solidGeneralContactFvPatchVectorField::globalMasterIndex()
 const
 {
-//	Info<<"Here I am in globalMasterIndex()"<<__LINE__<<endl;
+	Info<<"Here I am in globalMasterIndex()"<<__LINE__<<endl;
     if (!globalMasterIndexPtr_)
     {
         calcGlobalMasterIndex();
     }
-
+	Info<<"globalMasterIndexPtr_ in globalMasterIndex()"<<*globalMasterIndexPtr_<<endl;
     return *globalMasterIndexPtr_;
 }
 
@@ -1872,8 +1882,12 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
                         const volVectorField& D =
                             db().lookupObject<volVectorField>("U");
-
-                        patchDD =
+							
+				Info<<"D.boundaryField().size(): "<<D.boundaryField().size()<<endl;
+				Info<<"shadowPatchIndices()[shadowI]: "<<shadowPatchIndices()[shadowI]<<endl;
+                Info<<"patch().index(): "<<patch().index()<<endl;
+					
+						patchDD =
                             D.boundaryField()[patch().index()]
                           - D.oldTime().boundaryField()[patch().index()];
                         shadowPatchDD =
@@ -1884,6 +1898,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             ];
                     }
 					
+					Info<<"shadowPatchDD.size(): "<<shadowPatchDD.size()<<endl;
 					// Master zone DD
                     const vectorField zoneDD =
                         zoneField
@@ -1893,7 +1908,8 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             patchDD
                         );
 					
-					
+		Info<< "The current field is "<< dimensionedInternalField().name()<< endl;
+		Info<< "The current patch is "<< patch().name()<< endl;			
 			
                     // Master patch DD interpolated to the slave patch
         Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
@@ -1908,7 +1924,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             shadowZoneIndices()[shadowI],
 							//checking shadowZone(shadowI) instead of zoneToZone(shadowI)
                             //zoneToZone(shadowI).masterToSlave(zoneDD)()
-							zoneToZoneNewGgi(shadowI).slaveToMaster(zoneDD)()
+							zoneToZoneNewGgi(shadowI).masterToSlave(zoneDD)()
 							//zoneToZoneNewGgi(shadowI).masterToSlave(zoneDD)()
                         );
 										
@@ -1916,8 +1932,8 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					
 					
 					
-					FatalError
-                        << "Disabled: use jasakSolidContact" << abort(FatalError);
+			//		FatalError
+            //            << "Disabled: use jasakSolidContact" << abort(FatalError);
                      normalModel(shadowI).correct
                      (
                          shadowPatchFaceNormals,
@@ -2332,7 +2348,7 @@ const Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi() const
 {
 //   Info<<"Here I am in shadowZonesNewGgi()"<<__LINE__<<endl;
-   if (master_)
+   if (globalMasterPtr_)
     {
 		Info<<"Here I am in shadowZonesNewGgi()"<<__LINE__<<endl;
         if (shadowZonesNewGgi_.empty())
@@ -2367,7 +2383,7 @@ Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi()
 {
 //	Info<<"Here I am in shadowZonesNewGgi()"<<__LINE__<<endl;
-    if (master_)
+    if (globalMasterPtr_)
     {
 		Info<<"Here I am in shadowZonesNewGgi()"<<__LINE__<<endl;
         if (shadowZonesNewGgi_.empty())
@@ -2549,6 +2565,7 @@ bool Foam::solidGeneralContactFvPatchVectorField::globalMaster() const
 		Info<<"Here I am in globalMaster()"<<__LINE__<<endl;
         calcGlobalMaster();
     }
+	Info<<"globalMasterPtr_ in globalMaster()"<<*globalMasterPtr_<<endl;
 
     return *globalMasterPtr_;
 }
@@ -3002,12 +3019,13 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
         }
 	
 	Info<< "The current field is "<< dimensionedInternalField().name()<< endl;
-	
-	/* Info<<"Here I am above localSlave in write()"<<__LINE__<<endl;
-    if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
+	Info<< "The current patch is "<< patch().name()<< endl;
+	 Info<<"Here I am above localSlave check in write()"<<__LINE__<<endl;
+ /*   if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
         FatalError  << "solidGeneralContactFvPatchVectorField::write: localSlavePtr_ NOT defined:" 
                     << "Cannot write slave information because no slave identified!"  
-                    << exit(FatalError);; */
+                    << exit(FatalError);;  */
+					
 					
 
     if (localSlave()[shadowI])
