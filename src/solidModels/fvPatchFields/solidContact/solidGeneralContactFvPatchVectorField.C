@@ -1263,6 +1263,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     }
 	Info<< "The current field in c3 is "<< dimensionedInternalField().name()<< endl;
 	Info<< "The current patch in c3 is "<< patch().name()<< endl;
+	Info<<"zone().size(): "<<zone().size()<<endl;
 }
 	
 	// ********************************************** END General ********************************************
@@ -1463,6 +1464,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
 	Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
 	Info<< "The current patch in c5 is "<< patch().name()<< endl;
+	Info<<"zone().size(): "<<zone().size()<<endl;
     }
 
     if (ptf.globalMasterIndexPtr_)
@@ -1476,6 +1478,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 		Info<<"Here I am, localSlavePtr_ is defined in line 1436"<<localSlavePtr_<<endl;
     Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
 	Info<< "The current patch in c5 is "<< patch().name()<< endl;
+	Info<<"zone().size(): "<<zone().size()<<endl;
 	}
 
     if (ptf.shadowPatchNamesPtr_)
@@ -1483,6 +1486,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         shadowPatchNamesPtr_ = new wordList(*ptf.shadowPatchNamesPtr_);
     Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
 	Info<< "The current patch in c5 is "<< patch().name()<< endl;
+	Info<<"zone().size(): "<<zone().size()<<endl;
 	}
 
     if (ptf.shadowPatchIndicesPtr_)
@@ -1495,6 +1499,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         shadowZoneNamesPtr_ = new wordList(*ptf.shadowZoneNamesPtr_);
     Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
 	Info<< "The current patch in c5 is "<< patch().name()<< endl;
+	Info<<"zone().size(): "<<zone().size()<<endl;
 	} 
 
     if (ptf.shadowZoneIndicesPtr_)
@@ -1507,6 +1512,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
 	Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
 	Info<< "The current patch in c5 is "<< patch().name()<< endl;
+	Info<<"zone().size(): "<<zone().size()<<endl;
     }
 
     if (!ptf.zoneToZonesNewGgi_.empty())
@@ -1542,6 +1548,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     }
 	Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
 	Info<< "The current patch in c5 is "<< patch().name()<< endl;
+	Info<<"zone().size(): "<<zone().size()<<endl;
 }
 
 //**************************************************** END General**********************************************
@@ -1707,7 +1714,10 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
         return;
     }
 	
-//	Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+	Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+	Info<< "The current field in updateCoeffs() is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;
+	Info<<" updateCoeffs() - zone().size(): "<<zone().size()<<endl;
 
 //**************************************************** START General**********************************************	
 	boolList activeContactPairs(shadowPatchNames().size(), false);
@@ -1733,7 +1743,11 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                 normalModel(shadowI).newTimeStep();
                 frictionModel(shadowI).newTimeStep();
             }
-        }
+		Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+		Info<< "The current field in updateCoeffs() is "<< dimensionedInternalField().name()<< endl;
+		Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;
+		Info<<"updateCoeffs() - zone().size(): "<<zone().size()<<endl;
+		}
     }
 	
 	// Method
@@ -1758,7 +1772,11 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 //			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
            // Move the master and slave zone to the deformed configuration
             moveFaceZonesToDeformedConfiguration();
-        }
+			Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+		Info<< "The current field in updateCoeffs() is "<< dimensionedInternalField().name()<< endl;
+		Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;
+		Info<<"updateCoeffs() - zone().size(): "<<zone().size()<<endl;
+		}
 
 
 		// Clear interpolator weights
@@ -1784,8 +1802,12 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 		// Only the local masters calculates the contact force and the local
         // master interpolates this force
         const boolList& locSlave = localSlave();
-//		Info<<"Here I am below localSlave in updateCoeffs()"<<__LINE__<<endl;
-
+		Info<<"Here I am below localSlave in updateCoeffs()"<<__LINE__<<endl;
+		Info<< "The current field in updateCoeffs() is "<< dimensionedInternalField().name()<< endl;
+		Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;
+		Info<<"updateCoeffs() - zone().size(): "<<zone().size()<<endl;
+//		Info<<"updateCoeffs() - shadowZone(shadowI).size(): "<<shadowZone(shadowI).size()<<endl;
+		
         // Create master bounding box used for quick check
         boundBox masterBb(zone().localPoints(), false);
 
@@ -1885,6 +1907,11 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 							// **************** end solid4Foam ****************
                             //shadowZonesNewGgi(shadowI).faceNormals()
                         );
+						
+					Info<< "The current field in updateCoeffs() is "<< dimensionedInternalField().name()<< endl;
+					Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;
+					Info<<"updateCoeffs() - zone().size(): "<<zone().size()<<endl;
+					Info<<"updateCoeffs() - shadowZone(shadowI).size(): "<<shadowZone(shadowI).size()<<endl;
 
                     // Interpolate the master displacement increment to the
                     // slave patch as it is required by specific normal and
@@ -1899,6 +1926,11 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         ].size(),
                         vector::zero
                     );
+					
+					Info<< "The current field in updateCoeffs() is "<< dimensionedInternalField().name()<< endl;
+		Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;
+		Info<<"updateCoeffs() - zone().size(): "<<zone().size()<<endl;
+		Info<<"updateCoeffs() - shadowPatchDD.size(): "<<shadowPatchDD.size()<<endl;
 					
 					if (movingMesh())
                     {
@@ -1952,10 +1984,11 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 			
                     // Master patch DD interpolated to the slave patch
         Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
-		Info<<"zoneDD.size(): "<<zoneDD.size()<<endl;
-		Info<<"patchDD.size(): "<<patchDD.size()<<endl;
+		Info<<"updateCoeffs() - zoneDD.size(): "<<zoneDD.size()<<endl;
+		Info<<"updateCoeffs() - patchDD.size(): "<<patchDD.size()<<endl;
 		Info<<"shadowPatchIndices()[shadowI]: "<<shadowPatchIndices()[shadowI]<<endl;
 		Info<<"shadowZoneIndices()[shadowI]: "<<shadowZoneIndices()[shadowI]<<endl;
+	
 		const vectorField patchDDInterpToShadowPatch =
                         patchField
                         (
@@ -1969,7 +2002,10 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 										
 		Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;			
 					
-					
+		Info<< "The current field in updateCoeffs() is "<< dimensionedInternalField().name()<< endl;
+		Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;
+		Info<<"updateCoeffs() - zone().size(): "<<zone().size()<<endl;
+		Info<<"updateCoeffs() - shadowZone(shadowI).size(): "<<shadowZone(shadowI).size()<<endl;			
 					
 			//		FatalError
             //            << "Disabled: use jasakSolidContact" << abort(FatalError);
@@ -2090,10 +2126,15 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 	}
 	
 //**************************************************** END General**********************************************
-//       Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+		Info<< "The current field in updateCoeffs() is "<< dimensionedInternalField().name()<< endl;
+		Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;
+		Info<<"updateCoeffs() - zone().size(): "<<zone().size()<<endl;
 
     solidTractionFvPatchVectorField::updateCoeffs();
 	Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+	Info<< "The current field in updateCoeffs() is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;
+	Info<<"updateCoeffs() - zone().size(): "<<zone().size()<<endl;
 }
 
 const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc() const
