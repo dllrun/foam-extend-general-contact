@@ -1021,6 +1021,9 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
             "    const DimensionedField<vector, volMesh>& iF"
             ")"
         ) << endl;
+	
+	Info<< "The current field in c1 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c1 is "<< patch().name()<< endl;
     }
 }
 // ********************************************** END General ********************************************
@@ -1088,7 +1091,9 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     if (ptf.globalMasterPtr_)
     {
         globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
-    }
+    Info<< "The current field in c2 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c2 is "<< patch().name()<< endl;
+	}
 
     if (ptf.globalMasterIndexPtr_)
     {
@@ -1100,12 +1105,16 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
 		Info<<"Here I am, localSlavePtr_ is defined in line 1086 "<<localSlavePtr_<<endl;
+	Info<< "The current field in c2 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c2 is "<< patch().name()<< endl;
     }
 
     if (ptf.shadowPatchNamesPtr_)
     {
         shadowPatchNamesPtr_ = new wordList(*ptf.shadowPatchNamesPtr_);
-    }
+    Info<< "The current field in c2 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c2 is "<< patch().name()<< endl;
+	}
 
     if (ptf.shadowPatchIndicesPtr_)
     {
@@ -1115,7 +1124,9 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     if (ptf.shadowZoneNamesPtr_)
     {
         shadowZoneNamesPtr_ = new wordList(*ptf.shadowZoneNamesPtr_);
-    } 
+    Info<< "The current field in c2 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c2 is "<< patch().name()<< endl;
+	} 
 
     if (ptf.shadowZoneIndicesPtr_)
     {
@@ -1125,6 +1136,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     if (ptf.zonePtr_)
     {
         zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
+	Info<< "The current field in c2 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c2 is "<< patch().name()<< endl;
     }
 
     if (!ptf.zoneToZonesNewGgi_.empty())
@@ -1247,7 +1260,9 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         (
             patchInternalField() + gradient()/patch().deltaCoeffs()
         );
-    } 
+    }
+	Info<< "The current field in c3 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c3 is "<< patch().name()<< endl;
 }
 	
 	// ********************************************** END General ********************************************
@@ -1304,6 +1319,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     if (ptf.globalMasterPtr_)
     {
         globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
+	Info<< "The current field in c4 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c4 is "<< patch().name()<< endl;
     }
 
     if (ptf.globalMasterIndexPtr_)
@@ -1317,12 +1334,16 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
 		Info<<"Here I am, localSlavePtr_ is defined in line 1302"<<localSlavePtr_<<endl;
-    }
+    Info<< "The current field in c4 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c4 is "<< patch().name()<< endl;
+	}
 
     if (ptf.shadowPatchNamesPtr_)
     {
         shadowPatchNamesPtr_ = new wordList(*ptf.shadowPatchNamesPtr_);
-    }
+    Info<< "The current field in c4 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c4 is "<< patch().name()<< endl;
+	}
 
     if (ptf.shadowPatchIndicesPtr_)
     {
@@ -1342,6 +1363,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     if (ptf.zonePtr_)
     {
         zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
+	Info<< "The current field in c4 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c4 is "<< patch().name()<< endl;
     }
 
     if (!ptf.zoneToZonesNewGgi_.empty())
@@ -1438,6 +1461,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     if (ptf.globalMasterPtr_)
     {
         globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
+	Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c5 is "<< patch().name()<< endl;
     }
 
     if (ptf.globalMasterIndexPtr_)
@@ -1449,12 +1474,16 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
 	    localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
 		Info<<"Here I am, localSlavePtr_ is defined in line 1436"<<localSlavePtr_<<endl;
-    }
+    Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c5 is "<< patch().name()<< endl;
+	}
 
     if (ptf.shadowPatchNamesPtr_)
     {
         shadowPatchNamesPtr_ = new wordList(*ptf.shadowPatchNamesPtr_);
-    }
+    Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c5 is "<< patch().name()<< endl;
+	}
 
     if (ptf.shadowPatchIndicesPtr_)
     {
@@ -1464,7 +1493,9 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     if (ptf.shadowZoneNamesPtr_)
     {
         shadowZoneNamesPtr_ = new wordList(*ptf.shadowZoneNamesPtr_);
-    } 
+    Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c5 is "<< patch().name()<< endl;
+	} 
 
     if (ptf.shadowZoneIndicesPtr_)
     {
@@ -1474,6 +1505,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     if (ptf.zonePtr_)
     {
         zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
+	Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c5 is "<< patch().name()<< endl;
     }
 
     if (!ptf.zoneToZonesNewGgi_.empty())
@@ -1507,6 +1540,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         QcsPtr_ = new List<scalarField>(*ptf.QcsPtr_);
     }
+	Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in c5 is "<< patch().name()<< endl;
 }
 
 //**************************************************** END General**********************************************
@@ -1530,8 +1565,12 @@ Foam::solidGeneralContactFvPatchVectorField::
 
     deleteDemandDrivenData(globalMasterPtr_);
     deleteDemandDrivenData(globalMasterIndexPtr_);
+	Info<< "The current field in destructor is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in destructor is "<< patch().name()<< endl;
 	Info<<"Here I am, localSlavePtr_ is undefined "<<localSlavePtr_<<endl;
     deleteDemandDrivenData(localSlavePtr_);
+	Info<< "The current field in destructor is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in destructor is "<< patch().name()<< endl;
     deleteDemandDrivenData(shadowPatchNamesPtr_);
     deleteDemandDrivenData(shadowPatchIndicesPtr_);
     deleteDemandDrivenData(shadowZoneNamesPtr_);
@@ -3021,10 +3060,10 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
 	Info<< "The current field is "<< dimensionedInternalField().name()<< endl;
 	Info<< "The current patch is "<< patch().name()<< endl;
 	 Info<<"Here I am above localSlave check in write()"<<__LINE__<<endl;
- /*   if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
+    if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
         FatalError  << "solidGeneralContactFvPatchVectorField::write: localSlavePtr_ NOT defined:" 
                     << "Cannot write slave information because no slave identified!"  
-                    << exit(FatalError);;  */
+                    << exit(FatalError);;  
 					
 					
 
