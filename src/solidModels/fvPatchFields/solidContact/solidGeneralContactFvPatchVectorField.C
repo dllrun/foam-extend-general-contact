@@ -1023,6 +1023,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         ) << endl;
 	
 	Info<< "The current field in c1 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c1 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c1 is "<< patch().name()<< endl;
     }
 }
@@ -1071,7 +1072,9 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 // ******************************************** START General *****************************************
 {
 	Info<<"Here I am - c2(ptf,p,iF,mapper)"<<endl;
-    if (debug)
+	Info<< "The current field in c2 is "<< dimensionedInternalField().name()<< endl;
+    Info<< "The current dimensionedInternalField().size() in c2 is "<< dimensionedInternalField().size()<< endl;
+	if (debug)
     {
         InfoIn
         (
@@ -1092,7 +1095,9 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
     Info<< "The current field in c2 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c2 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c2 is "<< patch().name()<< endl;
+	Info<< "The current field in c2 is "<< dimensionedInternalField().name()<< endl;
 	}
 
     if (ptf.globalMasterIndexPtr_)
@@ -1106,8 +1111,9 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
 		Info<<"Here I am, localSlavePtr_ is defined in line 1086 "<<localSlavePtr_<<endl;
 	Info<< "The current field in c2 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c2 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c2 is "<< patch().name()<< endl;
-    }
+	}
 
     if (ptf.shadowPatchNamesPtr_)
     {
@@ -1125,6 +1131,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         shadowZoneNamesPtr_ = new wordList(*ptf.shadowZoneNamesPtr_);
     Info<< "The current field in c2 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c2 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c2 is "<< patch().name()<< endl;
 	} 
 
@@ -1137,6 +1144,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
 	Info<< "The current field in c2 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c2 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c2 is "<< patch().name()<< endl;
     }
 
@@ -1251,6 +1259,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     if (dict.found("value"))
     {
 		Info<<"Here I am - c3(p,iF,dict) line "<<__LINE__<<endl;
+		Info<< "The current field in c3 is "<< dimensionedInternalField().name()<< endl;
+		Info<< "The current dimensionedInternalField().size() in c3 is "<< dimensionedInternalField().size()<< endl;
         Field<vector>::operator=(vectorField("value", dict, p.size()));
     }
     else
@@ -1262,6 +1272,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         );
     }
 	Info<< "The current field in c3 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c3 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c3 is "<< patch().name()<< endl;
 	Info<<"zone().size(): "<<zone().size()<<endl;
 }
@@ -1321,6 +1332,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
 	Info<< "The current field in c4 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c4 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c4 is "<< patch().name()<< endl;
     }
 
@@ -1334,8 +1346,9 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     if (ptf.localSlavePtr_)
     {
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
-		Info<<"Here I am, localSlavePtr_ is defined in line 1302"<<localSlavePtr_<<endl;
+	Info<<"Here I am, localSlavePtr_ is defined in line 1302"<<localSlavePtr_<<endl;
     Info<< "The current field in c4 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c4 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c4 is "<< patch().name()<< endl;
 	}
 
@@ -1343,6 +1356,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         shadowPatchNamesPtr_ = new wordList(*ptf.shadowPatchNamesPtr_);
     Info<< "The current field in c4 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c4 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c4 is "<< patch().name()<< endl;
 	}
 
@@ -1365,6 +1379,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
 	Info<< "The current field in c4 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c4 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c4 is "<< patch().name()<< endl;
     }
 
@@ -1463,6 +1478,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
 	Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c5 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c5 is "<< patch().name()<< endl;
 	Info<<"zone().size(): "<<zone().size()<<endl;
     }
@@ -1477,6 +1493,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 	    localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
 		Info<<"Here I am, localSlavePtr_ is defined in line 1436"<<localSlavePtr_<<endl;
     Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c5 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c5 is "<< patch().name()<< endl;
 	Info<<"zone().size(): "<<zone().size()<<endl;
 	}
@@ -1485,6 +1502,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         shadowPatchNamesPtr_ = new wordList(*ptf.shadowPatchNamesPtr_);
     Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c5 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c5 is "<< patch().name()<< endl;
 	Info<<"zone().size(): "<<zone().size()<<endl;
 	}
@@ -1498,6 +1516,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         shadowZoneNamesPtr_ = new wordList(*ptf.shadowZoneNamesPtr_);
     Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c5 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c5 is "<< patch().name()<< endl;
 	Info<<"zone().size(): "<<zone().size()<<endl;
 	} 
@@ -1511,6 +1530,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     {
         zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
 	Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c5 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c5 is "<< patch().name()<< endl;
 	Info<<"zone().size(): "<<zone().size()<<endl;
     }
@@ -1547,6 +1567,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
         QcsPtr_ = new List<scalarField>(*ptf.QcsPtr_);
     }
 	Info<< "The current field in c5 is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in c5 is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in c5 is "<< patch().name()<< endl;
 	Info<<"zone().size(): "<<zone().size()<<endl;
 }
@@ -1570,13 +1591,15 @@ Foam::solidGeneralContactFvPatchVectorField::
         ) << endl;
     }
 
-    deleteDemandDrivenData(globalMasterPtr_);
+        deleteDemandDrivenData(globalMasterPtr_);
     deleteDemandDrivenData(globalMasterIndexPtr_);
 	Info<< "The current field in destructor is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in destructor is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in destructor is "<< patch().name()<< endl;
 	Info<<"Here I am, localSlavePtr_ is undefined "<<localSlavePtr_<<endl;
     deleteDemandDrivenData(localSlavePtr_);
 	Info<< "The current field in destructor is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current dimensionedInternalField().size() in destructor is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in destructor is "<< patch().name()<< endl;
     deleteDemandDrivenData(shadowPatchNamesPtr_);
     deleteDemandDrivenData(shadowPatchIndicesPtr_);
