@@ -3066,7 +3066,17 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
   
   //****************************START general***************************************//
   
-  solidTractionFvPatchVectorField::write(os);    
+  solidTractionFvPatchVectorField::write(os);   
+
+   if(
+	    !localSlavePtr_
+		&& dimensionedInternalField().name() == "U_0"
+		)
+		{
+//	  	Info<<"Here I am in first U_0 check in write()"<<__LINE__<<endl;
+		return;
+		}  
+
 
    os.writeKeyword("rigidMaster")
         << rigidMaster_ << token::END_STATEMENT << nl;
@@ -3074,29 +3084,6 @@ void solidGeneralContactFvPatchVectorField::write(Ostream& os) const
     // Write the dict from the first contact model
 
     const label shadowI = 0;
-	
-	if
-        (
-            dimensionedInternalField().name() == "D"
-         || dimensionedInternalField().name() == "DD"
-        )
-        { 
-			/*
-            Info<< "Writing deformed zones to VTK" << endl;
-            const word timeName =
-                patch().boundaryMesh().mesh().time().timeName();
-
-            zone().globalPatch().writeVTK("zone_" + timeName);
-
-            forAll(shadowZones(), shadI)
-            {
-                shadowZones()[shadI].globalPatch().writeVTK
-                (
-                    "shadowZone_" + timeName
-                );
-            }
-			*/
-        }
 	
 	Info<< "The current field is "<< dimensionedInternalField().name()<< endl;
 	Info<< "The current patch is "<< patch().name()<< endl;
