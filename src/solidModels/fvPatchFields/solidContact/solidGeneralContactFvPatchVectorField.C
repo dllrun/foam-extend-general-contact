@@ -2695,8 +2695,7 @@ bool Foam::solidGeneralContactFvPatchVectorField::globalMaster() const
 }
 
 
-
-
+/*
 // Interpolate traction from slave to master
 tmp<vectorField> solidGeneralContactFvPatchVectorField::interpolateSlaveToMaster
 (
@@ -2794,6 +2793,7 @@ tmp<vectorField> solidGeneralContactFvPatchVectorField::interpolateSlaveToMaster
 
     return tmasterInterpField;
 }
+*/
 
 /*
 //  Move the contact face zone patches to the deformed position

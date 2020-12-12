@@ -724,10 +724,10 @@ public:
 		// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 
             // interpolate the given field from patch to patch in parallel
-            virtual tmp<vectorField> interpolateSlaveToMaster
+        /*    virtual tmp<vectorField> interpolateSlaveToMaster
             (
                 const vectorField slaveField
-                );
+                ); */
 
             //- Force contact correction
             virtual void forceCorrection()
