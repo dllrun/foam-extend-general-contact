@@ -460,7 +460,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
 
 void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
 {
-//	Info<<"Here I am in calcNormalModels()"<<__LINE__<<endl;
+	Info<<"Here I am in calcNormalModels()"<<__LINE__<<endl;
     if (!normalModelsPtrL_.empty())
     {
         FatalErrorIn
@@ -1003,10 +1003,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     bbOffset_(0.0)
 	
 	// *************************************** END general ****************************
-//    shadowPatchID_(-1)
 
-//    masterFaceZoneID_(-1),
-//    slaveFaceZoneID_(-1)
 
 // ******************************************** START General *****************************************
 {
@@ -1064,11 +1061,6 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     bbOffset_(ptf.bbOffset_)
 // ********************************************** END General ********************************************
 
-
-//    shadowPatchID_(ptf.shadowPatchID_)
-	
- //   masterFaceZoneID_(ptf.masterFaceZoneID_),
- //   slaveFaceZoneID_(ptf.slaveFaceZoneID_)
 	
 // ******************************************** START General *****************************************
 {
@@ -1220,23 +1212,6 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 	
 	// ********************************************** END General ********************************************
 
-/*    shadowPatchID_
-    (
-        patch().patch().boundaryMesh().findPatchID(dict.lookup("shadowPatch"))
-        ) */
-	
-/*    masterFaceZoneID_
-    (
-        patch().boundaryMesh().mesh().faceZones().findZoneID
-        (
-            masterFaceZoneName_
-            )
-        ), */
-/*    slaveFaceZoneID_
-    (
-        patch().boundaryMesh().mesh().faceZones().findZoneID(slaveFaceZoneName_)
-        ) */
-	
 	
 	// ********************************************** START General ********************************************
 	
@@ -1290,10 +1265,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 	solidTractionFvPatchVectorField(ptf),
     globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
-//	masterFaceZoneID_(0),
-//	slaveFaceZoneID_(0),
     localSlavePtr_(NULL),
-//	shadowPatchID_(0),
     shadowPatchNamesPtr_(NULL),
     shadowPatchIndicesPtr_(NULL),
     zoneIndex_(ptf.zoneIndex_),
@@ -1437,8 +1409,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     shadowZoneIndicesPtr_(NULL),
     rigidMaster_(ptf.rigidMaster_),
     dict_(ptf.dict_),
-    normalModelsPtrL_(NULL),  //(ptf.normalModelsPtrL_),
-    frictionModelsPtrL_(NULL), //(ptf.frictionModelsPtrL_),
+    normalModelsPtrL_(ptf.normalModelsPtrL_), //(NULL),  //(ptf.normalModelsPtrL_),
+    frictionModelsPtrL_(ptf.frictionModelsPtrL_), //(NULL), //(ptf.frictionModelsPtrL_),
     zonePtr_(NULL),
     zoneToZones_(0),
 	zoneToZonesNewGgi_(0),
@@ -1451,11 +1423,6 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     bbOffset_(ptf.bbOffset_)
 
 	//**************************************************** END General**********************************************
-
-//	shadowPatchID_(ptf.shadowPatchID_)
-
-//    masterFaceZoneID_(ptf.masterFaceZoneID_),
-//    slaveFaceZoneID_(ptf.slaveFaceZoneID_)
 
 //**************************************************** START General**********************************************
 {
