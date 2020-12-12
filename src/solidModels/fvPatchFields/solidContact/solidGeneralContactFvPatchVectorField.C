@@ -1000,13 +1000,13 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     curPatchTractionPtr_(NULL),
     QcPtr_(NULL),
     QcsPtr_(NULL),
-//    bbOffset_(0.0)
+    bbOffset_(0.0)
 	
 	// *************************************** END general ****************************
-    shadowPatchID_(-1),
+//    shadowPatchID_(-1)
 
-    masterFaceZoneID_(-1),
-    slaveFaceZoneID_(-1)
+//    masterFaceZoneID_(-1),
+//    slaveFaceZoneID_(-1)
 
 // ******************************************** START General *****************************************
 {
@@ -1061,14 +1061,14 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     curPatchTractionPtr_(NULL),
     QcPtr_(NULL),
     QcsPtr_(NULL),
- //   bbOffset_(ptf.bbOffset_)
+    bbOffset_(ptf.bbOffset_)
 // ********************************************** END General ********************************************
 
 
-    shadowPatchID_(ptf.shadowPatchID_),
+//    shadowPatchID_(ptf.shadowPatchID_)
 	
-    masterFaceZoneID_(ptf.masterFaceZoneID_),
-    slaveFaceZoneID_(ptf.slaveFaceZoneID_)
+ //   masterFaceZoneID_(ptf.masterFaceZoneID_),
+ //   slaveFaceZoneID_(ptf.slaveFaceZoneID_)
 	
 // ******************************************** START General *****************************************
 {
@@ -1216,26 +1216,26 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     curPatchTractionPtr_(NULL),
     QcPtr_(NULL),
     QcsPtr_(NULL),
-  //  bbOffset_(0.0)
+    bbOffset_(0.0)
 	
 	// ********************************************** END General ********************************************
 
-    shadowPatchID_
+/*    shadowPatchID_
     (
         patch().patch().boundaryMesh().findPatchID(dict.lookup("shadowPatch"))
-        ),
+        ) */
 	
-    masterFaceZoneID_
+/*    masterFaceZoneID_
     (
         patch().boundaryMesh().mesh().faceZones().findZoneID
         (
             masterFaceZoneName_
             )
-        ),
-    slaveFaceZoneID_
+        ), */
+/*    slaveFaceZoneID_
     (
         patch().boundaryMesh().mesh().faceZones().findZoneID(slaveFaceZoneName_)
-        )
+        ) */
 	
 	
 	// ********************************************** START General ********************************************
@@ -1290,10 +1290,10 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 	solidTractionFvPatchVectorField(ptf),
     globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
-	masterFaceZoneID_(0),
-	slaveFaceZoneID_(0),
+//	masterFaceZoneID_(0),
+//	slaveFaceZoneID_(0),
     localSlavePtr_(NULL),
-	shadowPatchID_(0),
+//	shadowPatchID_(0),
     shadowPatchNamesPtr_(NULL),
     shadowPatchIndicesPtr_(NULL),
     zoneIndex_(ptf.zoneIndex_),
@@ -1311,8 +1311,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     curTimeIndex_(ptf.curTimeIndex_),
     curPatchTractionPtr_(NULL),
     QcPtr_(NULL),
-    QcsPtr_(NULL)
-//    bbOffset_(ptf.bbOffset_)
+    QcsPtr_(NULL),
+    bbOffset_(ptf.bbOffset_)
 {
 	Info<<"Here I am - c4(ptf)"<<endl;
     if (debug)
@@ -1448,14 +1448,14 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 	curPatchTractionPtr_(NULL),
     QcPtr_(NULL),
     QcsPtr_(NULL),
-//    bbOffset_(ptf.bbOffset_)
+    bbOffset_(ptf.bbOffset_)
 
 	//**************************************************** END General**********************************************
 
-	shadowPatchID_(ptf.shadowPatchID_),
+//	shadowPatchID_(ptf.shadowPatchID_)
 
-    masterFaceZoneID_(ptf.masterFaceZoneID_),
-    slaveFaceZoneID_(ptf.slaveFaceZoneID_)
+//    masterFaceZoneID_(ptf.masterFaceZoneID_),
+//    slaveFaceZoneID_(ptf.slaveFaceZoneID_)
 
 //**************************************************** START General**********************************************
 {
@@ -2694,413 +2694,6 @@ bool Foam::solidGeneralContactFvPatchVectorField::globalMaster() const
     return *globalMasterPtr_;
 }
 
-
-/*
-// Interpolate traction from slave to master
-tmp<vectorField> solidGeneralContactFvPatchVectorField::interpolateSlaveToMaster
-(
- const vectorField slaveField
-)
-{
-	Info<<"Here I am in interpolateSlaveToMaster()"<<__LINE__<<endl;
-    if (!master_)
-    {
-      FatalError
-          << "only the master may call the function "
-          "solidGeneralContactFvPatchVectorField::interpolateSlaveToMaster"
-          << exit(FatalError);
-    }
-
-  const fvMesh& mesh = patch().boundaryMesh().mesh();
-
-  vectorField masterField
-      (
-          mesh.boundaryMesh()[patch().index()].size(),
-          vector::zero
-          );
-
-  // for now, the slave must be the slave
-  const label slaveStart
-    = mesh.boundaryMesh()[shadowPatchID_].start();
-
-  // global slave field
-  vectorField globalSlaveField(slaveFaceZonePatchPtr_->size(), vector::zero);
-
-  // put local slaveField into globalSlaveField
-  forAll(slaveField, i)
-    {
-		Info<<"Here I am in ginterpolateSlaveToMaster()"<<__LINE__<<endl;
-      globalSlaveField[
-          mesh.faceZones()[slaveFaceZoneID_].whichFace(slaveStart + i)
-          ] =
-        slaveField[i];
-    }
-
-  //- exchange parallel data
-  // sum because each face is only on one proc
-  reduce(globalSlaveField, sumOp<vectorField>());
-
-  // select interpolator - patchToPatch or GGI
-  vectorField globalMasterInterpField
-      (
-          masterFaceZonePatchPtr_->size(),
-          vector::zero
-      );
-  if (slaveToMasterPatchToPatchInterpolatorPtr_)
-  {
-	  Info<<"Here I am in ginterpolateSlaveToMaster()"<<__LINE__<<endl;
-      globalMasterInterpField =
-          slaveToMasterPatchToPatchInterpolatorPtr_->faceInterpolate<vector>
-          (
-              globalSlaveField
-          );
-  }
-  else if (slaveToMasterGgiInterpolatorPtr_)
-  {
-	  Info<<"Here I am in ginterpolateSlaveToMaster()"<<__LINE__<<endl;
-      globalMasterInterpField =
-          slaveToMasterGgiInterpolatorPtr_->slaveToMaster
-          (
-              globalSlaveField
-          );
-  }
-  else
-  {
-      FatalErrorIn("solidGeneralContactFvPatchVectorField::interpolateSlaveToMaster()")
-          << "interpolationMethod is not patchToPatch or GGI!"
-          << abort(FatalError);
-  }
-
-  // now put global back into local
-  const label masterPatchStart
-    = mesh.boundaryMesh()[patch().index()].start();
-
-  tmp<vectorField> tmasterInterpField
-      (
-          new vectorField(masterFaceZonePatchPtr_->size(),vector::zero)
-          );
-  vectorField& masterInterpField = tmasterInterpField();
-
-  forAll(masterInterpField, i)
-    {
-		Info<<"Here I am in ginterpolateSlaveToMaster()"<<__LINE__<<endl;
-      masterInterpField[i] =
-        globalMasterInterpField
-        [
-         mesh.faceZones()[masterFaceZoneID_].whichFace(masterPatchStart + i)
-         ];
-      }
-
-    return tmasterInterpField;
-}
-*/
-
-/*
-//  Move the contact face zone patches to the deformed position
-void solidGeneralContactFvPatchVectorField::moveFaceZonePatches()
-{
-//	Info<<"Here I am in moveFaceZonePatches()"<<__LINE__<<endl;
-      //OFstream outFile("localFaces_"+name(Pstream::myProcNo()));
-      //outFile << slaveFaceZonePatchPtr_->localFaces() << endl;
-
-  // method: we get the total displacement field for the global
-  // face zone patches. We then interpolate these face values
-  // to the vertices. And we move the vertices by these
-  // interpolated displacements, so the global face zone patches
-  // should be in the same deformed position on all procs.
-  if (!master_)
-    {
-		Info<<"Here I am in moveFaceZonePatches()"<<__LINE__<<endl;
-      FatalError
-          << "Only the master may call the function "
-          "solidGeneralContactFvPatchVectorField::moveFaceZonePatches"
-          << exit(FatalError);
-    }
-
-  // update face zone patch interpolators
-  masterFaceZonePatchInterpolatorPtr_->movePoints();
-  slaveFaceZonePatchInterpolatorPtr_->movePoints();
-
-  // get total displacement fields for the master and slave face zone patches
-  const fvMesh& mesh = patch().boundaryMesh().mesh();
-  vectorField globalMasterU(masterFaceZonePatchPtr_->size(), vector::zero);
-  vectorField globalSlaveU(slaveFaceZonePatchPtr_->size(), vector::zero);
-  const label masterPatchStart
-    = mesh.boundaryMesh()[patch().index()].start();
-  const label slavePatchStart
-    = mesh.boundaryMesh()[shadowPatchID_].start();
-
-  // get local total displacement fields
-  const volVectorField& dispField =
-    this->db().objectRegistry::lookupObject<volVectorField>(fieldName_);
-  vectorField localMasterU = dispField.boundaryField()[patch().index()];
-  vectorField localSlaveU = dispField.boundaryField()[shadowPatchID_];
-  if (fieldName_ == "DU"
-     &&
-     nonLinear_ != nonLinearGeometry::UPDATED_LAGRANGIAN)
-    {
-		Info<<"Here I am in moveFaceZonePatches()"<<__LINE__<<endl;
-      const volVectorField& totalDispField =
-        this->db().objectRegistry::lookupObject<volVectorField>("U");
-      localMasterU += totalDispField.boundaryField()[patch().index()];
-      localSlaveU += totalDispField.boundaryField()[shadowPatchID_];
-    }
-  else if (fieldName_ != "U" && fieldName_ != "DU")
-    {
-      FatalError << "Displacement field must be U or DU!"
-                 << exit(FatalError);
-    }
-
-  // add on initial position so that localSlaveU becomes current local
-  // deformed position - done after
-  //localMasterU += mesh.boundaryMesh()[patch().index()].faceCentres();
-  //localSlaveU += mesh.boundaryMesh()[shadowPatchID_].faceCentres();
-
-  // put localMasterU field into globalMasterU
-  forAll(localMasterU, i)
-    {
-		Info<<"Here I am in moveFaceZonePatches()"<<__LINE__<<endl;
-      globalMasterU[
-          mesh.faceZones()[masterFaceZoneID_].whichFace(masterPatchStart + i)
-          ] = localMasterU[i];
-    }
-  // put localSlaveU field into globalSlaveU
-  forAll(localSlaveU, i)
-    {
-		Info<<"Here I am in moveFaceZonePatches()"<<__LINE__<<endl;
-      globalSlaveU[
-          mesh.faceZones()[slaveFaceZoneID_].whichFace(slavePatchStart + i)
-          ] = localSlaveU[i];
-    }
-
-  //- exchange parallel data
-  // sum because each face is only on one proc
-  reduce(globalMasterU, sumOp<vectorField>());
-  reduce(globalSlaveU, sumOp<vectorField>());
-
-  // hmnnn - globalSlaveU is exactly the same on every proc
-  // but slaveFaceZonePatchInterpolatorPtr_ needs globalSlaveU to
-  // be ordered in locally to be in the same order as the local
-  // globalFaceZone
-
-  // interpolate displacement from face centre to vertices
-  vectorField globalMasterNewPoints =
-    masterFaceZonePatchInterpolatorPtr_->faceToPointInterpolate(globalMasterU);
-  vectorField globalSlaveNewPoints =
-    slaveFaceZonePatchInterpolatorPtr_->faceToPointInterpolate(globalSlaveU);
-
-  // debug: try x motion to zero
-  // vector iHat(1,0,0);
-  // globalSlaveNewPoints = (I - sqr(iHat)) & globalSlaveNewPoints;
-  // globalMasterNewPoints = (I - sqr(iHat)) & globalMasterNewPoints;
-
-  // Add displacement to undeformed mesh points
-  // globalMasterNewPoints +=
-  // mesh.faceZones()[masterFaceZoneID_]().localPoints();
-  // globalSlaveNewPoints += mesh.faceZones()[slaveFaceZoneID_]().localPoints();
-  // BUG FIX 13-08-13 - philipc
-  // the faceZones keep with the mesh (mesh.faceZones()) are not moved correctly
-  // so I must keep a copy of the old time-step points
-  globalMasterNewPoints += oldMasterFaceZonePoints_;
-  globalSlaveNewPoints += oldSlaveFaceZonePoints_;
-
-  // find points which are on symmetryPlanes and force them
-  // to stay exactly on the symmetryPlane - WIP
-  // const labelList& slaveBoundaryPoints =
-  // slaveFaceZonePatchPtr_->boundaryPoints();
-  // const labelList& slaveMeshPoints = slaveFaceZonePatchPtr_->meshPoints();
-  // labelList slaveBoundaryPointsGlobalIndex(slaveBoundaryPoints.size(), -1);
-  // forAll(slaveBoundaryPointsGlobalIndex, pointi)
-  //   {
-  //     slaveBoundaryPointsGlobalIndex[pointi] =
-  // slaveMeshPoints[slaveBoundaryPoints[pointi]];
-  //   }
-
-  // as I can't figure out how to move the points
-  // of the current face zone patches
-  // I will delete the face zone patches and create new ones
-
-  // delete old face zone patches
-  delete masterFaceZonePatchPtr_;
-  delete slaveFaceZonePatchPtr_;
-
-  // create new face zone patches with deformed points
-  masterFaceZonePatchPtr_ =
-    new PrimitivePatch<face, Foam::List, pointField>
-    (
-     mesh.faceZones()[masterFaceZoneID_]().localFaces(),
-     globalMasterNewPoints
-     );
-
-  // masterFaceZonePatchPtr_->writeVTK
-  //   (
-  //         fileName("masterFaceZonePatch"+name(Pstream::myProcNo())),
-  //    masterFaceZonePatchPtr_->localFaces(),
-  //    masterFaceZonePatchPtr_->localPoints()
-  //    );
-
-  slaveFaceZonePatchPtr_ =
-    new PrimitivePatch<face, Foam::List, pointField>
-    (
-     mesh.faceZones()[slaveFaceZoneID_]().localFaces(),
-     globalSlaveNewPoints
-     );
-
-  // slaveFaceZonePatchPtr_->writeVTK
-  //   (
-  //    fileName("slaveFaceZonePatch"+name(Pstream::myProcNo())),
-  //    slaveFaceZonePatchPtr_->localFaces(),
-  //    slaveFaceZonePatchPtr_->localPoints()
-  //    );
-
-  // The patchToPatch, GGI and primitivePatch interpolators point to the
-  // old primitive patches so I must delete these interpolators
-  // it would be much nicer if I could just move the faceZonePatch points...
-  if (slaveToMasterPatchToPatchInterpolatorPtr_)
-  {
-	  Info<<"Here I am in moveFaceZonePatches()"<<__LINE__<<endl;
-      delete slaveToMasterPatchToPatchInterpolatorPtr_;
-      slaveToMasterPatchToPatchInterpolatorPtr_ =
-          new PatchToPatchInterpolation<
-              PrimitivePatch<
-                  face, Foam::List, pointField
-                  >, PrimitivePatch<face, Foam::List, pointField> >
-          (
-              *slaveFaceZonePatchPtr_, // from zone
-              *masterFaceZonePatchPtr_, // to zone
-              alg_,
-              dir_
-          );
-  }
-  else if (slaveToMasterGgiInterpolatorPtr_)
-  {
-	  Info<<"Here I am in moveFaceZonePatches()"<<__LINE__<<endl;
-      delete slaveToMasterGgiInterpolatorPtr_;
-      slaveToMasterGgiInterpolatorPtr_ =
-        new GGIInterpolation<
-            PrimitivePatch<
-                face, Foam::List, pointField
-                >, PrimitivePatch< face, Foam::List, pointField > >
-          (
-              *masterFaceZonePatchPtr_, // master zone
-              *slaveFaceZonePatchPtr_, // slave zone
-              tensorField(0),
-              tensorField(0),
-              vectorField(0),
-              0.0,
-              0.0,
-              true,
-              ggiInterpolation::AABB
-          );
-  }
-
-  // and primitive patch interpolators
-  delete masterFaceZonePatchInterpolatorPtr_;
-  masterFaceZonePatchInterpolatorPtr_ =
-    new PrimitivePatchInterpolation<
-        PrimitivePatch<face, Foam::List, pointField>
-        >(*masterFaceZonePatchPtr_);
-  delete slaveFaceZonePatchInterpolatorPtr_;
-  slaveFaceZonePatchInterpolatorPtr_ =
-    new PrimitivePatchInterpolation<
-        PrimitivePatch<face, Foam::List, pointField>
-        >(*slaveFaceZonePatchPtr_);
-
-  // Also maybe I should correct motion for 2D models
-  // OK for now
-} */
-
-/*
-// check shadow patch and face zones exist
-bool solidGeneralContactFvPatchVectorField::checkPatchAndFaceZones
-(const dictionary& dict) const
-{
-	Info<<"Here I am in checkPatchAndFaceZones()"<<__LINE__<<endl;
-  // check shadow patch
-  word shadowName = dict.lookup("shadowPatch");
-  label shadowPatchID = patch().patch().boundaryMesh().findPatchID(shadowName);
-  if (shadowPatchID == -1)
-    {
-      FatalError << "shadowPatch " << shadowName << " not found for patch "
-                 << patch().name() << exit(FatalError);
-    }
-
-  word curZoneName = patch().name()+"FaceZone";
-  word shadowZoneName =
-  patch().boundaryMesh().mesh().boundary()[shadowPatchID].name() + "FaceZone";
-  label curPatchFaceZoneID =
-    patch().boundaryMesh().mesh().faceZones().findZoneID(curZoneName);
-  if (curPatchFaceZoneID == -1)
-    {
-      FatalError
-          << "faceZone " << curZoneName
-          << " not found and is required for the solidContact boundaries\n"
-          << "To create a faceZone from a patch, use the setSet and "
-          << "setsToZone utilities:\n"
-          << "\tsetSet\n"
-          << "\tfaceSet "<<curZoneName<<" new patchToFace "<<patch().name()<< nl
-          << "\tfaceSet "<<shadowZoneName<<" new patchToFace "<<shadowName<<nl
-          << "\tquit\n"
-          << "\tsetsToZones -noFlipMap\n"
-          << exit(FatalError);
-    }
-
-  label shadowPatchFaceZoneID =
-  patch().boundaryMesh().mesh().faceZones().findZoneID(shadowZoneName);
-
-  if (shadowPatchFaceZoneID == -1)
-  {
-      FatalError
-          << "faceZone " << shadowZoneName
-          << " not found and is required for the solidContact boundaries\n"
-          << "To create a faceZone from a patch, use the setSet and "
-          << "setsToZone utilities:\n"
-          << "\tsetSet\n"
-          << "\tfaceSet "<<curZoneName<<" new patchToFace "<<patch().name()<< nl
-          << "\tfaceSet "<<shadowZoneName<<" new patchToFace "<<shadowName<<nl
-          << "\tquit\n"
-          << "\tcreate zones from sets\n"
-          << "\tsetsToZones -noFlipMap\n"
-          << exit(FatalError);
-  }
-
-  // if the total amount of faces in the master or slave face zones is zero
-  // then something is
-  // wrong with the face zones - they were probably created wrong.
-  if (
-      returnReduce
-      (
-          patch().boundaryMesh().mesh().faceZones()[curPatchFaceZoneID].size(),
-          sumOp<label>()
-          ) < 1
-      )
-  {
-      FatalError
-          << "faceZone " << curZoneName
-          << ", which is required for the solidContact boundaries,"
-          << " has no faces!\n"
-          << "You probably made a mistake creating the faceZones."
-          << exit(FatalError);
-  }
-
-  if (
-      returnReduce
-      (
-          patch().boundaryMesh().mesh().faceZones()
-          [shadowPatchFaceZoneID].size(),
-          sumOp<label>()
-          ) < 1)
-  {
-      FatalError
-          << "faceZone " << shadowZoneName
-          << ", which is required for the solidContact boundaries,"
-          << " has no faces!\n"
-          << "You probably made a mistake creating the faceZones."
-          << exit(FatalError);
-  }
-
-  return true;
-}  */
 
 
 // Write

@@ -175,7 +175,7 @@ class solidGeneralContactFvPatchVectorField
         generalFrictionContactModel* frictionContactModelPtr_;
 
         //- shadow patch ID
-        const label shadowPatchID_;
+        // const label shadowPatchID_;
 
         //- either the mater of slave is in charge of correcting the
         // contact laws
@@ -184,10 +184,10 @@ class solidGeneralContactFvPatchVectorField
         const Switch patchInChargeOfCorrection_;
 
         // master and slave face zone names and IDs
-        const word masterFaceZoneName_;
-        const word slaveFaceZoneName_;
-        const label masterFaceZoneID_;
-        const label slaveFaceZoneID_;
+        // const word masterFaceZoneName_;
+        // const word slaveFaceZoneName_;
+        // const label masterFaceZoneID_;
+        // const label slaveFaceZoneID_;
 
         // the master will keep a copy of two global master and slave patches
         // these patches will be moved to the deformed position prior to
