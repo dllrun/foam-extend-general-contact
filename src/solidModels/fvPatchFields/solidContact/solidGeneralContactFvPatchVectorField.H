@@ -376,10 +376,10 @@ class solidGeneralContactFvPatchVectorField
 	// * * * * * * * * * * * * * * * * * * * * * * End General * * * * * * * * * * * * * * * * * * * * //
 	
 		//  Move the contact face zone patches to the deformed position
-        virtual void moveFaceZonePatches();
+//        virtual void moveFaceZonePatches();
 
         //  check shadow patch and face zones exist
-        virtual bool checkPatchAndFaceZones(const dictionary& dict) const;
+ //       virtual bool checkPatchAndFaceZones(const dictionary& dict) const;
 
 public:
 

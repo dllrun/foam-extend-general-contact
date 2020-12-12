@@ -689,9 +689,10 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZone() const
 }
 
 //**************************start definition from solid4Foam **********************************************
+
 void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
 {
-//	Info<<"Here I am in calcShadowZonesNewGgi()"<<__LINE__<<endl;
+	Info<<"Here I am in calcShadowZonesNewGgi()"<<__LINE__<<endl;
     if (debug)
     {
         InfoIn
@@ -1746,6 +1747,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
 //**************************************************** START General**********************************************	
 	boolList activeContactPairs(shadowPatchNames().size(), false);
+	Info<<" updateCoeffs() - shadowPatchNames().size(): "<<shadowPatchNames().size()<<endl;
 	
 	    // if it is a new time step then reset iCorr
     if (curTimeIndex_ != db().time().timeIndex())
@@ -2793,7 +2795,7 @@ tmp<vectorField> solidGeneralContactFvPatchVectorField::interpolateSlaveToMaster
     return tmasterInterpField;
 }
 
-
+/*
 //  Move the contact face zone patches to the deformed position
 void solidGeneralContactFvPatchVectorField::moveFaceZonePatches()
 {
@@ -3006,9 +3008,9 @@ void solidGeneralContactFvPatchVectorField::moveFaceZonePatches()
 
   // Also maybe I should correct motion for 2D models
   // OK for now
-}
+} */
 
-
+/*
 // check shadow patch and face zones exist
 bool solidGeneralContactFvPatchVectorField::checkPatchAndFaceZones
 (const dictionary& dict) const
@@ -3098,7 +3100,7 @@ bool solidGeneralContactFvPatchVectorField::checkPatchAndFaceZones
   }
 
   return true;
-}
+}  */
 
 
 // Write
