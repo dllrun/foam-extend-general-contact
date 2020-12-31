@@ -268,7 +268,9 @@ void generalStandardPenalty::correct
     scalarField& areaInContact = this->areaInContact();
     forAll(slavePatchLocalFaces, faceI)
     {
-        areaInContact[faceI] =
+	Info<<"Step2: Here I am in generalStandardPenalty::correct(..):"<<__LINE__<<endl;
+    Info<<"Slave vertices are checked to find the vertex penetrations"<<__LINE__<<endl;
+		areaInContact[faceI] =
             slavePatchLocalFaces[faceI].areaInContact
             (
                 slavePatchLocalPoints,
@@ -312,6 +314,8 @@ void generalStandardPenalty::correct
 
         // Note: penetration is negative for points in contact
         {
+			Info<<"Step3: Here I am in generalStandardPenalty::correct(..):"<<__LINE__<<endl;
+			Info<<"Corrective contact forces added to penetrating slave vertices"<<__LINE__<<endl;
             // The force is linearly proportional the penetration, like a spring
             if (d < epsilon0_)
             {
@@ -355,6 +359,8 @@ void generalStandardPenalty::correct
         mesh.boundaryMesh()[slavePatchIndex]
     );
 
+	Info<<"Step4: Here I am in generalStandardPenalty::correct(..):"<<__LINE__<<endl;
+	Info<<"These slave point tractions are interpolated to slave face centers"<<__LINE__<<endl;
     // Interpolate point pressures to the face centres and apply in the negative
     // normal direction
     vectorField newSlaveTraction =

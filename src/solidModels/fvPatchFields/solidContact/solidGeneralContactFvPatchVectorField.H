@@ -123,7 +123,7 @@ class solidGeneralContactFvPatchVectorField
         
 
         //- List of zone-to-zone interpolators
-		//(Replacement to PtrList<primitivePatchInterpolation> works) PrimitivePatchInterpolation<standAlonePatch> 
+		//(NOT used but PtrList<primitivePatchInterpolation> works) PrimitivePatchInterpolation<standAlonePatch> 
         mutable PtrList<PrimitivePatchInterpolation<standAlonePatch>> zoneToZones_;
 		
 		//- List of zone-to-zone interpolators
@@ -203,7 +203,8 @@ class solidGeneralContactFvPatchVectorField
         // PrimitivePatch<face, Foam::List, const pointField&>*
         // slaveFaceZonePatchPtr_;
         // these patches keep a local copy of the points and faces
-        PrimitivePatch<face, Foam::List, pointField>* masterFaceZonePatchPtr_;
+        // NOT USED
+		PrimitivePatch<face, Foam::List, pointField>* masterFaceZonePatchPtr_;
         PrimitivePatch<face, Foam::List, pointField>* slaveFaceZonePatchPtr_;
 
         // method to interpolate traction from slave to master
@@ -551,7 +552,7 @@ public:
 			//********************* end solid4Foam ******************
 
             //- Return const reference to patch-to-patch interpolation (Replacement of newGgiStandAlonePatchInterpolation)
-			// (Also, replacement of primitivePatchInterpolation&) PrimitivePatchInterpolation<standAlonePatch> 
+			// NOT USED(Also, replacement of primitivePatchInterpolation&) PrimitivePatchInterpolation<standAlonePatch> 
             const PrimitivePatchInterpolation<standAlonePatch>& zoneToZone				
             (
                 const label shadowI
