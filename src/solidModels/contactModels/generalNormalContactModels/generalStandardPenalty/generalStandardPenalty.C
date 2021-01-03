@@ -269,7 +269,7 @@ void generalStandardPenalty::correct
     forAll(slavePatchLocalFaces, faceI)
     {
 	Info<<"Step2: Here I am in generalStandardPenalty::correct(..):"<<__LINE__<<endl;
-    Info<<"Slave vertices are checked to find the vertex penetrations"<<__LINE__<<endl;
+    Info<<"Slave vertices are checked to find the vertex penetrations face: "<<faceI<<endl;
 		areaInContact[faceI] =
             slavePatchLocalFaces[faceI].areaInContact
             (
@@ -296,17 +296,20 @@ void generalStandardPenalty::correct
 
         slavePatchLocalFaceAreas[faceI] =
             mag(slavePatchLocalFaces[faceI].normal(slavePatchLocalPoints));
-    }
+    Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
+	}
 
     // Calculate the point pressures
     // We will also record the average and minium penetrations
 
-    const scalar penaltyFac = penaltyFactor();
+    Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
+	const scalar penaltyFac = penaltyFactor();
     scalarField totalSlavePointPressure(slavePointPenetration.size(), 0.0);
     averagePenetration_ = 0.0;
     minPenetration_ = 0.0;
     int nPointsInContact = 0;
 
+	
     forAll(totalSlavePointPressure, pointI)
     {
         // Take copy of penetration

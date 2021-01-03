@@ -768,7 +768,7 @@ Foam::solidGeneralContactFvPatchVectorField::zone() const
         calcZone();
     }
 	Info<<"Here I am in zone()"<<__LINE__<<endl;
-	Info<<"zonePtr_ in zone()"<<*zonePtr_<<endl;
+//	Info<<"zonePtr_ in zone()"<<*zonePtr_<<endl;
 	Info<<"Which is this patch in zone()? "<<patch().name()<<endl;
 	
     return *zonePtr_;
@@ -1670,12 +1670,14 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZoneNames() const
 const Foam::List<Foam::label>&
 Foam::solidGeneralContactFvPatchVectorField::shadowZoneIndices() const
 {
-//	Info<<"Here I am in shadowZoneIndices()"<<__LINE__<<endl;
+	Info<<"Here I am in shadowZoneIndices()"<<__LINE__<<endl;
     if (!shadowZoneIndicesPtr_)
     {
         calcShadowZoneNames();
     }
-
+	
+	Info<<"CHECK *shadowZoneIndicesPtr_ in shadowZoneIndices()"<<*shadowZoneIndicesPtr_<<endl;
+	
     return *shadowZoneIndicesPtr_;
 }
 
@@ -1926,10 +1928,10 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             shadowPatchIndices()[shadowI],
                             shadowZoneIndices()[shadowI],
 							// **************** based on solid4Foam ****************
-							 shadowZone(shadowI).faceNormals()
+							  shadowZone(shadowI).faceNormals()
 							// **************** end solid4Foam ****************
                             //shadowZonesNewGgi(shadowI).faceNormals()
-                        );
+                        ); 
 						
 					Info<< "The current field in updateCoeffs() is "<< dimensionedInternalField().name()<< endl;
 					Info<< "The current dimensionedInternalField().size() in updateCoeffs() is "<< dimensionedInternalField().size()<< endl;
@@ -2047,11 +2049,11 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 									(
 										zoneToZonesNewGgi()[shadowI].slavePointDistanceToIntersection()
 									), */
-						shadowZonesNewGgi()[shadowI].globalPointToPatch
+						/*shadowZonesNewGgi()[shadowI].globalPointToPatch
 									(
 										zoneToZoneNewGgi(shadowI).slavePointDistanceToIntersection()
-									), 
-						/*zoneToZoneNewGgi(shadowI).slavePointDistanceToIntersection(),*/
+									), */
+						zoneToZoneNewGgi(shadowI).slavePointDistanceToIntersection(),
 					// zoneToZoneNewGgi(shadowI),
                          shadowPatchDD,
                          patchDDInterpToShadowPatch
@@ -2435,16 +2437,17 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
         // Only the local slave creates the interpolator
         if (locSlave[shadowI])
         {
-			
+			Info<<"The current patch in calcZoneToZones(): "<<patch().name()<<endl;
+			Info<<"calcZoneToZones() - patch().size(): "<<patch().size()<<endl;
 			Info<<"Here I am in calcZoneToZones()"<<__LINE__<<endl;
             zoneToZonesNewGgi_.set
                 (
                     shadowI,
                     new newGgiStandAlonePatchInterpolation 
                     (	
-                        shadowZone(shadowI), // master
+                        //shadowZone(shadowI), // master
                         zone(), // slave
-						//shadowZone(shadowI), // master
+						shadowZone(shadowI), // master
                         tensorField(0),
                         tensorField(0),
                         vectorField(0), // Slave-to-master separation.
