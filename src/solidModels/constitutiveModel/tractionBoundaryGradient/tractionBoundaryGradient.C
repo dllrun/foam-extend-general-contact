@@ -424,7 +424,7 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
          && nonLinear == nonLinearGeometry::OFF
         )
         {
-			Info<<"Here I am in tractionBoundaryGradient's updateCoeffs()"<<__LINE__<<endl;
+//			Info<<"Here I am in tractionBoundaryGradient's updateCoeffs()"<<__LINE__<<endl;
             // Use total traction
             Traction = (traction - n*pressure);
         }

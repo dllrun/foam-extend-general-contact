@@ -220,7 +220,9 @@ generalStandardPenalty::generalStandardPenalty
         normalContactModelDict_.lookupOrDefault<scalar>("epsilon0", 0.0)
     ),
     contactIterNum_(0)
-{}
+{
+	Info<<"Step0: Constructor C1(5 arguments) in ::generalStandardPenalty:"<<__LINE__<<endl;
+}
 
 
 generalStandardPenalty::generalStandardPenalty(const generalStandardPenalty& nm)
@@ -237,7 +239,9 @@ generalStandardPenalty::generalStandardPenalty(const generalStandardPenalty& nm)
     minPenetration_(nm.minPenetration_),
     epsilon0_(nm.epsilon0_),
     contactIterNum_(nm.contactIterNum_)
-{}
+{
+	Info<<"Step0: Constructor C2(1 argument) in generalStandardPenalty:"<<__LINE__<<endl;
+}
 
 
 // * * * * * * * * * * * * * * Member Functions * * * * * * * * * * * * * * * //
