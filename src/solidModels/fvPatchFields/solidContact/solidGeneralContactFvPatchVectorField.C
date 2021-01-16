@@ -132,14 +132,15 @@ moveFaceZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration
             const volVectorField& D = db().lookupObject<volVectorField>("U");
 
             // Take a reference to the patch face total displacement field
-            const vectorField& patchD =
+            //const vectorField& patchD =
+			const vectorField& patchDD =
                 D.boundaryField()[patch().index()];
 
             const vectorField& shadowPatchDD =
                 D.boundaryField()[shadPatchIndices[shadowI]];
 
             zoneD =
-                zoneField(zoneIndex(), patch().index(), patchD);
+                zoneField(zoneIndex(), patch().index(), patchDD); //...patchD)
             shadowZoneD =
                 zoneField
                 (
@@ -658,8 +659,10 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
 	
 	const boolList& locSlave = localSlave();
 
- 		if (!master_)
+//************************ start ERROR - skip this shadowI not defined ***********
+
 //    if (!locSlave[shadowI])
+	if (!master_)
     {
         FatalErrorIn
         (
@@ -667,6 +670,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
             "calcShadowZonesNewGgi() const"
         )   << "Trying to create shadow zones on a slave" << abort(FatalError);
     }
+	
+//************************ end ERROR - skip this shadowI not defined ***********
 
     if (!shadowZonesNewGgi_.empty())
     {
@@ -1870,15 +1875,17 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					/*
 					FatalError
                         << "Disabled: use jasakSolidContact" << abort(FatalError);
-                     */
+                     */ 
+					// normalModel()[shadowI].correct 
 					 normalModel(shadowI).correct
                      (
                          shadowPatchFaceNormals,
                     //     zoneToZoneNewGgi(shadowI),
 						shadowZonesNewGgi()[shadowI].globalPointToPatch
 									(
-										zoneToZoneNewGgi(shadowI).slavePointDistanceToIntersection()
+										zoneToZonesNewGgi()[shadowI].slavePointDistanceToIntersection()
 									),  
+					//	zoneToZoneNewGgi(shadowI).slavePointDistanceToIntersection(),
                          shadowPatchDD,
                          patchDDInterpToShadowPatch
                      );
