@@ -132,21 +132,21 @@ moveFaceZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration
             const volVectorField& D = db().lookupObject<volVectorField>("U");
 
             // Take a reference to the patch face total displacement field
-            //const vectorField& patchD =
-			const vectorField& patchDD =
+            const vectorField& patchD =
                 D.boundaryField()[patch().index()];
 
-            const vectorField& shadowPatchDD =
+            //const vectorField& shadowPatchDD = 
+			const vectorField& shadowPatchD = 
                 D.boundaryField()[shadPatchIndices[shadowI]];
 
             zoneD =
-                zoneField(zoneIndex(), patch().index(), patchDD); //...patchD)
+                zoneField(zoneIndex(), patch().index(), patchD);
             shadowZoneD =
                 zoneField
                 (
                     shadZoneIndices[shadowI],
                     shadPatchIndices[shadowI],
-                    shadowPatchDD
+                    shadowPatchD   //shadowPatchDD 
                 );
         }
 
