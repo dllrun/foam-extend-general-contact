@@ -433,7 +433,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
 
 void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
 {
-    if (!normalModelsPtrL_.empty())
+    if (!normalModels_.empty())
     {
         FatalErrorIn
         (
@@ -442,18 +442,18 @@ void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels() const
         )   << "normalModels already set" << abort(FatalError);
     }
 
-    normalModelsPtrL_.setSize(shadowPatchNames().size());
+    normalModels_.setSize(shadowPatchNames().size());
 
     const boolList& locSlave = localSlave();
 
-    forAll(normalModelsPtrL_, shadowI)
+    forAll(normalModels_, shadowI)
     {
         // Only the local slave creates the contact model
         if (locSlave[shadowI])
         {
 			
             // Calculate normal contact forces
-            normalModelsPtrL_.set
+            normalModels_.set
             (
                 shadowI,
                 generalNormalContactModel::New
@@ -483,12 +483,12 @@ Foam::solidGeneralContactFvPatchVectorField::normalModel(const label shadowI)
             << abort(FatalError);
     }
 
-    if (normalModelsPtrL_.empty())
+    if (normalModels_.empty())
     {
         calcNormalModels();
     }
 
-    return normalModelsPtrL_[shadowI];
+    return normalModels_[shadowI];
 }
 
 const Foam::generalNormalContactModel&
@@ -504,19 +504,19 @@ Foam::solidGeneralContactFvPatchVectorField::normalModel
             << abort(FatalError);
     }
 
-    if (normalModelsPtrL_.empty())
+    if (normalModels_.empty())
     {
         calcNormalModels();
     }
 
-    return normalModelsPtrL_[shadowI];
+    return normalModels_[shadowI];
 }
 
 
 void Foam::solidGeneralContactFvPatchVectorField::calcFrictionModels() const
 {
   
-  if (!frictionModelsPtrL_.empty())
+  if (!frictionModels_.empty())
     {
         FatalErrorIn
         (
@@ -525,15 +525,15 @@ void Foam::solidGeneralContactFvPatchVectorField::calcFrictionModels() const
         )   << "frictionModelPtr_[shadowI] already set" << abort(FatalError);
     }
 
-    frictionModelsPtrL_.setSize(shadowPatchNames().size());
+    frictionModels_.setSize(shadowPatchNames().size());
 
     const boolList& locSlave = localSlave();
 
-    forAll(frictionModelsPtrL_, shadowI)
+    forAll(frictionModels_, shadowI)
     {
         if (locSlave[shadowI])
         {
-            frictionModelsPtrL_.set
+            frictionModels_.set
                 (
                     shadowI,
                     generalFrictionContactModel::New
@@ -560,12 +560,12 @@ Foam::solidGeneralContactFvPatchVectorField::frictionModel(const label shadowI)
             << abort(FatalError);
     }
 
-    if (frictionModelsPtrL_.empty())
+    if (frictionModels_.empty())
     {
         calcFrictionModels();
     }
 
-    return frictionModelsPtrL_[shadowI];
+    return frictionModels_[shadowI];
 }
 
 
@@ -582,12 +582,12 @@ Foam::solidGeneralContactFvPatchVectorField::frictionModel
             << abort(FatalError);
     }
 
-    if (frictionModelsPtrL_.empty())
+    if (frictionModels_.empty())
     {
         calcFrictionModels();
     }
 
-    return frictionModelsPtrL_[shadowI];
+    return frictionModels_[shadowI];
 }
 
 void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex() const
@@ -946,8 +946,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     shadowZoneIndicesPtr_(NULL),
 	rigidMaster_(false),
     dict_(NULL),
-    normalModelsPtrL_(0),
-    frictionModelsPtrL_(0),
+    normalModels_(0),
+    frictionModels_(0),
     zonePtr_(NULL),
     zoneToZones_(0),
 	zoneToZonesNewGgi_(0),
@@ -1002,8 +1002,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     shadowZoneIndicesPtr_(NULL),
     rigidMaster_(ptf.rigidMaster_),
     dict_(ptf.dict_),
-    normalModelsPtrL_(NULL),  //(ptf.normalModelsPtrL_),
-    frictionModelsPtrL_(NULL), //(ptf.frictionModelsPtrL_),
+    normalModels_(NULL),  //(ptf.normalModels_),
+    frictionModels_(NULL), //(ptf.frictionModels_),
     zonePtr_(NULL),
     zoneToZones_(0),
 	zoneToZonesNewGgi_(0),
@@ -1137,8 +1137,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     shadowZoneIndicesPtr_(NULL),
     rigidMaster_(dict.lookupOrDefault<Switch>("rigidMaster", false)),
     dict_(dict),
-    normalModelsPtrL_(0),
-    frictionModelsPtrL_(0),
+    normalModels_(0),
+    frictionModels_(0),
     zonePtr_(0),
     zoneToZones_(0),
 	zoneToZonesNewGgi_(0),
@@ -1221,8 +1221,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     shadowZoneIndicesPtr_(NULL),
     rigidMaster_(ptf.rigidMaster_),
     dict_(ptf.dict_),
-    normalModelsPtrL_(NULL),   //(ptf.normalModelsPtrL_),
-    frictionModelsPtrL_(NULL),   //(ptf.frictionModelsPtrL_),
+    normalModels_(NULL),   //(ptf.normalModels_),
+    frictionModels_(NULL),   //(ptf.frictionModels_),
     zonePtr_(NULL),
     zoneToZones_(0),
 	zoneToZonesNewGgi_(0),
@@ -1341,8 +1341,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     shadowZoneIndicesPtr_(NULL),
     rigidMaster_(ptf.rigidMaster_),
     dict_(ptf.dict_),
-    normalModelsPtrL_(NULL),  //(ptf.normalModelsPtrL_),
-    frictionModelsPtrL_(NULL), //(ptf.frictionModelsPtrL_),
+    normalModels_(NULL),  //(ptf.normalModels_),
+    frictionModels_(NULL), //(ptf.frictionModels_),
     zonePtr_(NULL),
     zoneToZones_(0),
 	zoneToZonesNewGgi_(0),
@@ -1479,8 +1479,8 @@ Foam::solidGeneralContactFvPatchVectorField::
     deleteDemandDrivenData(shadowZoneNamesPtr_);
     deleteDemandDrivenData(shadowZoneIndicesPtr_);
 
-    normalModelsPtrL_.clear();
-    frictionModelsPtrL_.clear();
+    normalModels_.clear();
+    frictionModels_.clear();
 
     deleteDemandDrivenData(zonePtr_);
 

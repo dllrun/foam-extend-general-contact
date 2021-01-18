@@ -110,10 +110,10 @@ class solidGeneralContactFvPatchVectorField
         const dictionary dict_;
 
         //- List of normal contact models
-        mutable PtrList<generalNormalContactModel> normalModelsPtrL_;
+        mutable PtrList<generalNormalContactModel> normalModels_;
 
         //- List of friction contact models
-        mutable PtrList<generalFrictionContactModel> frictionModelsPtrL_;
+        mutable PtrList<generalFrictionContactModel> frictionModels_;
 
         // Master face zone kept in deformed configuration
          mutable standAlonePatch* zonePtr_;
