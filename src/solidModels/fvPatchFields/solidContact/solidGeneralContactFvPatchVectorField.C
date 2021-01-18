@@ -662,7 +662,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
 //************************ start ERROR - skip this shadowI not defined ***********
 
 //    if (!locSlave[shadowI])
-	if (!master_)
+	if (!globalMasterPtr_)
+//	if (!master_)
     {
         FatalErrorIn
         (
@@ -689,6 +690,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
     forAll(shadowZonesNewGgi_, shadPatchI)
     {
 		Info<<"Here I am in calcShadowZonesNewGgi()"<<__LINE__<<endl;
+		Info<<"shadPatchNames[shadPatchI] in calcShadowZonesNewGgi()"<<shadPatchNames[shadPatchI]<<endl;
         // Note: the main mesh will either be in the initial configuration or
         // the updated configuration
         shadowZonesNewGgi_.set
@@ -1607,7 +1609,6 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 //	Info<<"shadowPatchNames().size() in updateCoeffs():"<<shadowPatchNames().size()<<endl;
 	boolList activeContactPairs(shadowPatchNames().size(), false);
 	
-	
 	    // if it is a new time step then reset iCorr
     if (curTimeIndex_ != db().time().timeIndex())
     {
@@ -1628,6 +1629,10 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                 // case they need to update anything
                 normalModel(shadowI).newTimeStep();
                 frictionModel(shadowI).newTimeStep();
+				
+		// **************** based on solid4Foam ****************
+		 zoneToZonesNewGgi()[shadowI].clearPrevCandidateMasterNeighbors();
+		// **************** end solid4Foam ****************
 			}
         }
     }
@@ -1676,6 +1681,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
 		// Accumulated traction for the current patch
         vectorField curPatchTraction(patch().size(), vector::zero);
+	//	Info<<"What is curPatchTraction? "<<curPatchTraction<<endl;
 		Info<<"What is the size of the patch? "<<patch().size()<<endl;
 		
 		// Only the local masters calculates the contact force and the local
@@ -1793,6 +1799,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                     // friction contact models
 
                     vectorField patchDD(patch().size(), vector::zero);
+					Info<<"What is the patchDD? "<<patchDD<<endl;
                     vectorField shadowPatchDD
                     (
                         patch().boundaryMesh()
@@ -2341,6 +2348,86 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi()
 }
 // ******************* End efinition from solid4foam***********************************************
 
+// ******************* Definition from solid4foam***********************************************
+const Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
+Foam::solidGeneralContactFvPatchVectorField::zoneToZonesNewGgi() const
+{
+	Info<<"CHECK solid4Foam Here I am in solid4Foam's zoneToZonesNewGgi()"<<__LINE__<<endl;
+    if (master_)
+    {
+		Info<<"CHECK solid4Foam Here I am in solid4Foam's zoneToZonesNewGgi()"<<__LINE__<<endl;
+        if (zoneToZonesNewGgi_.empty())
+        {
+			Info<<"CHECK solid4Foam Here I am in solid4Foam's zoneToZonesNewGgi()"<<__LINE__<<endl;
+            calcZoneToZones();
+        }
+		
+	Info<< "CHECK The current patch is "<< patch().name()<< endl;	
+        return zoneToZonesNewGgi_;    // This needs to be FIXED later 
+    }
+    else
+    {
+		Info<<"CHECK solid4Foam Here I am in solid4Foam's zoneToZonesNewGgi()"<<__LINE__<<endl;
+        const volVectorField& field =
+            db().lookupObject<volVectorField>
+            (
+                this->dimensionedInternalField().name()
+            );
+
+        const solidGeneralContactFvPatchVectorField& shadowPatchField =
+            refCast<const solidGeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[shadowPatchIndices()[0]]
+            );
+			
+	Info<< "CHECK The current patch is "<< patch().name()<< endl;	
+        return shadowPatchField.zoneToZonesNewGgi();
+    }
+}
+
+
+Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
+Foam::solidGeneralContactFvPatchVectorField::zoneToZonesNewGgi()
+{
+	Info<<"CHECK solid4Foam Here I am in solid4Foam's zoneToZonesNewGgi()"<<__LINE__<<endl;
+    if (globalMasterPtr_)
+    {
+		Info<<"CHECK solid4Foam Here I am in solid4Foam's zoneToZonesNewGgi()"<<__LINE__<<endl;
+        if (zoneToZonesNewGgi_.empty())
+        {
+			Info<<"Does it enter solid4Foam's zoneToZonesNewGgi()? CHECK line "<<__LINE__<<endl;
+            calcZoneToZones();
+        }
+		Info<<"zoneToZonesNewGgi_ in solid4Foam's zoneToZonesNewGgi() line "<<__LINE__<<endl;
+	
+         return zoneToZonesNewGgi_;    // This needs to be FIXED later 
+    }
+    else
+    {
+		Info<<"CHECK solid4Foam Here I am in zoneToZonesNewGgi()"<<__LINE__<<endl;
+        // We will const_cast the shadow patch so we can delete the weights when
+        // the zones move
+        const volVectorField& field =
+            db().lookupObject<volVectorField>
+            (
+                this->dimensionedInternalField().name()
+            );
+
+        solidGeneralContactFvPatchVectorField& shadowPatchField =
+            const_cast<solidGeneralContactFvPatchVectorField&>
+            (
+                refCast<const solidGeneralContactFvPatchVectorField>
+                (
+                    field.boundaryField()[shadowPatchIndices()[0]]
+                )
+            );
+
+        return shadowPatchField.zoneToZonesNewGgi();
+    }
+
+}
+
+// ****************************** end definition from solid4foam*********************************
 
 const Foam::newGgiStandAlonePatchInterpolation&
 Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi

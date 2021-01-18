@@ -86,6 +86,11 @@ class solidGeneralContactFvPatchVectorField
         // copy of mesh.allPoints() and updates them to the deformed position
         // each time before the contact is corrected
         mutable bool* globalMasterPtr_;
+		//const Switch globalMasterPtr_ doesn't work 
+		
+		// **************** based on solid4Foam ****************
+		 
+		// **************** end solid4Foam ****************
 		
 		//- Patch index of global master patch
         mutable label* globalMasterIndexPtr_;
