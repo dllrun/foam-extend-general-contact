@@ -26,6 +26,7 @@ License
 
 #include "generalStandardPenaltyFriction.H"
 #include "addToRunTimeSelectionTable.H"
+#include "constitutiveModel.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -62,18 +63,33 @@ void Foam::generalStandardPenaltyFriction::calcFrictionPenaltyFactor()
 
     const label masterPatchIndex =  masterPatchID();
     const label slavePatchIndex =  slavePatchID();
-
-    // Lookup implicit stiffness = 2*mu + lambda, approximately equal to the
+	
+	//************** START standardPenaltyFriction based on ORG foam-extend-4.0 ************	
+	const constitutiveModel& rheology =
+      mesh_.objectRegistry::lookupObject<constitutiveModel>
+        ("rheologyProperties");
+    scalarField masterMu =
+      rheology.mu()().boundaryField()[masterPatchIndex];
+    scalarField slaveMu =
+      rheology.mu()().boundaryField()[slavePatchIndex];
+	//************** END standardPenaltyFriction based on ORG foam-extend-4.0 ************	
+	
+	Info<<"Step4A: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
+    //******************* Comment the section with object impK ***************
+	// Lookup implicit stiffness = 2*mu + lambda, approximately equal to the
     // bulk modulus
     const volScalarField& impK = mesh_.lookupObject<volScalarField>("impK");
-
+	//******************* END the section with object impK ***************
+	
     // Note: for solidRigidContact, only the master index is set
     if (masterPatchIndex > -1 && slavePatchIndex > -1)
     {
+		//******************* Comment the section with object impK ***************
         // Avarage contact patch bulk modulus
         const scalar masterK = gAverage(impK.boundaryField()[masterPatchIndex]);
         const scalar slaveK = gAverage(impK.boundaryField()[slavePatchIndex]);
-
+		//******************* END the section with object impK ***************
+		
         // avarage contact patch shear modulus
         const scalar modulus = 0.5*(masterK + slaveK);
 
@@ -113,9 +129,11 @@ void Foam::generalStandardPenaltyFriction::calcFrictionPenaltyFactor()
     }
     else if (slavePatchIndex > -1)
     {
-        // Avarage contact patch bulk modulus
+        //******************* Comment the section with object impK ***************
+		// Avarage contact patch bulk modulus
         const scalar modulus = gAverage(impK.boundaryField()[slavePatchIndex]);
-
+		//******************* END the section with object impK ***************
+		
         // average contact patch face area
         const scalar faceArea =
             gAverage(mesh_.magSf().boundaryField()[slavePatchIndex]);
