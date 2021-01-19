@@ -92,9 +92,10 @@ void generalStandardPenalty::calcPenaltyFactor() const
     if (masterPatchIndex > -1 && slavePatchIndex > -1)
     {
 	//************** START standardPenalty based on ORG foam-extend-4.0 ************	
-		// avarage contact patch bulk modulus
-    scalar masterK = gAverage(masterLambda + (2.0/3.0)*masterMu);
-    scalar slaveK = gAverage(slaveLambda + (2.0/3.0)*slaveMu);
+	//************* const in front of scalar masterK & scalar slaveK ****** 	
+	// avarage contact patch bulk modulus
+    const scalar masterK = gAverage(masterLambda + (2.0/3.0)*masterMu);
+    const scalar slaveK = gAverage(slaveLambda + (2.0/3.0)*slaveMu);
 	//************** END standardPenalty based on ORG foam-extend-4.0 ************	
 	
         //******************* Comment the section with object impK ***************

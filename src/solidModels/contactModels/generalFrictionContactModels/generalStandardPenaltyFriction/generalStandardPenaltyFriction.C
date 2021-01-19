@@ -74,24 +74,41 @@ void Foam::generalStandardPenaltyFriction::calcFrictionPenaltyFactor()
       rheology.mu()().boundaryField()[slavePatchIndex];
 	//************** END standardPenaltyFriction based on ORG foam-extend-4.0 ************	
 	
-	Info<<"Step4A: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
+	Info<<"Step4A: Here I am in generalStandardPenaltyFriction::calcFrictionPenaltyFactor():"<<__LINE__<<endl;
     //******************* Comment the section with object impK ***************
 	// Lookup implicit stiffness = 2*mu + lambda, approximately equal to the
     // bulk modulus
+	/*
     const volScalarField& impK = mesh_.lookupObject<volScalarField>("impK");
+	*/
 	//******************* END the section with object impK ***************
 	
     // Note: for solidRigidContact, only the master index is set
     if (masterPatchIndex > -1 && slavePatchIndex > -1)
     {
+		//*********(IF problem exist) START standardPenalty based on ORG foam-extend-4.0 ************	
+	/*	// avarage contact patch bulk modulus
+		scalar masterK = gAverage(masterLambda + (2.0/3.0)*masterMu);
+		scalar slaveK = gAverage(slaveLambda + (2.0/3.0)*slaveMu);
+	*/	//************** END standardPenalty based on ORG foam-extend-4.0 ************	
+	
 		//******************* Comment the section with object impK ***************
-        // Avarage contact patch bulk modulus
+    /*    // Avarage contact patch bulk modulus
         const scalar masterK = gAverage(impK.boundaryField()[masterPatchIndex]);
         const scalar slaveK = gAverage(impK.boundaryField()[slavePatchIndex]);
-		//******************* END the section with object impK ***************
+	*/	//******************* END the section with object impK ***************
 		
-        // avarage contact patch shear modulus
+		//************** START standardPenaltyFriction based on ORG foam-extend-4.0 ************
+		// ************ const added & shearModulus name changed to modulus *************
+		// avarage contact patch shear modulus
+		const scalar modulus = 0.5*(gAverage(masterMu)+gAverage(slaveMu));
+		//************** END standardPenaltyFriction based on ORG foam-extend-4.0 ************	
+	
+		//*********(IF problem exist) Choose this solid4Foam's ORG definitions ***********
+		// Is this bulk modulus (used in this definition)?
+	/*    // avarage contact patch shear modulus
         const scalar modulus = 0.5*(masterK + slaveK);
+	*/	//*********(END problem exist) Choose this solid4Foam's ORG definitions ***********
 
         // average contact patch face area
         const scalar masterMagSf =
@@ -129,9 +146,18 @@ void Foam::generalStandardPenaltyFriction::calcFrictionPenaltyFactor()
     }
     else if (slavePatchIndex > -1)
     {
+		//************** START standardPenaltyFriction based on ORG foam-extend-4.0 ************
+		// ************ const added & shearModulus name changed to modulus *************
+		// avarage contact patch shear modulus
+		const scalar modulus = gAverage(slaveMu);
+		//************** END standardPenaltyFriction based on ORG foam-extend-4.0 ************	
+		
         //******************* Comment the section with object impK ***************
-		// Avarage contact patch bulk modulus
+		// Is this bulk modulus (used in this definition)?
+		// Avarage contact patch bulk modulus 
+		/*
         const scalar modulus = gAverage(impK.boundaryField()[slavePatchIndex]);
+		*/
 		//******************* END the section with object impK ***************
 		
         // average contact patch face area
@@ -165,6 +191,8 @@ void Foam::generalStandardPenaltyFriction::calcFrictionPenaltyFactor()
 
     Info<< "    friction penalty factor: " << frictionPenaltyFactor_
         << endl;
+	
+	Info<<"Step4B: Here I am in generalStandardPenaltyFriction::calcFrictionPenaltyFactor():"<<__LINE__<<endl;
 }
 
 
@@ -302,7 +330,9 @@ void Foam::generalStandardPenaltyFriction::correct
             slip_[faceI] = (I - sqr(slaveFaceNormals[faceI])) & slip_[faceI];
 
             newSlaveTraction[faceI] = -frictionPenaltyFac*slip_[faceI];
-
+			
+			Info<<"Step4C: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
+			
             const scalar magSlip = mag(slip_[faceI]);
             maxMagSlip = max(maxMagSlip, magSlip);
 
@@ -361,6 +391,8 @@ void Foam::generalStandardPenaltyFriction::correct
     // Under-relax traction
     slaveTraction() =
         relaxFac_*newSlaveTraction + (1.0 - relaxFac_)*slaveTraction();
+
+	Info<<"Step4C: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
 }
 
 
