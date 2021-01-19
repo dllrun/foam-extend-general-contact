@@ -32,6 +32,7 @@ InClass
 #include "fvc.H"
 #include "addToRunTimeSelectionTable.H"
 #include "primitivePatchInterpolation.H"
+#include "constitutiveModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -62,18 +63,46 @@ void generalStandardPenalty::calcPenaltyFactor() const
 
     const label masterPatchIndex =  masterPatchID();
     const label slavePatchIndex =  slavePatchID();
+	
+	//************** START standardPenalty based on ORG foam-extend-4.0 ************
+	const constitutiveModel& rheology =
+	mesh_.objectRegistry::lookupObject<constitutiveModel>
+        ("rheologyProperties");
+    scalarField masterMu =
+      rheology.mu()().boundaryField()[masterPatchIndex];
+    scalarField slaveMu =
+      rheology.mu()().boundaryField()[slavePatchIndex];
+    scalarField masterLambda =
+      rheology.lambda()().boundaryField()[masterPatchIndex];
+    scalarField slaveLambda =
+      rheology.lambda()().boundaryField()[slavePatchIndex];
+	  
+	//************** END standardPenalty based on ORG foam-extend-4.0 ************	
 
+	//******************* Comment the section with object impK ***************
     // Lookup implicit stiffness = 2*mu + lambda, approximately equal to the
-    // bulk modulus
+    // bulk modulus 
+	/*
     const volScalarField& impK = mesh_.lookupObject<volScalarField>("impK");
-
+	*/
+	//******************* END the section with object impK ***************
+	
+	
     // Note: for solidRigidContact, only the master index is set
     if (masterPatchIndex > -1 && slavePatchIndex > -1)
     {
-        // Avarage contact patch bulk modulus
+	//************** START standardPenalty based on ORG foam-extend-4.0 ************	
+		// avarage contact patch bulk modulus
+    scalar masterK = gAverage(masterLambda + (2.0/3.0)*masterMu);
+    scalar slaveK = gAverage(slaveLambda + (2.0/3.0)*slaveMu);
+	//************** END standardPenalty based on ORG foam-extend-4.0 ************	
+	
+        //******************* Comment the section with object impK ***************
+	/*	// Avarage contact patch bulk modulus
         const scalar masterK = gAverage(impK.boundaryField()[masterPatchIndex]);
         const scalar slaveK = gAverage(impK.boundaryField()[slavePatchIndex]);
-
+	*/	//******************* END the section with object impK ***************
+		
         // Simple average
         //const scalar bulkModulus = 0.5*(masterK + slaveK);
         // Harmonic average
@@ -114,9 +143,18 @@ void generalStandardPenalty::calcPenaltyFactor() const
     }
     else if (slavePatchIndex > -1)
     {
-        // Avarage contact patch bulk modulus
+		
+		//************** START standardPenalty based on ORG foam-extend-4.0 ************	
+		// avarage contact patch bulk modulus
+    const scalar bulkModulus = 
+			gAverage(slaveLambda + (2.0/3.0)*slaveMu);
+	//************** END standardPenalty based on ORG foam-extend-4.0 ************	
+	
+		//******************* Comment the section with object impK ***************
+    /*    // Avarage contact patch bulk modulus
         const scalar bulkModulus =
             gAverage(impK.boundaryField()[slavePatchIndex]);
+	*/	//******************* END the section with object impK ***************	
 
         // Average contact patch face area
         const scalar faceArea =
