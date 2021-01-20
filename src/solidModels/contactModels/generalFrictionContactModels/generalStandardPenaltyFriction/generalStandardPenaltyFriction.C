@@ -300,12 +300,14 @@ void Foam::generalStandardPenaltyFriction::correct
     const vectorField& masterDDInterpToSlave
 )
 {
+	Info<<"Step4C: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
     // Preliminaries
     const fvMesh& mesh = mesh_;
     const label slavePatchIndex = slavePatchID();
-
+	
     // Calculate slave shear traction increments
     const scalarField magSlavePressure = mag(slavePressure);
+	Info<<"Step4D: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
     label numSlipFaces = 0;
     label numStickFaces = 0;
     scalarField& stickSlip = stickSlipFaces();
@@ -314,7 +316,7 @@ void Foam::generalStandardPenaltyFriction::correct
     scalar maxMagSlip = 0.0;
     scalarField slipTraction(magSlavePressure.size(), 0.0);
     vectorField newSlaveTraction(slipTraction.size(), vector::zero);
-
+	
     forAll(magSlavePressure, faceI)
     {
         if (areaInContact[faceI] > SMALL)
@@ -331,7 +333,7 @@ void Foam::generalStandardPenaltyFriction::correct
 
             newSlaveTraction[faceI] = -frictionPenaltyFac*slip_[faceI];
 			
-			Info<<"Step4C: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
+			Info<<"Step4D: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
 			
             const scalar magSlip = mag(slip_[faceI]);
             maxMagSlip = max(maxMagSlip, magSlip);
@@ -392,7 +394,7 @@ void Foam::generalStandardPenaltyFriction::correct
     slaveTraction() =
         relaxFac_*newSlaveTraction + (1.0 - relaxFac_)*slaveTraction();
 
-	Info<<"Step4C: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
+	Info<<"Step4E: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
 }
 
 

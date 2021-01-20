@@ -1888,11 +1888,11 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                      (
                          shadowPatchFaceNormals,
                     //     zoneToZoneNewGgi(shadowI),
-						shadowZonesNewGgi()[shadowI].globalPointToPatch
+					/*	shadowZonesNewGgi()[shadowI].globalPointToPatch
 									(
 										zoneToZonesNewGgi()[shadowI].slavePointDistanceToIntersection()
-									),  
-					//	zoneToZoneNewGgi(shadowI).slavePointDistanceToIntersection(),
+									), */ 
+						zoneToZoneNewGgi(shadowI).slavePointDistanceToIntersection(),
                          shadowPatchDD,
                          patchDDInterpToShadowPatch
                      );
@@ -2346,7 +2346,24 @@ Foam::solidGeneralContactFvPatchVectorField::shadowZonesNewGgi()
         return shadowPatchField.shadowZonesNewGgi();
     }
 }
-// ******************* End efinition from solid4foam***********************************************
+
+// ******************* End definition from solid4foam***********************************************
+
+// ******************* Definition from solid4foam***********************************************
+/* const Foam::globalPolyPatch&
+Foam::solid4ContactFvPatchVectorField::zoneNewGgi() const
+{
+
+}
+
+
+Foam::globalPolyPatch& Foam::solid4ContactFvPatchVectorField::zoneNewGgi()
+{
+
+}
+*/
+// ******************* End definition from solid4foam***********************************************
+
 
 // ******************* Definition from solid4foam***********************************************
 const Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
