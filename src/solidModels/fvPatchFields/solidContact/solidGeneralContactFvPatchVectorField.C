@@ -1631,7 +1631,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                 frictionModel(shadowI).newTimeStep();
 				
 		// **************** based on solid4Foam ****************
-		 zoneToZonesNewGgi()[shadowI].clearPrevCandidateMasterNeighbors();
+		// zoneToZonesNewGgi()[shadowI].clearPrevCandidateMasterNeighbors();
 		// **************** end solid4Foam ****************
 			}
         }
@@ -1930,6 +1930,8 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         (
                             dimensionedInternalField().name()
                         );
+					
+					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;
 						
 					const solidGeneralContactFvPatchVectorField&
                         localMasterField =
@@ -1940,6 +1942,8 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                                 shadowPatchIndices()[shadowI]
                             ]
                         );
+						
+					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;
 						
 					const label masterShadowI =
                         localMasterField.findShadowID(patch().index());
@@ -1953,6 +1957,8 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         (
                             masterShadowI
                         ).slavePressure();
+						
+					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;
 
                     vectorField shadowZoneTraction =
                         zoneField
@@ -1961,15 +1967,18 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             shadowPatchIndices()[shadowI],
                             shadowPatchTraction
                         );
-				
+					
+					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;
+					
 					// Face-to-face
 					vectorField masterZoneTraction =
                         localMasterField.zoneToZoneNewGgi
                         (
                             masterShadowI
-                        ).slaveToMaster(shadowZoneTraction);
+                        ).masterToSlave(shadowZoneTraction);
+					//	).slaveToMaster(shadowZoneTraction);	
 						
-					
+					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;
 					
                     // We store master patch traction as thermalGeneralContact
                     // uses it
