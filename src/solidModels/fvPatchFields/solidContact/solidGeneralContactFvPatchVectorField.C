@@ -1991,8 +1991,10 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             masterZoneTraction
                         );
 					
-										
+					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;	
+					Info<<"curPatchTractions(shadowI) in updateCoeffs()"<<curPatchTractions(shadowI)<<endl;
                     curPatchTraction += curPatchTractions(shadowI);
+					Info<<"curPatchTractions(shadowI) in updateCoeffs()"<<curPatchTractions(shadowI)<<endl;
 				}				
 			} // if contact pair is active
 		} // forAll contact pairs
