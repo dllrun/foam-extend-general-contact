@@ -710,11 +710,13 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowZonesNewGgi() const
 
 Foam::label Foam::solidGeneralContactFvPatchVectorField::zoneIndex() const
 {
+	Info<<"Does it enter here? in zoneIndex()"<<__LINE__<<endl;	
     if (zoneIndex_ == -1)
     {
         calcZoneIndex();
     }
-
+	Info<<"Does it enter here? in zoneIndex()"<<__LINE__<<endl;
+	Info<<"zoneIndex_ in zoneIndex()"<<zoneIndex_<<endl;
     return zoneIndex_;
 }
 
@@ -1979,6 +1981,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					//	).slaveToMaster(shadowZoneTraction);	
 						
 					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;
+					Info<<"What is masterZoneTraction? in updateCoeffs()"<<masterZoneTraction<<endl;
 					
                     // We store master patch traction as thermalGeneralContact
                     // uses it
