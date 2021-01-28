@@ -1808,18 +1808,22 @@ void newGGIInterpolation<MasterPatch, SlavePatch>::boundaryPointBiNormal
     label prevFaceID = -1;
     forAll(curPointFaces, pI)
     {
+		Info<<"In newGGIInterpolation(Weights)::boundaryPointBiNormal line: "<<__LINE__<<endl;
         const label faceID = curPointFaces[pI];
         const face& curFace = faces[faceID];
 
         forAll(curFace, fpI)
         {
+			Info<<"In newGGIInterpolation(Weights)::boundaryPointBiNormal line: "<<__LINE__<<endl;
             if (curFace[fpI] == prevPointID)
             {
+				Info<<"In newGGIInterpolation(Weights)::boundaryPointBiNormal line: "<<__LINE__<<endl;
                 prevFaceID = faceID;
                 break;
             }
             else if (curFace[fpI] == nextPointID)
             {
+				Info<<"In newGGIInterpolation(Weights)::boundaryPointBiNormal line: "<<__LINE__<<endl;
                 nextFaceID = faceID;
                 break;
             }

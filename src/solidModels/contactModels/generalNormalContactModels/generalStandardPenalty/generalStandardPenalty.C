@@ -414,6 +414,8 @@ void generalStandardPenalty::correct
         (
             totalSlavePointPressure
         )*(-slavePatchFaceNormals);
+		
+	Info<<"In generalStandardPenalty::correct(..):"<<__LINE__<<endl;
 
     // Under-relax pressure/traction
     // Note: slavePressure_ is really a traction vector

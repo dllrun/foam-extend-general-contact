@@ -79,6 +79,7 @@ patchField
     const Field<Type>& zoneField
 ) const
 {
+	Info<<"patchField(..) in solidGeneralContactFvPatchVectorFieldTemplates: "<<__LINE__<<endl;
     const fvMesh& mesh = patch().boundaryMesh().mesh();
 
     const faceZone& fZone = mesh.faceZones()[zoneIndex];

@@ -969,6 +969,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
 // ******************************************** START General *****************************************
 {
+	Info<<"Does it enter here? in C1(p, iF)"<<__LINE__<<endl;
     if (debug)
     {
         InfoIn
@@ -1026,6 +1027,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 	
 // ******************************************** START General *****************************************
 {
+	Info<<"Does it enter here? in C2(ptf, p, iF, mapper)"<<__LINE__<<endl;
     if (debug)
     {
         InfoIn
@@ -1175,6 +1177,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 	// ********************************************** START General ********************************************
 	
 	{
+		Info<<"Does it enter here? in C3(p, iF, dict)"<<__LINE__<<endl;
     Info<< "Creating " << solidGeneralContactFvPatchVectorField::typeName
         << " patch" << endl;
 
@@ -1236,6 +1239,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     QcsPtr_(NULL),
     bbOffset_(ptf.bbOffset_)
 {
+	Info<<"Does it enter here? in C4(ptf)"<<__LINE__<<endl;
     if (debug)
     {
         InfoIn
@@ -1366,6 +1370,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
 //**************************************************** START General**********************************************
 {
+	Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
 	Info<<"In constructor 5 line :"<<__LINE__<<endl;
     if (debug)
     {
@@ -1778,11 +1783,14 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
             if (activeContactPairs[shadowI])
             {
-				Info<<"activeContactPairs[shadowI] check in updateCoeffs():"<<__LINE__<<endl;
+				Info<<"START activeContactPairs[shadowI] check in updateCoeffs():"<<__LINE__<<endl;
 				if (locSlave[shadowI])
                 {
+					Info<<"SLAVE of LOCAL pair in updateCoeffs():"<<__LINE__<<endl;
 					Info<<"locSlave[shadowI] check in updateCoeffs():"<<__LINE__<<endl;
-                    Info<<"What is the locSlave[shadowI] boolList? "<<locSlave[shadowI]<<endl;
+                    Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;			
+		Info<< "The size of current patch in updateCoeffs() is "<< patch().size()<< endl;
+					Info<<"What is the locSlave[shadowI] boolList? "<<locSlave[shadowI]<<endl;
 					// Correct normal and friction contact models for the
                     // current contact pair
 
@@ -1842,7 +1850,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             ];
                     }
 					
-		Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+		Info<<"SLAVE of LOCAL pair in updateCoeffs()"<<__LINE__<<endl;
 			// Master zone DD
                     const vectorField zoneDD =
                         zoneField
@@ -1858,7 +1866,6 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 		Info<< "The size of current patch in updateCoeffs() is "<< patch().size()<< endl;
 		
                     
-        Info<<"In updateCoeffs() line "<<__LINE__<<endl;
 		Info<<"updateCoeffs() - zoneDD.size(): "<<zoneDD.size()<<endl;
 		Info<<"updateCoeffs() - zone().size(): "<<zone().size()<<endl;
 	//	Info<<"updateCoeffs() - shadowZone(shadowI).size(): "<<shadowZone(shadowI).size()<<endl;
@@ -1866,7 +1873,8 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 	//	Info<<"shadowPatchIndices()[shadowI]: "<<shadowPatchIndices()[shadowI]<<endl;
 	//	Info<<"shadowZoneIndices()[shadowI]: "<<shadowZoneIndices()[shadowI]<<endl;
 		Info<< "shadowI in updateCoeffs() "<<shadowI<< endl; 
-			
+		
+		Info<<"SLAVE of LOCAL pair in updateCoeffs() line "<<__LINE__<<endl;	
                     // Master patch DD interpolated to the slave patch
                     
 					const vectorField patchDDInterpToShadowPatch =
@@ -1885,6 +1893,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					FatalError
                         << "Disabled: use jasakSolidContact" << abort(FatalError);
                      */ 
+					Info<<"SLAVE of LOCAL pair in updateCoeffs() line "<<__LINE__<<endl;
 					// normalModel()[shadowI].correct 
 					 normalModel(shadowI).correct
                      (
@@ -1901,7 +1910,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					 
 					
 					// *************** end ERROR (noMatchingFunctionCall)******************
-					Info<<"Here I am in updateCoeffs()"<<__LINE__<<endl;
+					Info<<"SLAVE of LOCAL pair in updateCoeffs()"<<__LINE__<<endl;
 					
 					frictionModel(shadowI).correct
                     (
@@ -1912,7 +1921,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         patchDDInterpToShadowPatch
                     );
 					
-					Info<<"In updateCoeffs()"<<__LINE__<<endl;
+					Info<<"SLAVE of LOCAL pair in updateCoeffs()"<<__LINE__<<endl;
 					// Accumulate traction
 
                     curPatchTractions(shadowI) =
@@ -1924,7 +1933,9 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
 				else // local master
                 {
-					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;
+					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
+					Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;			
+		Info<< "The size of current patch in updateCoeffs() is "<< patch().size()<< endl;
 					// Get traction from local slave
 
                     const volVectorField& field =
@@ -1933,7 +1944,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             dimensionedInternalField().name()
                         );
 					
-					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;
+					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
 						
 					const solidGeneralContactFvPatchVectorField&
                         localMasterField =
@@ -1945,7 +1956,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             ]
                         );
 						
-					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;
+					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
 						
 					const label masterShadowI =
                         localMasterField.findShadowID(patch().index());
@@ -1954,23 +1965,25 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         -localMasterField.frictionModel
                         (
                             masterShadowI
-                        ).slaveTractionForMaster()
+                        ).slaveTractionForMaster()   //slaveTractionForMaster()
                         -localMasterField.normalModel
                         (
                             masterShadowI
                         ).slavePressure();
 						
-					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;
-
-                    vectorField shadowZoneTraction =
+					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
+					
+					//ORG
+                     vectorField shadowZoneTraction =
                         zoneField
                         (
                             shadowZoneIndices()[shadowI],
                             shadowPatchIndices()[shadowI],
                             shadowPatchTraction
-                        );
+                        ); 
+						
 					
-					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;
+					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
 					
 					// Face-to-face
 					vectorField masterZoneTraction =
@@ -1980,21 +1993,23 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         ).masterToSlave(shadowZoneTraction);
 					//	).slaveToMaster(shadowZoneTraction);	
 						
-					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;
+					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
 					Info<<"What is masterZoneTraction? in updateCoeffs()"<<masterZoneTraction<<endl;
 					
                     // We store master patch traction as thermalGeneralContact
                     // uses it
 					
+					//ORG
                     curPatchTractions(shadowI) =
                         patchField
                         (
                             patch().index(),
                             zoneIndex(),
                             masterZoneTraction
-                        );
+                        ); 
+												                            
 					
-					Info<<"Does it enter here? in updateCoeffs()"<<__LINE__<<endl;	
+					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;	
 					Info<<"curPatchTractions(shadowI) in updateCoeffs()"<<curPatchTractions(shadowI)<<endl;
                     curPatchTraction += curPatchTractions(shadowI);
 					Info<<"curPatchTractions(shadowI) in updateCoeffs()"<<curPatchTractions(shadowI)<<endl;
@@ -2206,6 +2221,7 @@ Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
     const label shadowI
 ) const
 {
+	Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
     if (!curPatchTractionPtr_)
     {
         makeCurPatchTractions();
@@ -2221,11 +2237,14 @@ Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
     const label shadowI
 )
 {
+	Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
     if (!curPatchTractionPtr_)
     {
+		Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
         makeCurPatchTractions();
     }
-
+	
+	Info<<"(*curPatchTractionPtr_)[shadowI] in curPatchTractions(..) line: "<<(*curPatchTractionPtr_)<<endl;
     return (*curPatchTractionPtr_)[shadowI];
 }
 
@@ -2465,14 +2484,15 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi
 (
     const label shadowI
 ) const
-{   
+{ 
+	Info<<"In zoneToZoneNewGgi()"<<__LINE__<<endl;
    if (!localSlave()[shadowI])
     {
         FatalErrorIn("zoneToZoneNewGgi(const label shadowI)")
             << "Only the local slave can call the zoneToZoneNewGgi interpolator"
             << abort(FatalError);
     }
-
+	Info<<"In zoneToZoneNewGgi()"<<__LINE__<<endl;
     if (zoneToZonesNewGgi_.empty())
     {
         word zoneName =
@@ -2486,6 +2506,7 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi
 
         calcZoneToZones();
     }
+	Info<<"In zoneToZoneNewGgi()"<<__LINE__<<endl;
 
     return zoneToZonesNewGgi_[shadowI];
 }
@@ -2493,12 +2514,15 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi
 Foam::newGgiStandAlonePatchInterpolation&
 Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi(const label shadowI)
 {
+	Info<<"In zoneToZoneNewGgi()"<<__LINE__<<endl;
     if (!localSlave()[shadowI])
     {
         FatalErrorIn("zoneToZone(const label shadowI)")
             << "Only the local slave can call the zoneToZone interpolator"
             << abort(FatalError);
     }
+	
+	Info<<"In zoneToZoneNewGgi()"<<__LINE__<<endl;
 
     if (zoneToZonesNewGgi_.empty())
     {
@@ -2513,6 +2537,9 @@ Foam::solidGeneralContactFvPatchVectorField::zoneToZoneNewGgi(const label shadow
 
         calcZoneToZones();
     }
+	
+	Info<<"In zoneToZoneNewGgi()"<<__LINE__<<endl;
+//	Info<<"zoneToZonesNewGgi_[shadowI] in zoneToZoneNewGgi()"<<zoneToZonesNewGgi_<<endl;
 
     return zoneToZonesNewGgi_[shadowI];
 }

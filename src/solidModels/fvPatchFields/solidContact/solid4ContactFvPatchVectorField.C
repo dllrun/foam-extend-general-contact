@@ -386,7 +386,9 @@ Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
     scaleFaceTractionsNearDownstreamPatch_(false),
     scaleTractionFieldPtr_(),
     curTimeIndex_(-1)
-{}
+{
+	Info<<"Does it enter here? in C1(p, iF)"<<__LINE__<<endl;
+}
 
 
 Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
@@ -461,6 +463,7 @@ Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
     scaleTractionFieldPtr_(),
     curTimeIndex_(-1)
 {
+	Info<<"Does it enter here? in C2(p, iF, dict)"<<__LINE__<<endl;
     if (debug)
     {
         Info<< "Creating " << solid4ContactFvPatchVectorField::typeName
@@ -545,7 +548,8 @@ Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
     scaleTractionFieldPtr_(),
     curTimeIndex_(ptf.curTimeIndex_)
 {
-    // Do not copy pointer objects: they will be re-created.
+    Info<<"Does it enter here? in C3(ptf, p, iF, mapper)"<<__LINE__<<endl;
+	// Do not copy pointer objects: they will be re-created.
 }
 
 
@@ -581,7 +585,8 @@ Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
     scaleTractionFieldPtr_(),
     curTimeIndex_(ptf.curTimeIndex_)
 {
-    // Do not copy pointer objects
+    Info<<"Does it enter here? in C4(ptf)"<<__LINE__<<endl;
+	// Do not copy pointer objects
 }
 
 
@@ -618,7 +623,8 @@ Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
     scaleTractionFieldPtr_(),
     curTimeIndex_(ptf.curTimeIndex_)
 {
-    // Do not copy pointer objects
+    Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
+	// Do not copy pointer objects
 }
 
 
