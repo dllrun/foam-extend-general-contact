@@ -605,6 +605,7 @@ void solidContactFvPatchVectorField::updateCoeffs()
 
     if (contactActive_)
     {
+		Info<<"START contactActive in updateCoeffs() line "<<__LINE__<<endl;
         // for the first updateCoeffs, the slave needs to grab the conatct
         // law pointers
         if (!normalContactModelPtr_)
@@ -865,6 +866,8 @@ void solidContactFvPatchVectorField::updateCoeffs()
     }
 
     directionMixedFvPatchVectorField::updateCoeffs();
+	Info<<"In updateCoeffs() line "<<__LINE__<<endl;
+	Info<<"refGrad(): "<<refGrad()<<endl;
 }
 
 

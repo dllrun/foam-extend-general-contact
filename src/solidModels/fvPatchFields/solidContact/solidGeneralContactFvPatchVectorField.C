@@ -2005,7 +2005,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
 					Info<<"shadowI in updateCoeffs()"<<shadowI<<endl;
 					Info<<"masterShadowI in updateCoeffs()"<<masterShadowI<<endl;
-					Info<<"What is masterZoneTraction? in updateCoeffs()"<<masterZoneTraction<<endl;
+				//	Info<<"What is masterZoneTraction? in updateCoeffs()"<<masterZoneTraction<<endl;
 					Info<<"size of masterZoneTraction? in updateCoeffs()"<<masterZoneTraction.size()<<endl;
 					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
 					
@@ -2039,6 +2039,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 
     solidTractionFvPatchVectorField::updateCoeffs();
 	Info<<"In updateCoeffs() line "<<__LINE__<<endl;
+	Info<<"traction() at the END: "<<traction()<<endl;
 }
 
 const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc() const

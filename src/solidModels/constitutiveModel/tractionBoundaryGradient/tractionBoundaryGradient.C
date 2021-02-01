@@ -620,6 +620,8 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
 
         gradient /= (2.0*mu + lambda);
     }
+	Info<<"Here I am in tractionBoundaryGradient's updateCoeffs()"<<__LINE__<<endl;
+	Info<<"traction at the END tractionBoundaryGradient's updateCoeffs()"<<traction<<endl;
 
     return tgradient;
 }
