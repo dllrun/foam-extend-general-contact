@@ -1935,7 +1935,8 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                 {
 					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
 					Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;			
-		Info<< "The size of current patch in updateCoeffs() is "<< patch().size()<< endl;
+					Info<< "The size of current patch in updateCoeffs() is "<< patch().size()<< endl;
+					Info<< "The current field in updateCoeffs() is "<<dimensionedInternalField().name()<< endl;
 					// Get traction from local slave
 
                     const volVectorField& field =
@@ -1957,11 +1958,17 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         );
 						
 					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
-						
+				//	Info<<"What is field.boundaryField()? in updateCoeffs()"<<field.boundaryField()[shadowPatchIndices()[shadowI]]<<endl;
+					Info<<"*localMasterField in updateCoeffs()"<<*localMasterField<<endl;
+					Info<<"shadowI in updateCoeffs()"<<shadowI<<endl;
+				//	Info<<"findShadowID(patch().index()) in updateCoeffs()"<<findShadowID(patch().index())<<endl;
+					
 					const label masterShadowI =
                         localMasterField.findShadowID(patch().index());
-
-                    vectorField shadowPatchTraction =
+					
+					Info<<"masterShadowI in updateCoeffs()"<<masterShadowI<<endl;
+                
+					vectorField shadowPatchTraction =
                         -localMasterField.frictionModel
                         (
                             masterShadowI
@@ -1973,8 +1980,9 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 						
 					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
 					
-					//ORG
-                     vectorField shadowZoneTraction =
+					//************** START (remove this evaluation)*******
+					
+					vectorField shadowZoneTraction =
                         zoneField
                         (
                             shadowZoneIndices()[shadowI],
@@ -1984,35 +1992,40 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 						
 					
 					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
-					
+					Info<<"size of shadowZoneTraction? in updateCoeffs()"<<shadowZoneTraction.size()<<endl;
+										
 					// Face-to-face
 					vectorField masterZoneTraction =
                         localMasterField.zoneToZoneNewGgi
                         (
                             masterShadowI
-                        ).masterToSlave(shadowZoneTraction);
-					//	).slaveToMaster(shadowZoneTraction);	
+                        ).masterToSlave(shadowPatchTraction)();
+					//	).slaveToMaster(shadowZoneTraction);	//.slavePointDistanceToIntersection()
 						
 					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
+					Info<<"shadowI in updateCoeffs()"<<shadowI<<endl;
+					Info<<"masterShadowI in updateCoeffs()"<<masterShadowI<<endl;
 					Info<<"What is masterZoneTraction? in updateCoeffs()"<<masterZoneTraction<<endl;
+					Info<<"size of masterZoneTraction? in updateCoeffs()"<<masterZoneTraction.size()<<endl;
+					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
 					
                     // We store master patch traction as thermalGeneralContact
                     // uses it
 					
-					//ORG
-                    curPatchTractions(shadowI) =
+                    curPatchTractions(shadowI) = 	
                         patchField
                         (
                             patch().index(),
                             zoneIndex(),
                             masterZoneTraction
                         ); 
-												                            
+							
+					// ********* END (remove this evaluation)***********
 					
 					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;	
-					Info<<"curPatchTractions(shadowI) in updateCoeffs()"<<curPatchTractions(shadowI)<<endl;
+				//	Info<<"curPatchTractions(shadowI) in updateCoeffs()"<<curPatchTractions(shadowI)<<endl;
                     curPatchTraction += curPatchTractions(shadowI);
-					Info<<"curPatchTractions(shadowI) in updateCoeffs()"<<curPatchTractions(shadowI)<<endl;
+				//	Info<<"curPatchTractions(shadowI) in updateCoeffs()"<<curPatchTractions(shadowI)<<endl;
 				}				
 			} // if contact pair is active
 		} // forAll contact pairs
@@ -2244,7 +2257,11 @@ Foam::solidGeneralContactFvPatchVectorField::curPatchTractions
         makeCurPatchTractions();
     }
 	
-	Info<<"(*curPatchTractionPtr_)[shadowI] in curPatchTractions(..) line: "<<(*curPatchTractionPtr_)<<endl;
+	Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
+	Info<< "The current patch in curPatchTractions() is "<< patch().name()<< endl;			
+	Info<< "patch().size() in curPatchTractions() is "<< patch().size()<< endl;
+	
+	Info<<"(*curPatchTractionPtr_) in curPatchTractions(..) "<<(*curPatchTractionPtr_)<<endl;
     return (*curPatchTractionPtr_)[shadowI];
 }
 
@@ -2712,7 +2729,9 @@ Foam::label Foam::solidGeneralContactFvPatchVectorField::findShadowID
 
 void Foam::solidGeneralContactFvPatchVectorField::makeCurPatchTractions() const
 {
-    if (curPatchTractionPtr_)
+	Info<<"In makeCurPatchTractions() line "<<__LINE__<<endl;
+	
+	if (curPatchTractionPtr_)
     {
         FatalErrorIn
         (
@@ -2720,6 +2739,10 @@ void Foam::solidGeneralContactFvPatchVectorField::makeCurPatchTractions() const
             "makeCurPatchTractions() const"
         )   << "curPatchTractionPtr_ already set" << abort(FatalError);
     }
+	
+	Info<< "The current patch in makeCurPatchTractions() is "<< patch().name()<< endl;			
+	Info<< "vectorField(patch().size() in makeCurPatchTractions() is "<< patch().size()<< endl;
+    Info<< "shadowPatchNames().size() in makeCurPatchTractions() is "<< shadowPatchNames().size()<< endl;
 
     curPatchTractionPtr_ =
         new List<vectorField>
