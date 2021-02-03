@@ -1263,16 +1263,20 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
     PtrList<scalarField>& contactPerShadow = this->contactPerShadow();
     forAll(contactPerShadow, shadI)
     {
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         contact_ += contactPerShadow[shadI];
     }
 
     // Scale any face in contact with more than one shadow
-    if (gMax(contact_) > (1.0 + SMALL))
+	//******************* START Scaling any face in contact ******************
+    /* if (gMax(contact_) > (1.0 + SMALL))
     {
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         forAll(contact_, faceI)
         {
             if (contact_[faceI] > (1.0 + SMALL))
             {
+				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
                 // Update the contact weights corresponding to each shadow
                 scalar sumContact = 0.0;
                 forAll(contactPerShadow, shadI)
@@ -1296,7 +1300,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 contact_[faceI] = 1.0;
             }
         }
-    }
+    } */
+	//******************* END Scaling any face in contact ******************
 
     solidTractionFvPatchVectorField::updateCoeffs();
 }
