@@ -13,6 +13,8 @@ $(boundaryConditions)/fixedDisplacementFixedRotation/fixedDisplacementFixedRotat
 $(boundaryConditions)/fixedDisplacementZeroShear/fixedDisplacementZeroShearFvPatchVectorField.C
 $(boundaryConditions)/fixedRotation/fixedRotationFvPatchVectorField.C
 $(boundaryConditions)/solidContact/solidGeneralContactFvPatchVectorField.C
+$(boundaryConditions)/solidContact/solid4GeneralContactFvPatchVectorField.C
+$(boundaryConditions)/solidContact/solid4GeneralContactFvPatchVectorFieldCalcContact.C 
 $(boundaryConditions)/solidContact/solid4ContactFvPatchVectorField.C
 $(boundaryConditions)/solidContact/solid4ContactFvPatchVectorFieldCalcContact.C 
 $(boundaryConditions)/solidContact/solidContactFvPatchVectorField.C

@@ -1445,6 +1445,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
     if (ptf.curPatchTractionPtr_)
     {
+		Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
         curPatchTractionPtr_ =
             new List<vectorField>(*ptf.curPatchTractionPtr_);
     }
