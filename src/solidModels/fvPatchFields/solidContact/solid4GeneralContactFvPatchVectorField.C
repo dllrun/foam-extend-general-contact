@@ -231,6 +231,45 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcLocalSlave() const
         }
     }
 }
+
+void Foam::solid4GeneralContactFvPatchVectorField::calcBbOffset() const
+{
+    if (bbOffset_ != 0)
+    {
+        FatalErrorIn
+        (
+            "Foam::scalar Foam::solid4GeneralContactFvPatchVectorField::"
+            "calcBbOffset() const"
+        )   << "already set" << abort(FatalError);
+    }
+
+    // We will set the BB offset to five times the average dimension of the
+    // smallest face on the zone
+
+    scalar minDim = GREAT;
+
+    if (patch().size() > 0)
+    {
+        minDim = min(sqrt(patch().magSf()));
+    }
+
+    bbOffset_ = 5.0*returnReduce(minDim, minOp<scalar>());
+
+    if (debug)
+    {
+        Info<< nl << "The bbOffset is " << bbOffset_ << endl;
+    }
+}
+
+Foam::scalar Foam::solid4GeneralContactFvPatchVectorField::bbOffset() const
+{
+    if (bbOffset_ == 0)
+    {
+        calcBbOffset();
+    }
+
+    return bbOffset_;
+}
 //******************** END based on solid General*****************
 
 void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames
@@ -558,7 +597,10 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     contactPerShadow_(),
     scaleFaceTractionsNearDownstreamPatch_(false),
     scaleTractionFieldPtr_(),
-    curTimeIndex_(-1)	
+    curTimeIndex_(-1),
+	//******** based on solid General*************
+	bbOffset_(0.0)
+	//******** END based on solid General*************
 {
 	Info<<"Does it enter here? in C1(p, iF)"<<__LINE__<<endl;
 }
@@ -639,7 +681,10 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
         )
     ),
     scaleTractionFieldPtr_(),
-    curTimeIndex_(-1)
+    curTimeIndex_(-1),
+	//******** based on solid General*************
+	bbOffset_(0.0)
+	//******** END based on solid General*************
 {
 	Info<<"Does it enter here? in C2(p, iF, dict)"<<__LINE__<<endl;
     if (debug)
@@ -729,7 +774,10 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
         ptf.scaleFaceTractionsNearDownstreamPatch_
     ),
     scaleTractionFieldPtr_(),
-    curTimeIndex_(ptf.curTimeIndex_)
+    curTimeIndex_(ptf.curTimeIndex_),
+	//******** based on solid General*************
+	bbOffset_(ptf.bbOffset_)
+	//******** END based on solid General*************
 {
     Info<<"Does it enter here? in C3(ptf, p, iF, mapper)"<<__LINE__<<endl;
 	// Do not copy pointer objects: they will be re-created.
@@ -771,7 +819,10 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
         ptf.scaleFaceTractionsNearDownstreamPatch_
     ),
     scaleTractionFieldPtr_(),
-    curTimeIndex_(ptf.curTimeIndex_)
+    curTimeIndex_(ptf.curTimeIndex_),
+	//******** based on solid General*************
+	bbOffset_(ptf.bbOffset_)
+	//******** END based on solid General*************
 {
     Info<<"Does it enter here? in C4(ptf)"<<__LINE__<<endl;
 	// Do not copy pointer objects
@@ -814,7 +865,10 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
         ptf.scaleFaceTractionsNearDownstreamPatch_
     ),
     scaleTractionFieldPtr_(),
-    curTimeIndex_(ptf.curTimeIndex_)
+    curTimeIndex_(ptf.curTimeIndex_),
+	//******** based on solid General*************
+	bbOffset_(ptf.bbOffset_)
+	//******** END based on solid General*************
 {
     Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
 	// Do not copy pointer objects

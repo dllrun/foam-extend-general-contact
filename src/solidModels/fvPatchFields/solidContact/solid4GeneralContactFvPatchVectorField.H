@@ -182,6 +182,11 @@ class solid4GeneralContactFvPatchVectorField
 
         //- Current time index
         label curTimeIndex_;
+		
+		//*************** based on solidGeneral*****************
+		//- Offset used if bounding box of patch has a zero dimension
+        mutable scalar bbOffset_;
+		//*************** END based on solidGeneral*****************
 
 
     // Private Member Functions
@@ -254,6 +259,14 @@ class solid4GeneralContactFvPatchVectorField
 
         //- Make the scaleTractionField
         void makeScaleTractionField() const;
+		
+		//*************** based on solidGeneral*****************
+		//- Calculate the bounding box offset
+        void calcBbOffset() const;
+
+        //- Return the bounding box offset
+        scalar bbOffset() const;
+		//*************** END based on solidGeneral*****************
 
 
 public:
