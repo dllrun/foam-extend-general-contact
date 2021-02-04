@@ -1027,6 +1027,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
     {
         return;
     }
+	
+	//*************** based on solidGeneral*****************
+	boolList activeContactPairs(shadowPatchNames().size(), false);
+	//*************** END based on solidGeneral**************
 
     if (curTimeIndex_ != this->db().time().timeIndex())
     {
