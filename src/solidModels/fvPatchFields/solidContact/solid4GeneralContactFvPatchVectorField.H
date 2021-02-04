@@ -90,7 +90,21 @@ class solid4GeneralContactFvPatchVectorField
     public solidTractionFvPatchVectorField
 {
     // Private data
-
+		
+	//*************** based on solidGeneral*****************
+		//- Is this the global master patch: the global master patches keeps a
+        // copy of mesh.allPoints() and updates them to the deformed position
+        // each time before the contact is corrected
+        mutable bool* globalMasterPtr_;
+		
+		//- Patch index of global master patch
+        mutable label* globalMasterIndexPtr_;
+		
+		//- If the current patch is the local slave of the contact pair
+        // The local slave is the patch with the lower patch index
+        mutable boolList* localSlavePtr_;
+	//*************** END based on solidGeneral**************
+	
         //- Store a copy of the patch dictionary
         //  This allows us to use lazy evaluation when creating the contact
         //  models
@@ -201,9 +215,23 @@ class solid4GeneralContactFvPatchVectorField
 
         //- Move the master and slave zones to the deformed configuration
         void moveZonesToDeformedConfiguration();
-
+		
         // Set the contactPerShadow field
         void calcContactPerShadow() const;
+		
+		//*************** based on solidGeneral*****************
+		//- Check global master patch
+        void calcGlobalMaster() const;
+
+        //- Check global master patch index
+        void calcGlobalMasterIndex() const;
+		
+		//- Calculate local slaves
+        void calcLocalSlave() const;
+		
+		//- Return local slaves
+			const boolList& localSlave() const;
+		//*************** END based on solidGeneral*****************
 
         // //- Interpolate zone face values to points
         // template<class Type>
@@ -302,7 +330,15 @@ public:
     // Member functions
 
         // Access
+			
+			//*************** based on solidGeneral*****************
+			//- Return true if this patch is the global master
+            bool globalMaster() const;
 
+            //- Return index of global master patch
+            label globalMasterIndex() const;
+			//*************** END based on solidGeneral*****************
+			
             //- Return if this patch is the slave
             Switch master() const
             {

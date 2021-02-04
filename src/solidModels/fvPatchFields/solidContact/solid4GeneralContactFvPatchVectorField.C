@@ -40,7 +40,7 @@ InClass
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-// *********************** START solidGeneralContact ************************
+// *********************** START solid GeneralContact ************************
 bool Foam::solid4GeneralContactFvPatchVectorField::movingMesh() const
 {
     // If the deformation gradient "F" and the displacement increment DU" are
@@ -58,7 +58,7 @@ bool Foam::solid4GeneralContactFvPatchVectorField::movingMesh() const
         return false;
     }
 }
-// *********************** END solidGeneralContact ************************
+// *********************** END solid GeneralContact ************************
 
 /*
 bool Foam::solid4GeneralContactFvPatchVectorField::movingMesh() const
@@ -69,6 +69,169 @@ bool Foam::solid4GeneralContactFvPatchVectorField::movingMesh() const
 	
 }
 */
+
+//******************* based on solid General******************
+bool Foam::solid4GeneralContactFvPatchVectorField::globalMaster() const
+{
+    if (!globalMasterPtr_)
+    {
+        calcGlobalMaster();
+    }
+	/*
+	Info<< "The current field in globalMaster() is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in globalMaster()) is "<< patch().name()<< endl;			
+	Info<< "The size of current patch in globalMaster() is "<< patch().size()<< endl;
+	Info<< "*globalMasterPtr_ in globalMaster() is "<<*globalMasterPtr_<< endl;
+    */
+	return *globalMasterPtr_;
+}
+
+
+void Foam::solid4GeneralContactFvPatchVectorField::calcGlobalMaster() const   //// CHECK method to calculate global master
+{
+	
+    if (globalMasterPtr_)
+    {
+        FatalErrorIn
+            (
+                "void Foam::solid4GeneralContactFvPatchVectorField::"
+                "calcGlobalMaster() const"
+            )   << "globalMasterPtr_ already set" << abort(FatalError);
+    }
+
+    // The global master is the first solid4GeneralContact patch i.e. the one
+    // with the lowest patch index
+	/*
+	Info<< "In calcGlobalMaster() "<<__LINE__<<endl;
+	Info<< "globalMasterIndex() in calcGlobalMaster() "<<globalMasterIndex()<<endl;
+	Info<< "patch().index() in calcGlobalMaster() "<<patch().index()<<endl;
+    Info<< "patch().name() in calcGlobalMaster() "<<patch().name()<<endl;
+	*/
+	if (globalMasterIndex() == patch().index())
+    {
+        globalMasterPtr_ = new bool(true);
+    }
+    else
+    {
+        globalMasterPtr_ = new bool(false);
+    }
+	
+}
+
+Foam::label Foam::solid4GeneralContactFvPatchVectorField::globalMasterIndex()
+const
+{
+    if (!globalMasterIndexPtr_)
+    {
+        calcGlobalMasterIndex();
+    }
+
+
+    return *globalMasterIndexPtr_;
+}
+
+void Foam::solid4GeneralContactFvPatchVectorField::calcGlobalMasterIndex() const
+{
+    if (globalMasterIndexPtr_)
+    {
+        FatalErrorIn
+        (
+            "label Foam::solid4GeneralContactFvPatchVectorField::"
+            "calcGlobalMasterIndex() const"
+        )   << "globalMasterIndexPtr_ already set" << abort(FatalError);
+    }
+
+    // The global master is the first solid4GeneralContact patch i.e. the one
+    // with the lowest patch index
+
+    const volVectorField& field =
+        db().objectRegistry::lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    globalMasterIndexPtr_ = new label(-1);
+    label& gMasterID = *globalMasterIndexPtr_;
+
+    forAll(field.boundaryField(), patchI)
+    {
+        if
+        (
+            field.boundaryField()[patchI].type()
+            == solid4GeneralContactFvPatchVectorField::typeName
+        )
+        {
+            gMasterID = patchI;
+
+            break;
+        }
+    }
+
+    // Check there is only one global master
+
+    label GMasterID = returnReduce(gMasterID, maxOp<label>());
+
+    if (gMasterID != GMasterID)
+    {
+        FatalErrorIn
+        (
+            "solid4GeneralContactFvPatchVectorField::"
+            "calcGlobalMasterIndex() const"
+        )   << "There are multiple global masters" << abort(FatalError);
+    }
+
+    if (debug)
+    {
+        Pout<< nl << "The global master contact patch is "
+            << patch().boundaryMesh()[gMasterID].name() << endl;
+    }
+}
+
+
+const Foam::boolList&
+Foam::solid4GeneralContactFvPatchVectorField::localSlave() const
+{
+    if (!localSlavePtr_)
+    {
+        calcLocalSlave();
+    }
+	Info<< "The current field in localSlave() is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in localSlave() is "<< patch().name()<< endl;			
+	Info<< "The size of current patch in localSlave() is "<< patch().size()<< endl;
+	Info<< "*localSlavePtr_ in localSlave() is "<<*localSlavePtr_<< endl;
+    return *localSlavePtr_;
+}
+
+void Foam::solid4GeneralContactFvPatchVectorField::calcLocalSlave() const
+{
+    if (localSlavePtr_)
+    {
+        FatalErrorIn
+        (
+            "label Foam::solid4GeneralContactFvPatchVectorField::"
+            "calcLocalSlave() const"
+        )   << "localSlavePtr_ already set" << abort(FatalError);
+    }
+
+    localSlavePtr_ = new boolList(shadowPatchNames().size(), false);
+
+    boolList& localSlave = *localSlavePtr_;
+	
+	Info<< "In calcLocalSlave() "<<__LINE__<<endl;
+	Info<< "patch().index() in calcLocalSlave() "<<patch().index()<<endl;
+    forAll(localSlave, shadowI)
+    {
+        if (patch().index() < shadowPatchIndices()[shadowI])
+        {
+            localSlave[shadowI] = true;
+
+            Info<< "solid4GeneralContact: "
+                << shadowPatchNames()[shadowI] << " (master)" << " to "
+                << patch().name() << " (slave)" << endl;
+        }
+    }
+}
+//******************** END based on solid General*****************
 
 void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames
 (
@@ -1027,7 +1190,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
     {
         return;
     }
-	
+	Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
+	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
 	//*************** based on solidGeneral*****************
 	boolList activeContactPairs(shadowPatchNames().size(), false);
 	//*************** END based on solidGeneral**************
