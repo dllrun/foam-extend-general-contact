@@ -1389,16 +1389,19 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
     if (ptf.globalMasterPtr_)
     {
+		Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
         globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
     }
 
     if (ptf.globalMasterIndexPtr_)
     {
+		Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
         globalMasterIndexPtr_ = new label(*ptf.globalMasterIndexPtr_);
     }
 
     if (ptf.localSlavePtr_)
     {
+		Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
     }
 

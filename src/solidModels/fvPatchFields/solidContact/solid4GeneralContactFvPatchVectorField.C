@@ -447,8 +447,13 @@ void Foam::solid4GeneralContactFvPatchVectorField::clearOut()
             "void Foam::solid4GeneralContactFvPatchVectorField::clearOut()"
         )   << patch().name() << " : clearOut" << endl;
     }
-
-    deleteDemandDrivenData(shadowPatchIndicesPtr_);
+	//************ based on solid General*************
+	deleteDemandDrivenData(globalMasterPtr_);
+    deleteDemandDrivenData(globalMasterIndexPtr_);
+    deleteDemandDrivenData(localSlavePtr_);
+	//************ END based on solid General*************
+    
+	deleteDemandDrivenData(shadowPatchIndicesPtr_);
     deleteDemandDrivenData(zonePtr_);
     shadowZones_.clear();
     zoneToZones_.clear();
@@ -525,10 +530,15 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF
 )
-:
+:	
     solidTractionFvPatchVectorField(p, iF),
+	//******** based on solid General***************
+    globalMasterPtr_(NULL),
+    globalMasterIndexPtr_(NULL),
+	localSlavePtr_(NULL),
+	//******** END based on solid General*************
     dict_(),
-    master_(false),
+	master_(false),
     writeZoneVTK_(false),
     writePointDistanceFields_(false),
     shadowPatchNames_(),
@@ -548,7 +558,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     contactPerShadow_(),
     scaleFaceTractionsNearDownstreamPatch_(false),
     scaleTractionFieldPtr_(),
-    curTimeIndex_(-1)
+    curTimeIndex_(-1)	
 {
 	Info<<"Does it enter here? in C1(p, iF)"<<__LINE__<<endl;
 }
@@ -561,6 +571,11 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     const dictionary& dict
 )
 :   solidTractionFvPatchVectorField(p, iF),
+	//******** based on solid General***************
+    globalMasterPtr_(NULL),
+    globalMasterIndexPtr_(NULL),
+	localSlavePtr_(NULL),
+	//******** END based on solid General*************
     dict_(dict),
     master_(dict.lookup("master")),
     writeZoneVTK_(dict.lookupOrDefault<Switch>("writeZoneVTK", false)),
@@ -685,7 +700,12 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 )
 :
     solidTractionFvPatchVectorField(ptf, p, iF, mapper),
-    dict_(ptf.dict_),
+    //******** based on solid General***************
+    globalMasterPtr_(NULL),
+    globalMasterIndexPtr_(NULL),
+	localSlavePtr_(NULL),
+	//******** END based on solid General*************
+	dict_(ptf.dict_),
     master_(ptf.master_),
     writeZoneVTK_(ptf.writeZoneVTK_),
     writePointDistanceFields_(ptf.writePointDistanceFields_),
@@ -722,6 +742,11 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 )
 :
     solidTractionFvPatchVectorField(ptf),
+	//******** based on solid General***************
+    globalMasterPtr_(NULL),
+    globalMasterIndexPtr_(NULL),
+	localSlavePtr_(NULL),
+	//******** END based on solid General*************
     dict_(ptf.dict_),
     master_(ptf.master_),
     writeZoneVTK_(ptf.writeZoneVTK_),
@@ -760,6 +785,11 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 )
 :
     solidTractionFvPatchVectorField(ptf, iF),
+	//******** based on solid General***************
+    globalMasterPtr_(NULL),
+    globalMasterIndexPtr_(NULL),
+	localSlavePtr_(NULL),
+	//******** END based on solid General*************
     dict_(ptf.dict_),
     master_(ptf.master_),
     writeZoneVTK_(ptf.writeZoneVTK_),
