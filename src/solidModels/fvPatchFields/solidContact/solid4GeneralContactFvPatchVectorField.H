@@ -103,6 +103,18 @@ class solid4GeneralContactFvPatchVectorField
 		//- If the current patch is the local slave of the contact pair
         // The local slave is the patch with the lower patch index
         mutable boolList* localSlavePtr_;
+		
+		//- List of shadowG patch names
+        mutable List<word>* shadowGPatchNamesPtr_;
+
+        //YYY- List of shadowG patch indices 
+        mutable List<label>* shadowGPatchIndicesPtr_;
+		
+		//- List of shadowG zone names
+        mutable List<word>* shadowGZoneNamesPtr_;
+
+        //- List of shadowG zone indices
+        mutable List<label>* shadowGZoneIndicesPtr_;
 	//*************** END based on solidGeneral**************
 	
         //- Store a copy of the patch dictionary
@@ -236,6 +248,12 @@ class solid4GeneralContactFvPatchVectorField
 		
 		//- Return local slaves
 			const boolList& localSlave() const;
+			
+		//- Calculate shadowG patch names
+        void calcshadowGPatchNames() const;
+
+        //- Calculate shadowG zone names
+        void calcshadowGZoneNames() const;
 		//*************** END based on solidGeneral*****************
 
         // //- Interpolate zone face values to points
@@ -350,6 +368,28 @@ public:
 
             //- Return index of global master patch
             label globalMasterIndex() const;
+			
+			//Step1 - Return the list of shadowG patch names
+            const List<word>& shadowGPatchNames() const;
+
+            //Step3 - Return the list of shadowG patch indices
+            const List<label>& shadowGPatchIndices() const;
+        
+            //- Return the list of shadowG zone names
+            const List<word>& shadowGZoneNames() const;
+
+            //- Return the list of shadowG zone indices
+            const List<label>& shadowGZoneIndices() const;
+			
+			//Step2's - Return const reference to deformed master zone
+            const standAlonePatch& shadowGZone(const label shadowGI) const;
+
+            //- Return reference to deformed master zone
+            standAlonePatch& shadowGZone(const label shadowGI);
+			
+			//- Given the patch index of a shadowG, return the position in the
+            // shadowG list of the current patch
+            label findshadowGID(const label patchID) const;
 			//*************** END based on solidGeneral*****************
 			
             //- Return if this patch is the slave

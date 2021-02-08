@@ -29,6 +29,8 @@ InClass
 
 #include "solid4GeneralContactFvPatchVectorField.H"
 #include "pointFields.H"
+#include "polyPatchID.H"
+#include "ZoneIDs.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -36,7 +38,7 @@ void
 Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
 {
     // Only the master moves the zones
-    if (!master_)
+    if (!globalMaster())
     {
         return;
     }
@@ -197,7 +199,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const
             << patch().name() << " : making the zone" << endl;
     }
 
-    if (!master_)
+    if (!globalMaster())
     {
         FatalErrorIn
         (
@@ -233,7 +235,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcShadowZones() const
         )   << patch().name() << " : making the shadow zones" << endl;
     }
 
-    if (!master_)
+    if (!globalMaster())
     {
         FatalErrorIn
         (
@@ -309,7 +311,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
                 field.boundaryField()[shadowPatchIndices()[shadPatchI]]
             );
 
-        if (master_)
+        if (globalMaster())
         {
             if (shadowPatchField.master() == true)
             {
@@ -332,7 +334,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
             }
         }
 
-        if (master_)
+        if (globalMaster())
         {
             // Create interpolation for patches
             zoneToZones_.set
@@ -457,7 +459,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcContactPerShadow() const
 const Foam::globalPolyPatch&
 Foam::solid4GeneralContactFvPatchVectorField::zone() const
 {
-    if (master_)
+    if (globalMaster())
     {
         if (!zonePtr_)
         {
@@ -487,7 +489,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zone() const
 
 Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 {
-    if (master_)
+    if (globalMaster())
     {
         if (!zonePtr_)
         {
@@ -512,7 +514,7 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
                     field.boundaryField()[shadowPatchIndices()[0]]
                 )
             );
-
+		
         return shadowPatchField.zone();
     }
 }
@@ -521,7 +523,7 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 const Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solid4GeneralContactFvPatchVectorField::shadowZones() const
 {
-    if (master_)
+    if (globalMaster())
     {
         if (shadowZones_.empty())
         {
@@ -552,13 +554,13 @@ Foam::solid4GeneralContactFvPatchVectorField::shadowZones() const
 Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solid4GeneralContactFvPatchVectorField::shadowZones()
 {
-    if (master_)
+    if (globalMaster())
     {
         if (shadowZones_.empty())
         {
             calcShadowZones();
         }
-
+		
         return shadowZones_;
     }
     else
@@ -586,7 +588,7 @@ Foam::solid4GeneralContactFvPatchVectorField::shadowZones()
 const Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
 Foam::solid4GeneralContactFvPatchVectorField::zoneToZones() const
 {
-    if (master_)
+    if (globalMaster())
     {
         if (zoneToZones_.empty())
         {
@@ -617,7 +619,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones() const
 Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
 Foam::solid4GeneralContactFvPatchVectorField::zoneToZones()
 {
-    if (master_)
+    if (globalMaster())
     {
         if (zoneToZones_.empty())
         {
@@ -654,7 +656,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones()
 const Foam::newGgiStandAlonePatchInterpolation&
 Foam::solid4GeneralContactFvPatchVectorField::zoneToZoneForThisSlave() const
 {
-    if (master_)
+    if (globalMaster())
     {
         FatalErrorIn
         (
@@ -697,7 +699,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZoneForThisSlave() const
 const Foam::globalPolyPatch&
 Foam::solid4GeneralContactFvPatchVectorField::zoneForThisSlave() const
 {
-    if (master_)
+    if (globalMaster())
     {
         FatalErrorIn
         (
@@ -733,6 +735,247 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneForThisSlave() const
     // Return the zoneToZone between the master and the current patch
     return shadowZones()[masterShadowID];
 }
+
+
+//*************** based on solidGeneral*****************
+/*
+// Private GeneralMember functions
+void Foam::solid4GeneralContactFvPatchVectorField::calcshadowGPatchNames() const
+{
+    if (shadowGPatchNamesPtr_ || shadowGPatchIndicesPtr_)
+    {
+        FatalErrorIn
+        (
+            "label Foam::solid4GeneralContactFvPatchVectorField::"
+            "calcshadowGPatchNames() const"
+        )   << "shadowGPatchNames_ or shadowGPatchIndices_ already set"
+            << abort(FatalError);
+    }
+
+    // Add each solid4GeneralContact patch in the order of increasing patch index
+
+    const volVectorField& field =
+        db().objectRegistry::lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    // Count shadowG patches
+
+    label nShadPatches = 0;
+
+    forAll(field.boundaryField(), patchI)
+    {
+        if
+        (
+            field.boundaryField()[patchI].type()
+            == solid4GeneralContactFvPatchVectorField::typeName
+            && patchI != patch().index()
+        )
+        {
+            nShadPatches++;
+        }
+    }
+	
+    shadowGPatchNamesPtr_ = new wordList(nShadPatches);
+    wordList& shadowGPatchNames = *shadowGPatchNamesPtr_;
+	Info<<"In calcshadowGPatchNames():"<<__LINE__<<endl;
+//	Info<<"What is *shadowGPatchNamesPtr_? in calcshadowGPatchNames():"<<*shadowGPatchNamesPtr_<<endl;
+
+    shadowGPatchIndicesPtr_ = new labelList(nShadPatches);
+    labelList& shadowGPatchIndices = *shadowGPatchIndicesPtr_;
+//	Info<<"In calcshadowGPatchNames():"<<__LINE__<<endl;
+	
+    // Record shadowG patch names
+
+    label shadowGI = 0;
+
+    forAll(field.boundaryField(), patchI)
+    {
+        if
+        (
+            field.boundaryField()[patchI].type()
+            == solid4GeneralContactFvPatchVectorField::typeName
+            && patchI != patch().index()
+        )
+        {
+            shadowGPatchNames[shadowGI] = patch().boundaryMesh()[patchI].name();
+
+            shadowGPatchIndices[shadowGI++] = patchI;
+        }
+    }
+}
+
+void Foam::solid4GeneralContactFvPatchVectorField::calcshadowGZoneNames() const
+{
+    if (shadowGZoneNamesPtr_ || shadowGZoneIndicesPtr_)
+    {
+        FatalErrorIn
+        (
+            "label Foam::solid4GeneralContactFvPatchVectorField::"
+            "calcshadowGZoneNames() const"
+        )   << "shadowGZoneNames_ or shadowGZoneIndices_ already set"
+            << abort(FatalError);
+    }
+
+    const wordList& shadNames = shadowGPatchNames();
+
+    shadowGZoneNamesPtr_ = new wordList(shadNames.size());
+    wordList& shadowGZoneNames = *shadowGZoneNamesPtr_;
+
+    shadowGZoneIndicesPtr_ = new labelList(shadNames.size());
+    labelList& shadowGZoneIndices = *shadowGZoneIndicesPtr_;
+
+    const fvMesh& mesh = patch().boundaryMesh().mesh();
+
+    forAll(shadNames, shadowGI)
+    {
+        word zoneName = shadNames[shadowGI] + "FaceZone";
+
+        faceZoneID zone(zoneName, mesh.faceZones());
+
+        if (!zone.active())
+        {
+            FatalErrorIn("solid4GeneralContactFvPatchVectorField")
+                << "Face zone name " << zoneName
+                << " not found.  Please check your zone definition."
+                << abort(FatalError);
+        }
+
+        shadowGZoneNames[shadowGI] = zoneName;
+
+        shadowGZoneIndices[shadowGI] = zone.index();
+    }
+}
+		
+//Public:
+//Access GeneralMember
+
+//Step1 - 
+const Foam::List<Foam::word>&
+Foam::solid4GeneralContactFvPatchVectorField::shadowGPatchNames() const
+{
+    if (!shadowGPatchNamesPtr_)
+    {
+        calcshadowGPatchNames();
+    }
+
+    return *shadowGPatchNamesPtr_;
+}
+
+//Step3 - 
+const Foam::List<Foam::label>&
+Foam::solid4GeneralContactFvPatchVectorField::shadowGPatchIndices() const
+{
+	Info<<"In shadowGPatchIndices() line "<<__LINE__<<endl;
+    if (!shadowGPatchIndicesPtr_)
+    {
+		Info<<"In shadowGPatchIndices() line "<<__LINE__<<endl;
+        calcshadowGPatchNames();
+    }
+Info<<"*shadowGPatchIndicesPtr_ in shadowGPatchIndices() "<<*shadowGPatchIndicesPtr_<<endl;
+    return *shadowGPatchIndicesPtr_;
+}
+        
+const Foam::List<Foam::word>&
+Foam::solid4GeneralContactFvPatchVectorField::shadowGZoneNames() const
+{
+    if (!shadowGZoneNamesPtr_)
+    {
+        calcshadowGZoneNames();
+    }
+
+    return *shadowGZoneNamesPtr_;
+}
+
+const Foam::List<Foam::label>&
+Foam::solid4GeneralContactFvPatchVectorField::shadowGZoneIndices() const
+{
+    if (!shadowGZoneIndicesPtr_)
+    {
+        calcshadowGZoneNames();
+    }
+
+    return *shadowGZoneIndicesPtr_;
+}
+
+			
+//Step2's - 
+const Foam::standAlonePatch&
+Foam::solid4GeneralContactFvPatchVectorField::shadowGZone
+(
+    const label shadowGI
+) const
+{
+    const volVectorField& field =
+        db().objectRegistry::lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    const solid4GeneralContactFvPatchVectorField& shadowGPatchField =
+        refCast<const solid4GeneralContactFvPatchVectorField>
+        (
+            field.boundaryField()[shadowGPatchIndices()[shadowGI]]
+        );
+
+    return shadowGPatchField.zone();
+}
+
+
+Foam::standAlonePatch&
+Foam::solid4GeneralContactFvPatchVectorField::shadowGZone
+(
+    const label shadowGI
+)
+{
+    const volVectorField& field =
+        db().objectRegistry::lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+
+    // Const cast away the const-ness
+    solid4GeneralContactFvPatchVectorField& shadowGPatchField =
+        const_cast<solid4GeneralContactFvPatchVectorField&>
+        (
+            refCast<const solid4GeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[shadowGPatchIndices()[shadowGI]]
+            )
+        );
+
+    return shadowGPatchField.zone();
+}
+			
+Foam::label Foam::solid4GeneralContactFvPatchVectorField::findshadowGID
+(
+    const label patchID
+) const
+{
+    label shadowGI = -1;
+
+    const labelList shadowGIDs = shadowGPatchIndices();
+
+    forAll(shadowGIDs, I)
+    {
+        if (patchID == shadowGIDs[I])
+        {
+            shadowGI = I;
+            break;
+        }
+    }
+
+    if (shadowGI == -1)
+    {
+        FatalErrorIn("findshadowGID(const label patchID)")
+            << "shadowG patch not found!" << abort(FatalError);
+    }
+
+    return shadowGI;
+}
+*/
+//*************** END based on solidGeneral**************
 
 
 // ************************************************************************* //

@@ -1295,6 +1295,8 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
             }
         }
     }
+	Info<<"In updateCoeffs() line "<<__LINE__<<endl;
+	Info<<"traction() in updateCoeffs() 1299 "<<traction()<<endl;
 
     solidTractionFvPatchVectorField::updateCoeffs();
 }
