@@ -2006,7 +2006,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         (
                             masterShadowI
                         ).masterToSlave(shadowPatchTraction)();
-					//	).slaveToMaster(shadowZoneTraction);	//.slavePointDistanceToIntersection()
+					//	).slaveToMaster(shadowZoneTraction)();	//.slavePointDistanceToIntersection()
 						
 					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
 					Info<<"shadowI in updateCoeffs()"<<shadowI<<endl;
