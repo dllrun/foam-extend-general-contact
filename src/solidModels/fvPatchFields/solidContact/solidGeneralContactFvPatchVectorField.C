@@ -731,7 +731,7 @@ Foam::solidGeneralContactFvPatchVectorField::zone() const
 //	Info<< "The current dimensionedInternalField().size() in zone() is "<< dimensionedInternalField().size()<< endl;
 	Info<< "The current patch in zone() is "<< patch().name()<< endl;			
 	Info<< "The size of current patch in zone() is "<< patch().size()<< endl;
-
+	Info<< "*zonePtr_ in zone() is "<<*zonePtr_<< endl;
     return *zonePtr_;
 }
 
@@ -943,20 +943,20 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     localSlavePtr_(NULL),
     shadowPatchNamesPtr_(NULL),
     shadowPatchIndicesPtr_(NULL),
-    zoneIndex_(-1),
-    shadowZoneNamesPtr_(NULL),
-    shadowZoneIndicesPtr_(NULL),
-	rigidMaster_(false),
-    dict_(NULL),
-    normalModels_(0),
+	dict_(NULL),
+	normalModels_(0),
     frictionModels_(0),
-    zonePtr_(NULL),
-    zoneToZones_(0),
+	zonePtr_(NULL),
+	zoneIndex_(-1),	
+    shadowZoneNamesPtr_(NULL),
+    shadowZoneIndicesPtr_(NULL), 
+	zoneToZones_(0),
 	zoneToZonesNewGgi_(0),
+	rigidMaster_(false),
+	curPatchTractionPtr_(NULL),
 	alg_(Foam::intersection::VISIBLE),
     dir_(Foam::intersection::CONTACT_SPHERE),
 	curTimeIndex_(-1),
-    curPatchTractionPtr_(NULL),
     QcPtr_(NULL),
     QcsPtr_(NULL),
     bbOffset_(0.0)
@@ -995,6 +995,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 :	// ******************************************** START General *****************************************
 	
 	solidTractionFvPatchVectorField(ptf, p, iF, mapper),
+	dict_(ptf.dict_),
 	globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
     localSlavePtr_(NULL),
@@ -1004,9 +1005,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     shadowZoneNamesPtr_(NULL),
     shadowZoneIndicesPtr_(NULL),
     rigidMaster_(ptf.rigidMaster_),
-    dict_(ptf.dict_),
-    normalModels_(NULL),  //(ptf.normalModels_),
-    frictionModels_(NULL), //(ptf.frictionModels_),
+    normalModels_(ptf.normalModels_),  // (NULL),
+    frictionModels_(ptf.frictionModels_), // (NULL),
     zonePtr_(NULL),
     zoneToZones_(0),
 	zoneToZonesNewGgi_(0),
@@ -1131,6 +1131,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 	// ********************************************** START General ********************************************
 	
 	solidTractionFvPatchVectorField(p, iF),
+	dict_(dict),
     globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
     localSlavePtr_(NULL),
@@ -1140,7 +1141,6 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     shadowZoneNamesPtr_(NULL),
     shadowZoneIndicesPtr_(NULL),
     rigidMaster_(dict.lookupOrDefault<Switch>("rigidMaster", false)),
-    dict_(dict),
     normalModels_(0),
     frictionModels_(0),
     zonePtr_(0),
@@ -1213,6 +1213,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 )
 :
 	solidTractionFvPatchVectorField(ptf),
+	dict_(ptf.dict_),
     globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
 //	masterFaceZoneID_(0),
@@ -1225,9 +1226,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     shadowZoneNamesPtr_(NULL),
     shadowZoneIndicesPtr_(NULL),
     rigidMaster_(ptf.rigidMaster_),
-    dict_(ptf.dict_),
-    normalModels_(NULL),   //(ptf.normalModels_),
-    frictionModels_(NULL),   //(ptf.frictionModels_),
+    normalModels_(ptf.normalModels_),   //(NULL),
+    frictionModels_(ptf.frictionModels_),   //(NULL),
     zonePtr_(NULL),
     zoneToZones_(0),
 	zoneToZonesNewGgi_(0),
@@ -1337,6 +1337,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 : 	//**************************************************** START General**********************************************
 
 	solidTractionFvPatchVectorField(ptf, iF),
+	dict_(ptf.dict_),
     globalMasterPtr_(NULL),
     globalMasterIndexPtr_(NULL),
     localSlavePtr_(NULL),
@@ -1346,9 +1347,8 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
     shadowZoneNamesPtr_(NULL),
     shadowZoneIndicesPtr_(NULL),
     rigidMaster_(ptf.rigidMaster_),
-    dict_(ptf.dict_),
-    normalModels_(NULL),  //(ptf.normalModels_),
-    frictionModels_(NULL), //(ptf.frictionModels_),
+    normalModels_(ptf.normalModels_),  //(NULL),
+    frictionModels_(ptf.frictionModels_), //(NULL),
     zonePtr_(NULL),
     zoneToZones_(0),
 	zoneToZonesNewGgi_(0),
@@ -1389,16 +1389,19 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
     if (ptf.globalMasterPtr_)
     {
+		Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
         globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
     }
 
     if (ptf.globalMasterIndexPtr_)
     {
+		Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
         globalMasterIndexPtr_ = new label(*ptf.globalMasterIndexPtr_);
     }
 
     if (ptf.localSlavePtr_)
     {
+		Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
     }
 
@@ -1445,6 +1448,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 
     if (ptf.curPatchTractionPtr_)
     {
+		Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
         curPatchTractionPtr_ =
             new List<vectorField>(*ptf.curPatchTractionPtr_);
     }
@@ -1857,7 +1861,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         (
                             zoneIndex(),
                             patch().index(),
-                            patchDD
+						    patchDD
                         );
 					
 		Info<< "The current field in updateCoeffs() is "<< dimensionedInternalField().name()<< endl;
@@ -1883,7 +1887,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                             shadowPatchIndices()[shadowI],
                             shadowZoneIndices()[shadowI],
 							//checking shadowZone(shadowI) instead of zoneToZone(shadowI)
-                            //zoneToZone(shadowI).masterToSlave(zoneDD)()
+                        //    zoneToZoneNewGgi(shadowI).masterToSlave(zoneDD)()
 							zoneToZoneNewGgi(shadowI).slaveToMaster(zoneDD)()
                         );
 										
@@ -1903,6 +1907,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 									(
 										zoneToZonesNewGgi()[shadowI].slavePointDistanceToIntersection()
 									), */ 
+					//	zoneToZoneNewGgi(shadowI).masterPointDistanceToIntersection(),
 						zoneToZoneNewGgi(shadowI).slavePointDistanceToIntersection(),
                          shadowPatchDD,
                          patchDDInterpToShadowPatch
@@ -1929,6 +1934,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         + normalModel(shadowI).slavePressure();
 
                     curPatchTraction += curPatchTractions(shadowI);
+				Info<<"curPatchTraction local Slave in updateCoeffs()"<<curPatchTraction<<endl;
 				}
 
 				else // local master
@@ -2000,7 +2006,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         (
                             masterShadowI
                         ).masterToSlave(shadowPatchTraction)();
-					//	).slaveToMaster(shadowZoneTraction);	//.slavePointDistanceToIntersection()
+					//	).slaveToMaster(shadowZoneTraction)();	//.slavePointDistanceToIntersection()
 						
 					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
 					Info<<"shadowI in updateCoeffs()"<<shadowI<<endl;
@@ -2025,7 +2031,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;	
 				//	Info<<"curPatchTractions(shadowI) in updateCoeffs()"<<curPatchTractions(shadowI)<<endl;
                     curPatchTraction += curPatchTractions(shadowI);
-				//	Info<<"curPatchTractions(shadowI) in updateCoeffs()"<<curPatchTractions(shadowI)<<endl;
+					Info<<"curPatchTraction local Master in updateCoeffs()"<<curPatchTraction<<endl;
 				}				
 			} // if contact pair is active
 		} // forAll contact pairs
@@ -2036,6 +2042,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 	
 //**************************************************** END General**********************************************
        Info<<"In updateCoeffs() line "<<__LINE__<<endl;
+	   	Info<<"traction() in updateCoeffs() 2045 "<<traction()<<endl;
 
     solidTractionFvPatchVectorField::updateCoeffs();
 	Info<<"In updateCoeffs() line "<<__LINE__<<endl;
@@ -2751,6 +2758,7 @@ void Foam::solidGeneralContactFvPatchVectorField::makeCurPatchTractions() const
             shadowPatchNames().size(),
             vectorField(patch().size(), vector::zero)
         );
+	Info<< "curPatchTractionPtr_ in makeCurPatchTractions() is "<<*curPatchTractionPtr_<< endl;
 }
 
 
