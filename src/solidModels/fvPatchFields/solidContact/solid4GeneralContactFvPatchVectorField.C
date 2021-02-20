@@ -1435,16 +1435,17 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         );
 		}
     }
+	
+	
+		// Calculate and apply contact forces
+		if (globalMaster())
+		{
+			// Reset the traction to zero as we will accumulate it over all the
+			// shadow patches
+			traction() = vector::zero;
 
-    // Calculate and apply contact forces
-    if (globalMaster())
-    {
-        // Reset the traction to zero as we will accumulate it over all the
-        // shadow patches
-        traction() = vector::zero;
-
-        forAll(activeContactPairs, shadPatchI)
-        {
+			forAll(activeContactPairs, shadPatchI)
+			{
             // Calculate the slave patch face unit normals as they are used by
             // both the normal and friction models
             const vectorField shadowPatchFaceNormals =
@@ -1463,8 +1464,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 vector::zero
             );
 
-            if (movingMesh())
-            {
+				if (movingMesh())
+				{
                 // Updated Lagrangian, we will directly lookup the displacement
                 // increment
 
@@ -1475,9 +1476,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 patchDD = DD.boundaryField()[patch().index()];
                 shadowPatchDD =
                     DD.boundaryField()[shadowPatchIndices()[shadPatchI]];
-            }
-            else
-            {
+				}
+				else
+				{
                 // We will lookup the total displacement and old total
                 // displacement
 
@@ -1494,7 +1495,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                     [
                         shadowPatchIndices()[shadPatchI]
                     ];
-            }
+				}
 			
             // Master zone DD
             const vectorField zoneDD = zone().patchFaceToGlobal(patchDD);
@@ -1534,17 +1535,17 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 patchDDInterpToShadowPatch
             );
 
-            if (rigidMaster_)
-            {
+				if (rigidMaster_)
+				{
                 // Set to master to traction free to mimic a rigid contact
                 traction() = vector::zero;
 
                 // Set contact indicator field
                 contactPerShadow()[shadPatchI] = 0.0;
-            }
-            else
-            {
-                // Interpolate slave traction to the master
+				}
+				else
+				{
+				// Interpolate slave traction to the master
                 const vectorField slavePatchTraction =
                    - frictionModels()[shadPatchI].slaveTractionForMaster()
                    - normalModels()[shadPatchI].slavePressure();
@@ -1562,7 +1563,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 // We will use 1.
 
                 // Calculate traction for this contact
-                vectorField tractionForThisShadow =
+					vectorField tractionForThisShadow =
                     zone().globalFaceToPatch
                     (
                         zoneToZones()[shadPatchI].slaveToMaster
@@ -1581,22 +1582,22 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 const scalar tol = 1e-6*gMax(magTraction);
                 scalarField& contactForThisShadow =
                     contactPerShadow()[shadPatchI];
-                forAll(contactForThisShadow, faceI)
-                {
-                    if (magTraction[faceI] > tol)
-                    {
+					forAll(contactForThisShadow, faceI)
+					{
+						if (magTraction[faceI] > tol)
+						{
                         contactForThisShadow[faceI] = 1.0;
-                    }
-                    else
-                    {
+						}
+						else
+						{
                         contactForThisShadow[faceI] = 0.0;
-                    }
-                }
-            }
-        }
-    }
-    else
-    {
+						}
+					}
+				}
+			}
+		}
+		else
+		{
         // Set the traction on the slave patch
         // The master stores the friction and normal models, so we need to find
         // which models correspond to the current shadow
@@ -1609,10 +1610,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         // downstream patch
         // This is an attempt to fix an issue where the first row of faces
         // deform unphysically when being drawn into the die
-        if (scaleFaceTractionsNearDownstreamPatch_)
-        {
+			if (scaleFaceTractionsNearDownstreamPatch_)
+			{
             traction() *= scaleTractionField();
-        }
+			}
         // TESTING - END
 
         // Update contactPerShadow field
@@ -1621,48 +1622,48 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         const scalarField magTraction = mag(traction());
         const scalar tol = 1e-6*gMax(magTraction);
         scalarField& contactForThisShadow = contactPerShadow()[0];
-        forAll(contactForThisShadow, faceI)
-        {
-            if (magTraction[faceI] > tol)
-            {
+			forAll(contactForThisShadow, faceI)
+			{
+				if (magTraction[faceI] > tol)
+				{
                 contactForThisShadow[faceI] = 1.0;
-            }
-            else
-            {
+				}
+				else
+				{
                 contactForThisShadow[faceI] = 0.0;
-            }
-        }
-    }
+				}
+			}
+		}
 
     // Accumulate the contact indicator field
     contact_ = 0.0;
     PtrList<scalarField>& contactPerShadow = this->contactPerShadow();
-    forAll(contactPerShadow, shadI)
-    {
+		forAll(contactPerShadow, shadI)
+		{
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         contact_ += contactPerShadow[shadI];
-    }
+		}
 
     // Scale any face in contact with more than one shadow
 	//******************* START Scaling any face in contact ******************
-    /* if (gMax(contact_) > (1.0 + SMALL))
-    {
+    /* 	if (gMax(contact_) > (1.0 + SMALL))
+		{
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-        forAll(contact_, faceI)
-        {
-            if (contact_[faceI] > (1.0 + SMALL))
-            {
+			forAll(contact_, faceI)
+			{
+				if (contact_[faceI] > (1.0 + SMALL))
+				{
 				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
                 // Update the contact weights corresponding to each shadow
                 scalar sumContact = 0.0;
-                forAll(contactPerShadow, shadI)
-                {
+					forAll(contactPerShadow, shadI)
+					{
                     contactPerShadow[shadI][faceI] /= contact_[faceI];
                     sumContact += contactPerShadow[shadI][faceI];
-                }
+					}
 
-                if (sumContact > (1.0 + SMALL))
-                {
+					if (sumContact > (1.0 + SMALL))
+					{
                     FatalErrorIn
                     (
                         "void solid4GeneralContactFvPatchVectorField::"
@@ -1670,15 +1671,15 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                     )   << "There is a problem normalising the contact field"
                         << ", sumContact is: " << sumContact
                         << abort(FatalError);
-                }
+					}
 
                 // Reset accumulated contact face value to 1.0
                 contact_[faceI] = 1.0;
-            }
-        }
-    } */
+				}
+			}
+		} */
 	//******************* END Scaling any face in contact ******************
-
+	
     solidTractionFvPatchVectorField::updateCoeffs();
 }
 
