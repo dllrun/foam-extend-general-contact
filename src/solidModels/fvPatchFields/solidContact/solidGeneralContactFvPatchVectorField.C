@@ -86,7 +86,7 @@ moveFaceZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration
     // might have a moving or stationary mesh
 	
     // Shadow patch and zone indices
-    const labelList& shadPatchIndices = shadowPatchIndices();
+    const labelList& shadPatchIndices = shadowPatchIndices();	
     const labelList& shadZoneIndices = shadowZoneIndices();
 	
 
@@ -241,6 +241,9 @@ void Foam::solidGeneralContactFvPatchVectorField::calcGlobalMasterIndex() const
 
     globalMasterIndexPtr_ = new label(-1);
     label& gMasterID = *globalMasterIndexPtr_;
+	
+	Info<< "patch().name() in calcGlobalMasterIndex() "<<patch().name()<<endl;
+	Info<< "label gMasterID in calcGlobalMasterIndex() "<<gMasterID<<endl;
 
     forAll(field.boundaryField(), patchI)
     {
@@ -360,11 +363,13 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
 	
     shadowPatchNamesPtr_ = new wordList(nShadPatches);
     wordList& shadowPatchNames = *shadowPatchNamesPtr_;
+	Info<<"What does reference variable/object shadowPatchNames return? "<<shadowPatchNames<<endl;
 	Info<<"In calcShadowPatchNames():"<<__LINE__<<endl;
 //	Info<<"What is *shadowPatchNamesPtr_? in calcShadowPatchNames():"<<*shadowPatchNamesPtr_<<endl;
 
     shadowPatchIndicesPtr_ = new labelList(nShadPatches);
     labelList& shadowPatchIndices = *shadowPatchIndicesPtr_;
+	Info<<"What does reference variable/object shadowPatchIndices return? "<<shadowPatchIndices<<endl;
 //	Info<<"In calcShadowPatchNames():"<<__LINE__<<endl;
 	
     // Record shadow patch names
@@ -402,6 +407,7 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
     }
 
     const wordList& shadNames = shadowPatchNames();
+	Info<<"What does reference variable/object shadNames return? "<<shadNames<<endl;
 
     shadowZoneNamesPtr_ = new wordList(shadNames.size());
     wordList& shadowZoneNames = *shadowZoneNamesPtr_;
@@ -1469,6 +1475,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 Foam::solidGeneralContactFvPatchVectorField::
 ~solidGeneralContactFvPatchVectorField()
 {
+	Info<<"Does it enter here? in Destructor "<<__LINE__<<endl;
     if (debug)
     {
         InfoIn

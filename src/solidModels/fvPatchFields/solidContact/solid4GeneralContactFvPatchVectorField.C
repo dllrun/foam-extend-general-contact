@@ -843,6 +843,24 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 {
     Info<<"Does it enter here? in C3(ptf, p, iF, mapper)"<<__LINE__<<endl;
 	// Do not copy pointer objects: they will be re-created.
+	
+	//******************* based on solid General******************
+	// Copy pointer objects
+    if (ptf.globalMasterPtr_)
+    {
+        globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
+    }
+	
+	if (ptf.globalMasterIndexPtr_)
+    {
+        globalMasterIndexPtr_ = new label(*ptf.globalMasterIndexPtr_);
+    }
+	
+	if (ptf.localSlavePtr_)
+    {
+        localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+    }
+	//******************* END based on solid General******************
 }
 
 
@@ -888,6 +906,24 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 {
     Info<<"Does it enter here? in C4(ptf)"<<__LINE__<<endl;
 	// Do not copy pointer objects
+	
+	//******************* based on solid General******************
+	// Copy pointer objects
+	if (ptf.globalMasterPtr_)
+    {
+        globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
+    }
+
+    if (ptf.globalMasterIndexPtr_)
+    {
+        globalMasterIndexPtr_ = new label(*ptf.globalMasterIndexPtr_);
+    }
+
+    if (ptf.localSlavePtr_)
+    {
+        localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+    }
+	//******************* END based on solid General******************
 }
 
 
@@ -934,6 +970,25 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 {
     Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
 	// Do not copy pointer objects
+	
+	//******************* based on solid General******************
+	/*// Copy pointer objects
+	if (ptf.globalMasterPtr_)
+    {
+        globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
+    }
+
+    if (ptf.globalMasterIndexPtr_)
+    {
+        globalMasterIndexPtr_ = new label(*ptf.globalMasterIndexPtr_);
+    }
+
+    if (ptf.localSlavePtr_)
+    {
+        localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+    }
+	*/
+	//******************* END based on solid General******************
 }
 
 
