@@ -1420,8 +1420,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
     }
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
     // Move the master and slave zone to the deformed configuration
-    moveZonesToDeformedConfiguration();
-
+    if (globalMaster())
+    {
+	moveZonesToDeformedConfiguration();
+	}
+	
     // Delete the zone-to-zone interpolator weights as the zones have moved
     const wordList& shadPatchNames = shadowPatchNames();
     forAll(activeContactPairs, shadPatchI)
@@ -1435,6 +1438,13 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         );
 		}
     }
+	
+		// Only the local masters calculates the contact force and the local
+        // master interpolates this force
+        const boolList& locSlave = localSlave();
+		
+		// Create master bounding box used for quick check
+        boundBox masterBb(zone().patch().localPoints(), false);
 	
 	
 		// Calculate and apply contact forces
