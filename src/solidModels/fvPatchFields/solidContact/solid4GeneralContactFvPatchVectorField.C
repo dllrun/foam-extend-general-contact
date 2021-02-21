@@ -1445,6 +1445,36 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 		
 		// Create master bounding box used for quick check
         boundBox masterBb(zone().patch().localPoints(), false);
+		
+		// The BB may have zero thickness in one of the directions e.g. for a
+        // flat patch, so we will check for this and, if found, create an offset
+        const scalar bbOff = bbOffset();
+		Info<<"What is bbOff? in updateCoeffs():"<<bbOff<<endl;
+		if (masterBb.minDim() < bbOff)
+        {
+            const vector bbDiag = masterBb.max() - masterBb.min();
+
+            if (bbDiag.x() < bbOff)
+            {
+				Info<<"Does it enter this check? in updateCoeffs():"<<__LINE__<<endl;
+                vector offset(bbOff, 0, 0);
+                masterBb.min() -= offset;
+                masterBb.max() += offset;
+				Info<<"What is offset? in updateCoeffs():"<<offset<<endl;
+            }
+            else if (bbDiag.y() < bbOff)
+            {
+                vector offset(0, bbOff, 0);
+                masterBb.min() -= offset;
+                masterBb.max() += offset;
+            }
+            else if (bbDiag.z() < bbOff)
+            {
+                vector offset(0, 0, bbOff);
+                masterBb.min() -= offset;
+                masterBb.max() += offset;
+            }
+        }
 	
 	
 		// Calculate and apply contact forces
@@ -1455,7 +1485,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 			traction() = vector::zero;
 
 			forAll(activeContactPairs, shadPatchI)
-			{
+			{			
+			// Create shadow bounding box
+            boundBox shadowBb(shadowZones()[shadPatchI].patch().localPoints(), false);
+				
             // Calculate the slave patch face unit normals as they are used by
             // both the normal and friction models
             const vectorField shadowPatchFaceNormals =
