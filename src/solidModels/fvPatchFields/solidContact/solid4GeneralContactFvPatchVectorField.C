@@ -1488,6 +1488,37 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 			{			
 			// Create shadow bounding box
             boundBox shadowBb(shadowZones()[shadPatchI].patch().localPoints(), false);
+			
+			// Check for a zero dimension in the shadowBb
+            if (shadowBb.minDim() < bbOff)
+            {
+                const vector bbDiag = shadowBb.max() - shadowBb.min();
+
+                if (bbDiag.x() < bbOff)
+                {
+                    vector offset(bbOff, 0, 0);
+                    shadowBb.min() -= offset;
+                    shadowBb.max() += offset;
+                }
+                else if (bbDiag.y() < bbOff)
+                {
+                    vector offset(0, bbOff, 0);
+                    shadowBb.min() -= offset;
+                    shadowBb.max() += offset;
+                }
+                else if (bbDiag.z() < bbOff)
+                {
+                    vector offset(0, 0, bbOff);
+                    shadowBb.min() -= offset;
+                    shadowBb.max() += offset;
+                }
+            }
+			
+			if (masterBb.overlaps(shadowBb))
+            {
+				Info<<"In updateCoeffs():"<<__LINE__<<endl;
+                activeContactPairs[shadPatchI] = true;
+            }
 				
             // Calculate the slave patch face unit normals as they are used by
             // both the normal and friction models
