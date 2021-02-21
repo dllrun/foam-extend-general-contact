@@ -1519,7 +1519,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 				Info<<"In updateCoeffs():"<<__LINE__<<endl;
                 activeContactPairs[shadPatchI] = true;
             }
-				
+			
+			
             // Calculate the slave patch face unit normals as they are used by
             // both the normal and friction models
             const vectorField shadowPatchFaceNormals =
@@ -1527,6 +1528,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 (
                     shadowZones()[shadPatchI].globalPatch().faceNormals()
                 );
+			
 
             // Interpolate the master displacement increment to the slave patch
             // as it is required by specific normal and friction contact models
@@ -1537,7 +1539,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 patch().boundaryMesh()[shadowPatchIndices()[shadPatchI]].size(),
                 vector::zero
             );
-
+			
+			
 				if (movingMesh())
 				{
                 // Updated Lagrangian, we will directly lookup the displacement
