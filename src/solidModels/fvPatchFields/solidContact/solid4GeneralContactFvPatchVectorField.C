@@ -1513,13 +1513,13 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
             }
 			
 	
-		// Calculate and apply contact forces
-		if (globalMaster())
-		{
+		if (activeContactPairs[shadPatchI])
+        {				
+			if (locSlave[shadPatchI])
+            {
 			// Reset the traction to zero as we will accumulate it over all the
 			// shadow patches
 			traction() = vector::zero;
-
 			
 			
             // Calculate the slave patch face unit normals as they are used by
@@ -1673,9 +1673,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 					}
 				}
 			
-		}
-		else
-		{
+			}
+			else
+			{
         // Set the traction on the slave patch
         // The master stores the friction and normal models, so we need to find
         // which models correspond to the current shadow
@@ -1688,10 +1688,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         // downstream patch
         // This is an attempt to fix an issue where the first row of faces
         // deform unphysically when being drawn into the die
-			if (scaleFaceTractionsNearDownstreamPatch_)
-			{
-            traction() *= scaleTractionField();
-			}
+				if (scaleFaceTractionsNearDownstreamPatch_)
+				{
+				traction() *= scaleTractionField();
+				}
         // TESTING - END
 
         // Update contactPerShadow field
@@ -1700,18 +1700,19 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         const scalarField magTraction = mag(traction());
         const scalar tol = 1e-6*gMax(magTraction);
         scalarField& contactForThisShadow = contactPerShadow()[0];
-			forAll(contactForThisShadow, faceI)
-			{
-				if (magTraction[faceI] > tol)
+				forAll(contactForThisShadow, faceI)
 				{
-                contactForThisShadow[faceI] = 1.0;
-				}
-				else
-				{
-                contactForThisShadow[faceI] = 0.0;
+					if (magTraction[faceI] > tol)
+					{
+					contactForThisShadow[faceI] = 1.0;
+					}
+					else
+					{
+					contactForThisShadow[faceI] = 0.0;
+					}
 				}
 			}
-		}
+		} // if contact pair is active
 	}// forAll contact pairs
 
     // Accumulate the contact indicator field
