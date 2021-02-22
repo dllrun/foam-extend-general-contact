@@ -1475,17 +1475,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 masterBb.max() += offset;
             }
         }
-	
-	
-		// Calculate and apply contact forces
-		if (globalMaster())
-		{
-			// Reset the traction to zero as we will accumulate it over all the
-			// shadow patches
-			traction() = vector::zero;
-
-			forAll(activeContactPairs, shadPatchI)
-			{			
+		
+	forAll(activeContactPairs, shadPatchI)
+	{			
 			// Create shadow bounding box
             boundBox shadowBb(shadowZones()[shadPatchI].patch().localPoints(), false);
 			
@@ -1519,6 +1511,15 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 				Info<<"In updateCoeffs():"<<__LINE__<<endl;
                 activeContactPairs[shadPatchI] = true;
             }
+			
+	
+		// Calculate and apply contact forces
+		if (globalMaster())
+		{
+			// Reset the traction to zero as we will accumulate it over all the
+			// shadow patches
+			traction() = vector::zero;
+
 			
 			
             // Calculate the slave patch face unit normals as they are used by
@@ -1671,7 +1672,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 						}
 					}
 				}
-			}
+			
 		}
 		else
 		{
@@ -1711,6 +1712,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 				}
 			}
 		}
+	}// forAll contact pairs
 
     // Accumulate the contact indicator field
     contact_ = 0.0;
