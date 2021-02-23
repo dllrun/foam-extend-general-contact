@@ -350,28 +350,54 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcShadowPatchIndices() cons
             " calcShadowPatchIndices() const"
         )   << "pointer already set" << abort(FatalError);
     }
+	    
+   //******************** based on solid General*************			
+   
+   // Add each solid4GeneralContact patch in the order of increasing patch index
 
-    shadowPatchIndicesPtr_ = new labelList(shadowPatchNames().size(), -1);
-    labelList& shadowPatchIndices = *shadowPatchIndicesPtr_;
+    const volVectorField& field =
+        db().objectRegistry::lookupObject<volVectorField>
+        (
+            dimensionedInternalField().name()
+        );
+		
+	// Count shadow patches
 
-    forAll(shadowPatchIndices, shadPatchI)
+    label nShadPatches = 0;
+	
+	forAll(field.boundaryField(), patchI)
     {
-        shadowPatchIndices[shadPatchI] =
-            patch().patch().boundaryMesh().findPatchID
-            (
-                shadowPatchNames_[shadPatchI]
-            );
-
-        if (shadowPatchIndices[shadPatchI] == -1)
+        if
+        (
+            field.boundaryField()[patchI].type()
+            == solid4GeneralContactFvPatchVectorField::typeName
+            && patchI != patch().index()
+        )
         {
-            FatalErrorIn
-            (
-                "void solid4GeneralContactFvPatchVectorField::"
-                " calcShadowPatchIndices() const"
-            )   << "shadowPatch " << shadowPatchNames_[shadPatchI]
-                << " not found!" << abort(FatalError);
+            nShadPatches++;
         }
     }
+	
+	shadowPatchIndicesPtr_ = new labelList(nShadPatches);
+    labelList& shadowPatchIndices = *shadowPatchIndicesPtr_;
+	
+	// Record shadow patch names
+
+    label shadPatchI = 0;
+
+    forAll(field.boundaryField(), patchI)
+    {
+        if
+        (
+            field.boundaryField()[patchI].type()
+            == solid4GeneralContactFvPatchVectorField::typeName
+            && patchI != patch().index()
+        )
+        {            
+			shadowPatchIndices[shadPatchI++] = patchI;
+		}
+    } 
+	//******************** END based on solid General*************			
 }
 
 
