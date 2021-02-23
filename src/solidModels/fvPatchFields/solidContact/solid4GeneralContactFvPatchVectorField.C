@@ -1047,7 +1047,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::rmap
         refCast<const solid4GeneralContactFvPatchVectorField>(ptf);
 
     // PC, I'm not sure if this "if" check should be here...
-    if (shadowPatchNames_.size() > 0)
+    if (shadowPatchNames_)  //if (shadowPatchNames_.size() > 0)
     {
         contact_.rmap(dmptf.contact_, addr);
 
