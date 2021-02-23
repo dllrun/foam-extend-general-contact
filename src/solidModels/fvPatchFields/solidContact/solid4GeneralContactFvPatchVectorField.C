@@ -275,10 +275,10 @@ Foam::scalar Foam::solid4GeneralContactFvPatchVectorField::bbOffset() const
 
 
 
-void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames
-(
+void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames()const
+/*(
     const dictionary& dict
-) const
+) const */
 {
 	//********************** based on solid General*************
 	if (shadowPatchNames_)
@@ -1073,9 +1073,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::rmap
 const Foam::wordList&
 Foam::solid4GeneralContactFvPatchVectorField::shadowPatchNames() const
 {
-    if (shadowPatchNames_.size() == 0)
+    if (!shadowPatchNames_) //if (shadowPatchNames_.size() == 0)
     {
-        makeShadowPatchNames(dict_);
+       makeShadowPatchNames(); //makeShadowPatchNames(dict_);
     }
 
     return shadowPatchNames_;

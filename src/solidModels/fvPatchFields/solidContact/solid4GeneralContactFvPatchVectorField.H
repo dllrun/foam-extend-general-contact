@@ -211,7 +211,11 @@ class solid4GeneralContactFvPatchVectorField
         bool movingMesh() const;
 
         //- Make the shadow patch names
-        void makeShadowPatchNames(const dictionary& dict) const;
+        //void makeShadowPatchNames(const dictionary& dict) const;
+		
+		// New declaration
+		//- Make the shadow patch names
+        void makeShadowPatchNames() const;
 
         //- Calculate the shadow patch indices
         void calcShadowPatchIndices() const;
