@@ -1014,12 +1014,12 @@ void Foam::solid4GeneralContactFvPatchVectorField::autoMap
         }
     }
 
-    if (shadowPatchNames_.size() > 0)
+    if (shadowPatchNames_)  // if (shadowPatchNames_.size() > 0)
     {
         // Let the contact models know about the mapping
         // Be careful, we must pass slave
         // FIX PC 21-Sep-17: move this check inside if (shadowPatchNames ... )
-        if (!globalMaster())
+        if (!globalMaster())  // if (!localSlave()) 
         {
             normalModelForThisSlave().autoMap(m);
             frictionModelForThisSlave().autoMap(m);
