@@ -132,7 +132,11 @@ class solid4GeneralContactFvPatchVectorField
         const Switch writePointDistanceFields_;
 
         //- Shadow patch names
-        mutable wordList shadowPatchNames_;
+    //    mutable wordList shadowPatchNames_;
+		
+		//************ based on solidGeneralContact****************
+		mutable List<word>* shadowPatchNames_;
+		//************ END based on solidGeneralContact****************
 
         //- Shadow patch indices
         mutable labelList* shadowPatchIndicesPtr_;

@@ -280,12 +280,17 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames
     const dictionary& dict
 ) const
 {
-	
-    if (globalMaster())
-    {
-	
 	//********************** based on solid General*************
-	/*
+	if (shadowPatchNames_)
+    {
+        FatalErrorIn
+        (
+            "label Foam::solid4GeneralContactFvPatchVectorField::"
+            "calcShadowPatchNames() const"
+        )   << "shadowPatchNames_ already set"
+            << abort(FatalError);
+    }
+	
 	// Add each solid4GeneralContact patch in the order of increasing patch index
 
     const volVectorField& field =
@@ -293,13 +298,13 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames
         (
             dimensionedInternalField().name()
         );
-
-    // Count shadow patches
+		
+	// Count shadow patches
 
     label nShadPatches = 0;
-
-		forAll(field.boundaryField(), patchI)
-		{
+	
+	forAll(field.boundaryField(), patchI)
+    {
         if
         (
             field.boundaryField()[patchI].type()
@@ -309,14 +314,14 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames
         {
             nShadPatches++;
         }
-		}
-		
-		shadowPatchNames_ = new wordList(nShadPatches);
-		wordList& shadowPatchNames = *shadowPatchNames_;
-		
-		// Record shadow patch names
+    }
+	
+	shadowPatchNames_ = new wordList(nShadPatches);
+	wordList& shadowPatchNames = *shadowPatchNames_;
+	
+	// Record shadow patch names
 
-    label shadowI = 0;
+    label shadPatchI = 0;
 
     forAll(field.boundaryField(), patchI)
     {
@@ -327,63 +332,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames
             && patchI != patch().index()
         )
         {
-            shadowPatchNames[shadowI] = patch().boundaryMesh()[patchI].name();
-
-        //    shadowPatchIndices[shadowI++] = patchI;
+            shadowPatchNames[shadPatchI] = patch().boundaryMesh()[patchI].name();           
         }
     }
-	*/
-	//******************** END based on solid General*************	
-		
 	
-        // Check if only one shadow patch is specified
-        if (dict.found("shadowPatch"))
-        {
-            Info<< "Reading individual shadowPatch" << endl;
-
-            // Just one shadow patch
-            shadowPatchNames_.setSize(1);
-            shadowPatchNames_[0] = word(dict.lookup("shadowPatch"));
-        }
-        else if (dict.found("shadowPatches"))
-        {
-            Info<< "Reading list of shadowPatches" << endl;
-
-            // Shadow patches defined as a list
-            shadowPatchNames_ = wordList(dict.lookup("shadowPatches"));
-        }
-        else
-        {
-            FatalErrorIn
-            (
-                "void solid4GeneralContactFvPatchVectorField::"
-                " makeShadowPatchNames() const"
-            )   << "'shadowPatch' OR 'shadowPatches' should be defined"
-                << abort(FatalError);
-        } 
-		
-
-        // It is an error to defined both shadowPatch and shadowPatches
-        if (dict.found("shadowPatch") && dict.found("shadowPatches"))
-        {
-            FatalErrorIn
-            (
-                "void solid4GeneralContactFvPatchVectorField::"
-                " makeShadowPatchNames() const"
-            )   << "'shadowPatch' OR 'shadowPatches' should be defined: "
-                << "not both!" << abort(FatalError);
-        }
-		
-    }
-    else
-    {
-        // If this is not the master then we will assume there is only one
-        // shadow i.e. the master is the shadow
-        shadowPatchNames_.setSize(1);
-        shadowPatchNames_[0] = word(dict.lookup("shadowPatch"));
-    }
-	
-	
+	//******************** END based on solid General*************			
 }
 
 
