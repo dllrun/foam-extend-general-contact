@@ -1953,7 +1953,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
 		*/
         //else
         //{
-            forAll(shadowPatchNames_, shadPatchI)
+			wordList& shadowPatchNames = *shadowPatchNames_;
+            forAll(shadowPatchNames, shadPatchI)
             {
                 os  << patch().name() << "_to_"
                     << shadowPatchNames_[shadPatchI] << "_dict" << nl
