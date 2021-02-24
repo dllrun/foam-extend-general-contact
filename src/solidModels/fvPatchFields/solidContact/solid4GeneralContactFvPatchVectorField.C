@@ -1904,8 +1904,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
             << nl;
     }
 
-    if (globalMaster())   //if (master_) 
-    {
+    //if (globalMaster())   //if (master_) //if (localSlave()[shadPatchI]) 
+    //{
         os.writeKeyword("rigidMaster") << rigidMaster_
             << token::END_STATEMENT << nl;
 
@@ -1970,7 +1970,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
                 os  << '}' << endl;
             }
         }
-    }
+    //}
 
     if (writeZoneVTK_)
     {
