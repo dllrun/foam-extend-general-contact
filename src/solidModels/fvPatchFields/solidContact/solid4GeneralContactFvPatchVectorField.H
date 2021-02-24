@@ -213,7 +213,7 @@ class solid4GeneralContactFvPatchVectorField
         //- Make the shadow patch names
         //void makeShadowPatchNames(const dictionary& dict) const;
 		
-		// New declaration
+		// ************ based on solidGeneral ****New declaration ***
 		//- Make the shadow patch names
         void makeShadowPatchNames() const;
 
@@ -407,7 +407,12 @@ public:
             }
 
             //- Return the shadow patch names
-            const wordList& shadowPatchNames() const;
+            //const wordList& shadowPatchNames() const;
+			
+			//*************** based on solidGeneral*****************
+			//- Return the list of shadow patch names
+            const List<word>& shadowPatchNames() const;
+			//*************** END based on solidGeneral*****************
 
             //- Return the shadow patch indices
             const labelList& shadowPatchIndices() const;

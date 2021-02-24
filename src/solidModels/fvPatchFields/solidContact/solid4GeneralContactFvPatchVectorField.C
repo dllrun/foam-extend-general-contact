@@ -1069,8 +1069,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::rmap
     scaleTractionFieldPtr_.clear();
 }
 
-
-const Foam::wordList&
+//*************** ORG = NOT based on solidGeneral*****************
+//const Foam::wordList&
+//*************** END based on solidGeneral*****************
+const Foam::List<Foam::word>&
 Foam::solid4GeneralContactFvPatchVectorField::shadowPatchNames() const
 {
     if (!shadowPatchNames_) //if (shadowPatchNames_.size() == 0)
@@ -1078,7 +1080,7 @@ Foam::solid4GeneralContactFvPatchVectorField::shadowPatchNames() const
        makeShadowPatchNames(); //makeShadowPatchNames(dict_);
     }
 
-    return shadowPatchNames_;
+    return *shadowPatchNames_;
 }
 
 
@@ -1836,7 +1838,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
     // If the shadowPatchIndices pointer is not set then we will assume that the
     // contact models were not created and nothing has changed; so we will just
     // output the input dict unchanged
-    if (shadowPatchNames_.size() == 0)
+    if (!shadowPatchNames_)  //if (shadowPatchNames_.size() == 0)
     {
         // Overwrite fields in the dict
         dictionary& dict = const_cast<dictionary&>(dict_);
