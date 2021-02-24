@@ -1909,7 +1909,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
         os.writeKeyword("rigidMaster") << rigidMaster_
             << token::END_STATEMENT << nl;
 
-        if (shadowPatchNames_.size() == 1)
+        /*
+		if (shadowPatchNames_.size() == 1)
         {
             os.writeKeyword("generalNormalContactModel")
                 << normalModels()[0].type()
@@ -1949,8 +1950,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
                 )
                 << token::END_STATEMENT << nl;
         }
-        else
-        {
+		*/
+        //else
+        //{
             forAll(shadowPatchNames_, shadPatchI)
             {
                 os  << patch().name() << "_to_"
@@ -1969,7 +1971,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
 
                 os  << '}' << endl;
             }
-        }
+        //}
     //}
 
     if (writeZoneVTK_)
