@@ -280,6 +280,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames()const
     const dictionary& dict
 ) const */
 {
+	Info<<"In makeShadowPatchNames() line:"<<__LINE__<<endl;
 	//********************** based on solid General*************
 	if (shadowPatchNames_)
     {
@@ -1376,9 +1377,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
 	//*************** based on solidGeneral*****************
-	boolList activeContactPairs(shadowPatchNames().size(), false);
+	boolList activeContactPairs(shadowPatchNames().size(), true);
 	//*************** END based on solidGeneral**************
-
+	
+	Info<< "this->db().time().timeIndex() "<<this->db().time().timeIndex()<<endl;
+	Info<< "curTimeIndex_ "<<curTimeIndex_<<endl;
     if (curTimeIndex_ != this->db().time().timeIndex())
     {
         // Update old quantities at the start of a new time-step
@@ -1388,6 +1391,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         {
             // Let the contact models know that it is a new time-step, in case
             // they need to update anything
+			Info<<"Is it activeContactPairs? in updateCoeffs() "<<activeContactPairs<<endl;
             forAll(activeContactPairs, shadPatchI)
             {
 				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
@@ -1419,7 +1423,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         );
 		}
     }
-	
+		
 		// Only the local masters calculates the contact force and the local
         // master interpolates this force
         const boolList& locSlave = localSlave();
@@ -1456,9 +1460,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 masterBb.max() += offset;
             }
         }
-		
+	
+	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	forAll(activeContactPairs, shadPatchI)
-	{			
+	{
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 			// Create shadow bounding box
             boundBox shadowBb(shadowZones()[shadPatchI].patch().localPoints(), false);
 			
@@ -1492,17 +1498,21 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 				Info<<"In updateCoeffs():"<<__LINE__<<endl;
                 activeContactPairs[shadPatchI] = true;
             }
-			
+			else
+			{
+				//activeContactPairs[shadPatchI] = false;
+			}
 	
 		if (activeContactPairs[shadPatchI])
-        {				
+        {
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 			if (locSlave[shadPatchI])
             {
 			// Reset the traction to zero as we will accumulate it over all the
 			// shadow patches
 			traction() = vector::zero;
 			
-			
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Calculate the slave patch face unit normals as they are used by
             // both the normal and friction models
             const vectorField shadowPatchFaceNormals =
@@ -1511,7 +1521,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                     shadowZones()[shadPatchI].globalPatch().faceNormals()
                 );
 			
-
+			
             // Interpolate the master displacement increment to the slave patch
             // as it is required by specific normal and friction contact models
 
@@ -1560,13 +1570,15 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
             const vectorField zoneDD = zone().patchFaceToGlobal(patchDD);
 			Info<< "zoneDD in updateCoeffs() "<<zoneDD<< endl;
 			
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Master patch DD interpolated to the slave patch
             const vectorField patchDDInterpToShadowPatch =
                 shadowZones()[shadPatchI].globalFaceToPatch
                 (
                     zoneToZones()[shadPatchI].masterToSlave(zoneDD)()
                 );
-
+			
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Calculate normal contact forces
             // shadowPatchDD is the DU on the shadow patch, whereas
             // patchDDInterpToShadowPatch is the master patch DU interpolated to
@@ -1653,10 +1665,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 						}
 					}
 				}
-			
+			Info<<"End of MASTER computation in updateCoeffs() line:"<<__LINE__<<endl;
 			}
 			else
 			{
+			Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
         // Set the traction on the slave patch
         // The master stores the friction and normal models, so we need to find
         // which models correspond to the current shadow
@@ -1692,7 +1705,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 					contactForThisShadow[faceI] = 0.0;
 					}
 				}
-			}
+			}// SLAVE
 		} // if contact pair is active
 	}// forAll contact pairs
 
@@ -1740,7 +1753,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 			}
 		} */
 	//******************* END Scaling any face in contact ******************
-	
+	Info<<"Before solidTractionFvPatch in updateCoeffs() line:"<<__LINE__<<endl;
     solidTractionFvPatchVectorField::updateCoeffs();
 }
 

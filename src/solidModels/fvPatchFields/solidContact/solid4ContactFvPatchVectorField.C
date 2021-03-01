@@ -1025,9 +1025,15 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
     {
         return;
     }
-
+	
+	Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
+	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
+	Info<< "this->db().time().timeIndex() "<<this->db().time().timeIndex()<<endl;
+	Info<< "curTimeIndex_ "<<curTimeIndex_<<endl;
+	
     if (curTimeIndex_ != this->db().time().timeIndex())
     {
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         // Update old quantities at the start of a new time-step
         curTimeIndex_ = this->db().time().timeIndex();
 
@@ -1037,6 +1043,7 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
             // they need to update anything
             forAll(shadowPatchNames(), shadPatchI)
             {
+				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
                 normalModels()[shadPatchI].newTimeStep();
                 frictionModels()[shadPatchI].newTimeStep();
 
@@ -1045,27 +1052,31 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
             }
         }
     }
-
+	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
     // Move the master and slave zone to the deformed configuration
     moveZonesToDeformedConfiguration();
 
     // Delete the zone-to-zone interpolator weights as the zones have moved
     const wordList& shadPatchNames = shadowPatchNames();
+	Info<<"shadPatchNames in updateCoeffs() "<<shadPatchNames<<endl;
     forAll(shadPatchNames, shadPatchI)
     {
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         zoneToZones()[shadPatchI].movePoints
         (
             tensorField(0), tensorField(0), vectorField(0)
         );
     }
-
+	
+	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
     // Calculate and apply contact forces
     if (master_)
     {
         // Reset the traction to zero as we will accumulate it over all the
         // shadow patches
         traction() = vector::zero;
-
+	
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         forAll(shadPatchNames, shadPatchI)
         {
             // Calculate the slave patch face unit normals as they are used by
@@ -1121,14 +1132,16 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
 
             // Master zone DD
             const vectorField zoneDD = zone().patchFaceToGlobal(patchDD);
-
+			
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Master patch DD interpolated to the slave patch
             const vectorField patchDDInterpToShadowPatch =
                 shadowZones()[shadPatchI].globalFaceToPatch
                 (
                     zoneToZones()[shadPatchI].masterToSlave(zoneDD)()
                 );
-
+				
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Calculate normal contact forces
             // shadowPatchDD is the DU on the shadow patch, whereas
             // patchDDInterpToShadowPatch is the master patch DU interpolated to
@@ -1215,10 +1228,13 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
                     }
                 }
             }
+		Info<<"In updateCoeffs() loop line:"<<__LINE__<<endl;
         }
+		Info<<"End of MASTER computation in updateCoeffs() line:"<<__LINE__<<endl;
     }
     else
     {
+		Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
         // Set the traction on the slave patch
         // The master stores the friction and normal models, so we need to find
         // which models correspond to the current shadow
@@ -1261,6 +1277,7 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
     PtrList<scalarField>& contactPerShadow = this->contactPerShadow();
     forAll(contactPerShadow, shadI)
     {
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         contact_ += contactPerShadow[shadI];
     }
 
@@ -1295,7 +1312,7 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
             }
         }
     }
-
+	Info<<"Before solidTractionFvPatch in updateCoeffs() line:"<<__LINE__<<endl;
     solidTractionFvPatchVectorField::updateCoeffs();
 }
 

@@ -1610,12 +1610,15 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
     {
         return;
     }
-
+	Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
+	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
 //**************************************************** START General**********************************************	
 	Info<<"In updateCoeffs() line :"<<__LINE__<<endl;
 //	Info<<"shadowPatchNames().size() in updateCoeffs():"<<shadowPatchNames().size()<<endl;
 	boolList activeContactPairs(shadowPatchNames().size(), false);
 	
+	Info<< "db().time().timeIndex() "<<db().time().timeIndex()<<endl;
+	Info<< "curTimeIndex_ "<<curTimeIndex_<<endl;
 	    // if it is a new time step then reset iCorr
     if (curTimeIndex_ != db().time().timeIndex())
     {
@@ -1929,11 +1932,12 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                         + normalModel(shadowI).slavePressure();
 
                     curPatchTraction += curPatchTractions(shadowI);
+				Info<<"End of local SLAVE computation in updateCoeffs() line:"<<__LINE__<<endl;
 				}
-
+				
 				else // local master
                 {
-					Info<<"LOCAL pair MASTER in updateCoeffs()"<<__LINE__<<endl;
+					Info<<"local MASTER in updateCoeffs()"<<__LINE__<<endl;
 					Info<< "The current patch in updateCoeffs() is "<< patch().name()<< endl;			
 					Info<< "The size of current patch in updateCoeffs() is "<< patch().size()<< endl;
 					Info<< "The current field in updateCoeffs() is "<<dimensionedInternalField().name()<< endl;
@@ -2035,10 +2039,10 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
 	}
 	
 //**************************************************** END General**********************************************
-       Info<<"In updateCoeffs() line "<<__LINE__<<endl;
+       Info<<"Before solidTractionFvPatch in updateCoeffs() line "<<__LINE__<<endl;
 
     solidTractionFvPatchVectorField::updateCoeffs();
-	Info<<"In updateCoeffs() line "<<__LINE__<<endl;
+	//Info<<"In updateCoeffs() line "<<__LINE__<<endl;
 }
 
 const Foam::scalarField& Foam::solidGeneralContactFvPatchVectorField::Qc() const
