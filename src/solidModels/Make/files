@@ -18,6 +18,8 @@ $(boundaryConditions)/solidContact/solidGeneralContactFvPatchVectorField.C
 $(boundaryConditions)/solidContact/solid4ContactFvPatchVectorField.C
 $(boundaryConditions)/solidContact/solid4ContactFvPatchVectorFieldCalcContact.C 
 $(boundaryConditions)/solidContact/solidContactFvPatchVectorField.C
+$(boundaryConditions)/solidContact/solidMultiContactFvPatchVectorField.C
+$(boundaryConditions)/solidContact/solidMultiContactFvPatchVectorFieldCalcContact.C
 $(boundaryConditions)/solidDirectionMixed/solidDirectionMixedFvPatchVectorField.C
 $(boundaryConditions)/solidTraction/solidTractionFvPatchVectorField.C
 $(boundaryConditions)/solidTractionFree/solidTractionFreeFvPatchVectorField.C
