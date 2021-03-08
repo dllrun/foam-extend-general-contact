@@ -282,13 +282,13 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames()const
 {
 	Info<<"In makeShadowPatchNames() line:"<<__LINE__<<endl;
 	//********************** based on solid General*************
-	if (shadowPatchNames_)
+	if (shadowPatchNames_ || shadowPatchIndicesPtr_)
     {
         FatalErrorIn
         (
             "label Foam::solid4GeneralContactFvPatchVectorField::"
             "calcShadowPatchNames() const"
-        )   << "shadowPatchNames_ already set"
+        )   << "shadowPatchNames_ or shadowPatchIndices_ already set"
             << abort(FatalError);
     }
 	
@@ -323,6 +323,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames()const
 	wordList& shadowPatchNames = *shadowPatchNames_;
 	Info<<"shadowPatchNames in makeShadowPatchNames() "<<shadowPatchNames<<endl;
 	
+	shadowPatchIndicesPtr_ = new labelList(nShadPatches);
+    labelList& shadowPatchIndices = *shadowPatchIndicesPtr_;
+	
 	// Record shadow patch names
 
     label shadPatchI = 0;
@@ -339,13 +342,15 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames()const
         )
         {
             shadowPatchNames[shadPatchI] = patch().boundaryMesh()[patchI].name();           
-        }
+			Info<<"shadowPatchNames[shadPatchI] in makeShadowPatchNames(): "<<shadowPatchNames[shadPatchI]<<endl;	
+			shadowPatchIndices[shadPatchI++] = patchI;
+		}
     }
 	
 	//******************** END based on solid General*************			
 }
 
-
+/*
 void Foam::solid4GeneralContactFvPatchVectorField::calcShadowPatchIndices() const
 {
     if (shadowPatchIndicesPtr_)
@@ -405,7 +410,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcShadowPatchIndices() cons
     } 
 	//******************** END based on solid General*************			
 }
-
+*/
 
 void Foam::solid4GeneralContactFvPatchVectorField::makeNormalModels
 (
@@ -1098,7 +1103,7 @@ Foam::solid4GeneralContactFvPatchVectorField::shadowPatchIndices() const
 {
     if (!shadowPatchIndicesPtr_)
     {
-        calcShadowPatchIndices();
+        makeShadowPatchNames(); //calcShadowPatchIndices();
     }
 
     return *shadowPatchIndicesPtr_;

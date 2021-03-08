@@ -359,7 +359,9 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
     }
 	
     shadowPatchNamesPtr_ = new wordList(nShadPatches);
-    wordList& shadowPatchNames = *shadowPatchNamesPtr_;
+    Info<<"In calcShadowPatchNames() line:"<<__LINE__<<endl;	
+	wordList& shadowPatchNames = *shadowPatchNamesPtr_;
+	Info<<"shadowPatchNames in calcShadowPatchNames() "<<shadowPatchNames<<endl;
 	Info<<"In calcShadowPatchNames():"<<__LINE__<<endl;
 //	Info<<"What is *shadowPatchNamesPtr_? in calcShadowPatchNames():"<<*shadowPatchNamesPtr_<<endl;
 
@@ -373,6 +375,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
 
     forAll(field.boundaryField(), patchI)
     {
+		Info<<"In calcShadowPatchNames() line:"<<__LINE__<<endl;
+		Info<<"patch().index() in calcShadowPatchNames(): "<<patch().index()<<endl;	
         if
         (
             field.boundaryField()[patchI].type()
@@ -381,8 +385,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowPatchNames() const
         )
         {
             shadowPatchNames[shadowI] = patch().boundaryMesh()[patchI].name();
-
-            shadowPatchIndices[shadowI++] = patchI;
+			Info<<"shadowPatchNames[shadowI] in calcShadowPatchNames(): "<<shadowPatchNames[shadowI]<<endl;	
+            shadowPatchIndices[shadowI++] = patchI;			
         }
     }
 }
@@ -1527,7 +1531,8 @@ Foam::solidGeneralContactFvPatchVectorField::shadowPatchNames() const
     {
         calcShadowPatchNames();
     }
-
+	
+	Info<<"*shadowPatchNames_ in shadowPatchNames(): "<<*shadowPatchNamesPtr_<<endl;
     return *shadowPatchNamesPtr_;
 }
 
