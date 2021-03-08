@@ -350,84 +350,30 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames()const
 	//******************** END based on solid General*************			
 }
 
-/*
-void Foam::solid4GeneralContactFvPatchVectorField::calcShadowPatchIndices() const
-{
-    if (shadowPatchIndicesPtr_)
-    {
-        FatalErrorIn
-        (
-            "void solid4GeneralContactFvPatchVectorField::"
-            " calcShadowPatchIndices() const"
-        )   << "pointer already set" << abort(FatalError);
-    }
-	    
-   //******************** based on solid General*************			
-   
-   // Add each solid4GeneralContact patch in the order of increasing patch index
-
-    const volVectorField& field =
-        db().objectRegistry::lookupObject<volVectorField>
-        (
-            dimensionedInternalField().name()
-        );
-		
-	// Count shadow patches
-
-    label nShadPatches = 0;
-	
-	forAll(field.boundaryField(), patchI)
-    {
-        if
-        (
-            field.boundaryField()[patchI].type()
-            == solid4GeneralContactFvPatchVectorField::typeName
-            && patchI != patch().index()
-        )
-        {
-            nShadPatches++;
-        }
-    }
-	
-	shadowPatchIndicesPtr_ = new labelList(nShadPatches);
-    labelList& shadowPatchIndices = *shadowPatchIndicesPtr_;
-	
-	// Record shadow patch names
-
-    label shadPatchI = 0;
-
-    forAll(field.boundaryField(), patchI)
-    {
-        if
-        (
-            field.boundaryField()[patchI].type()
-            == solid4GeneralContactFvPatchVectorField::typeName
-            && patchI != patch().index()
-        )
-        {            
-			shadowPatchIndices[shadPatchI++] = patchI;
-		}
-    } 
-	//******************** END based on solid General*************			
-}
-*/
 
 void Foam::solid4GeneralContactFvPatchVectorField::makeNormalModels
 (
     const dictionary& dict
 ) const
 {
+	Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
     normalModels_.setSize(shadowPatchNames().size());
-
-    forAll (normalModels_, shadPatchI)
+	
+	Info<<"normalModels_.size() in makeNormalModels(..): "<<normalModels_.size()<<endl;
+    const boolList& locSlave = localSlave();
+	
+	forAll (normalModels_, shadPatchI)
     {
+		/*
         // Check if only one shadow patch is defined
         const dictionary* contactDictPtr = NULL;
         if (normalModels_.size() == 1)
         {
+			Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
             if (dict.found("generalNormalContactModel") )
-            {
+            {				
                 contactDictPtr = &dict;
+				Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
             }
             else
             {
@@ -449,22 +395,40 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeNormalModels
                 );
         }
         const dictionary& contactDict = *contactDictPtr;
-
-        // Create contact model
-        normalModels_.set
-        (
-            shadPatchI,
-            generalNormalContactModel::New
-            (
-                word(contactDict.lookup("generalNormalContactModel")),
-                patch(),
-                contactDict,
-                patch().index(),                  // master
-                shadowPatchIndices()[shadPatchI], // slave
-                zone().globalPatch(),
-                shadowZones()[shadPatchI].globalPatch()
-            ).ptr()
-        );
+		Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+		*/
+		
+		// Only the local slave creates the contact model
+        if (locSlave[shadPatchI])
+        {
+			const dictionary* contactDictPtr = NULL;
+			Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+            if (dict.found("generalNormalContactModel") )
+            {				
+                contactDictPtr = &dict;
+				Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+            }
+			
+			const dictionary& contactDict = *contactDictPtr;
+			Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+			
+			// Create contact model
+			normalModels_.set
+			(
+				shadPatchI,
+				generalNormalContactModel::New
+				(
+					word(contactDict.lookup("generalNormalContactModel")),
+					patch(),
+					contactDict,
+					patch().index(),                  // master
+					shadowPatchIndices()[shadPatchI], // slave
+					zone().globalPatch(),
+					shadowZones()[shadPatchI].globalPatch()
+				).ptr()
+			);
+		}
+		Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
     }
 
     // Initialise penalty scales to -1
@@ -479,9 +443,12 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeFrictionModels
 ) const
 {
     frictionModels_.setSize(shadowPatchNames().size());
-
+	
+	const boolList& locSlave = localSlave();
+	
     forAll (frictionModels_, shadPatchI)
     {
+		/*
         // Check if only one shadow patch is defined
         const dictionary* contactDictPtr = NULL;
         if (frictionModels_.size() == 1)
@@ -510,21 +477,33 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeFrictionModels
                 );
         }
         const dictionary& contactDict = *contactDictPtr;
-
-        // Create contact model
-        frictionModels_.set
-        (
-            shadPatchI,
-            generalFrictionContactModel::New
-            (
-                word(contactDict.lookup("generalFrictionContactModel")),
-                patch(),
-                contactDict,
-                patch().index(),                 // master
-                shadowPatchIndices()[shadPatchI] // slave
-            ).ptr()
-        );
+		*/
+		
+		if (locSlave[shadPatchI])
+        {
+			const dictionary* contactDictPtr = NULL;
+			if (dict.found("generalFrictionContactModel") )
+            {
+                contactDictPtr = &dict;
+            }
+			
+			const dictionary& contactDict = *contactDictPtr;
+			// Create contact model
+			frictionModels_.set
+			(
+				shadPatchI,
+				generalFrictionContactModel::New
+				(
+					word(contactDict.lookup("generalFrictionContactModel")),
+					patch(),
+					contactDict,
+					patch().index(),                 // master
+					shadowPatchIndices()[shadPatchI] // slave
+				).ptr()
+			);
+		}
     }
+	Info<<"In makeFrictionModels(..) line:"<<__LINE__<<endl;
 }
 
 
@@ -1390,7 +1369,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
 	//*************** based on solidGeneral*****************
-	boolList activeContactPairs(shadowPatchNames().size(), false);
+	boolList activeContactPairs(shadowPatchNames().size(), true);
 	//*************** END based on solidGeneral**************
 	Info<<"activeContactPairs in updateCoeffs() "<<activeContactPairs<<endl;
 	
@@ -1423,11 +1402,13 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
     // Move the master and slave zone to the deformed configuration
     if (globalMaster())
     {
+	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	moveZonesToDeformedConfiguration();
+	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	}
 	
     // Delete the zone-to-zone interpolator weights as the zones have moved
-    const wordList& shadPatchNames = shadowPatchNames();
+    // const wordList& shadPatchNames = shadowPatchNames();
     forAll(activeContactPairs, shadPatchI)
     {
 		if (localSlave()[shadPatchI])
