@@ -1632,7 +1632,8 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
         if (globalMaster())
         {
 			Info<<"Does it enter this check? in updateCoeffs():"<<__LINE__<<endl;
-            forAll(activeContactPairs, shadowI)
+            Info<<"Is it activeContactPairs? in updateCoeffs() "<<activeContactPairs<<endl;
+			forAll(activeContactPairs, shadowI)
             {
 				Info<<"Which shadowI? "<<shadowI<<endl;
                 // Let the contact models know that it is a new time-step, in

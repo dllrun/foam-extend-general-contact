@@ -75,6 +75,7 @@ void Foam::solid4ContactFvPatchVectorField::makeShadowPatchNames
     const dictionary& dict
 ) const
 {
+	Info<<"In makeShadowPatchNames() line:"<<__LINE__<<endl;
     if (master_)
     {
         // Check if only one shadow patch is specified
@@ -728,11 +729,14 @@ void Foam::solid4ContactFvPatchVectorField::rmap
 const Foam::wordList&
 Foam::solid4ContactFvPatchVectorField::shadowPatchNames() const
 {
+	Info<<"In shadowPatchNames() line:"<<__LINE__<<endl;
     if (shadowPatchNames_.size() == 0)
     {
+		Info<<"In shadowPatchNames() line:"<<__LINE__<<endl;
         makeShadowPatchNames(dict_);
     }
-
+	
+	Info<<"shadowPatchNames_ in shadowPatchNames(): "<<shadowPatchNames_<<endl;
     return shadowPatchNames_;
 }
 
@@ -1039,6 +1043,7 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
 
         if (master_)
         {
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Let the contact models know that it is a new time-step, in case
             // they need to update anything
             forAll(shadowPatchNames(), shadPatchI)
@@ -1407,11 +1412,13 @@ Foam::solid4ContactFvPatchVectorField::contactPerShadow() const
 
 void Foam::solid4ContactFvPatchVectorField::write(Ostream& os) const
 {
+	Info<<"In solid4Contact::write function "<<__LINE__<<endl;
     // If the shadowPatchIndices pointer is not set then we will assume that the
     // contact models were not created and nothing has changed; so we will just
     // output the input dict unchanged
     if (shadowPatchNames_.size() == 0)
     {
+		Info<<"In solid4GeneralContact::write function "<<__LINE__<<endl;
         // Overwrite fields in the dict
         dictionary& dict = const_cast<dictionary&>(dict_);
 

@@ -266,6 +266,7 @@ void solidTractionFvPatchVectorField::evaluate(const Pstream::commsTypes)
 // Write
 void solidTractionFvPatchVectorField::write(Ostream& os) const
 {
+	Info<<"In solidTraction::write function line "<<__LINE__<<endl;
     fvPatchVectorField::write(os);
     os.writeKeyword("nonLinear")
         << nonLinearGeometry::nonLinearNames_[nonLinear_]

@@ -317,8 +317,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames()const
         }
     }
 	
+	
 	shadowPatchNames_ = new wordList(nShadPatches);
+	Info<<"In makeShadowPatchNames() line:"<<__LINE__<<endl;	
 	wordList& shadowPatchNames = *shadowPatchNames_;
+	Info<<"shadowPatchNames in makeShadowPatchNames() "<<shadowPatchNames<<endl;
 	
 	// Record shadow patch names
 
@@ -326,6 +329,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames()const
 
     forAll(field.boundaryField(), patchI)
     {
+		Info<<"In makeShadowPatchNames() line:"<<__LINE__<<endl;
+		Info<<"patch().index() in makeShadowPatchNames(): "<<patch().index()<<endl;	
         if
         (
             field.boundaryField()[patchI].type()
@@ -1076,10 +1081,13 @@ void Foam::solid4GeneralContactFvPatchVectorField::rmap
 const Foam::List<Foam::word>&
 Foam::solid4GeneralContactFvPatchVectorField::shadowPatchNames() const
 {
+	Info<<"In shadowPatchNames() line:"<<__LINE__<<endl;
     if (!shadowPatchNames_) //if (shadowPatchNames_.size() == 0)
     {
+		Info<<"In shadowPatchNames() line:"<<__LINE__<<endl;
        makeShadowPatchNames(); //makeShadowPatchNames(dict_);
     }
+	Info<<"*shadowPatchNames_ in shadowPatchNames(): "<<*shadowPatchNames_<<endl;
 
     return *shadowPatchNames_;
 }
@@ -1377,18 +1385,21 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
 	//*************** based on solidGeneral*****************
-	boolList activeContactPairs(shadowPatchNames().size(), true);
+	boolList activeContactPairs(shadowPatchNames().size(), false);
 	//*************** END based on solidGeneral**************
+	Info<<"activeContactPairs in updateCoeffs() "<<activeContactPairs<<endl;
 	
 	Info<< "this->db().time().timeIndex() "<<this->db().time().timeIndex()<<endl;
 	Info<< "curTimeIndex_ "<<curTimeIndex_<<endl;
     if (curTimeIndex_ != this->db().time().timeIndex())
     {
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         // Update old quantities at the start of a new time-step
         curTimeIndex_ = this->db().time().timeIndex();
 
         if (globalMaster())
         {
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Let the contact models know that it is a new time-step, in case
             // they need to update anything
 			Info<<"Is it activeContactPairs? in updateCoeffs() "<<activeContactPairs<<endl;
@@ -1498,10 +1509,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 				Info<<"In updateCoeffs():"<<__LINE__<<endl;
                 activeContactPairs[shadPatchI] = true;
             }
-			else
+			/*else
 			{
 				//activeContactPairs[shadPatchI] = false;
-			}
+			}*/
 	
 		if (activeContactPairs[shadPatchI])
         {
@@ -1720,7 +1731,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 
     // Scale any face in contact with more than one shadow
 	//******************* START Scaling any face in contact ******************
-    /* 	if (gMax(contact_) > (1.0 + SMALL))
+     	if (gMax(contact_) > (1.0 + SMALL))
 		{
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 			forAll(contact_, faceI)
@@ -1751,7 +1762,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 contact_[faceI] = 1.0;
 				}
 			}
-		} */
+		} 
 	//******************* END Scaling any face in contact ******************
 	Info<<"Before solidTractionFvPatch in updateCoeffs() line:"<<__LINE__<<endl;
     solidTractionFvPatchVectorField::updateCoeffs();
@@ -1848,11 +1859,13 @@ Foam::solid4GeneralContactFvPatchVectorField::contactPerShadow() const
 
 void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
 {
+	Info<<"In solid4GeneralContact::write function "<<__LINE__<<endl;
     // If the shadowPatchIndices pointer is not set then we will assume that the
     // contact models were not created and nothing has changed; so we will just
     // output the input dict unchanged
     if (!shadowPatchNames_)  //if (shadowPatchNames_.size() == 0)
     {
+		Info<<"In solid4GeneralContact::write function "<<__LINE__<<endl;
         // Overwrite fields in the dict
         dictionary& dict = const_cast<dictionary&>(dict_);
 
