@@ -481,7 +481,12 @@ public:
 
             //- Return const reference to contactPerShadow fields
             const PtrList<scalarField>& contactPerShadow() const;
-
+			
+			//************** based on solidGeneral************
+			//- Given the patch index of a shadow, return the position in the
+            // shadow list of the current patch
+            label findShadowID(const label patchID) const;
+			//************** END based on solidGeneral**********
 
         // Mapping functions
 

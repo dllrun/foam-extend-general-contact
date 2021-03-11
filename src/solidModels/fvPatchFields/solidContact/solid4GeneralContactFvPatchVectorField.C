@@ -724,8 +724,8 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     }
 
     // Master creates contact laws
-    //if (master_)
-	if (globalMaster())
+    //if (master_) 
+	if (globalMaster())//if (ocalSlavePtr_)
     {
         rigidMaster_ = Switch(dict.lookup("rigidMaster"));
 
@@ -1368,6 +1368,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
     }
 	Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
+	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	//*************** based on solidGeneral*****************
 	boolList activeContactPairs(shadowPatchNames().size(), true);
 	//*************** END based on solidGeneral**************
@@ -1382,7 +1383,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         curTimeIndex_ = this->db().time().timeIndex();
 
         if (globalMaster())
-        {
+        {			
 			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Let the contact models know that it is a new time-step, in case
             // they need to update anything
@@ -1461,6 +1462,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	forAll(activeContactPairs, shadPatchI)
 	{
+		Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
+		Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
 			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 			// Create shadow bounding box
             boundBox shadowBb(shadowZones()[shadPatchI].patch().localPoints(), false);
@@ -1503,7 +1506,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 		if (activeContactPairs[shadPatchI])
         {
 			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-			if (locSlave[shadPatchI])
+			if (locSlave[shadPatchI])  //MASTER starts
             {
 			// Reset the traction to zero as we will accumulate it over all the
 			// shadow patches
@@ -1876,25 +1879,24 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
 
         return;
     }
-
+	
     solidTractionFvPatchVectorField::write(os);
-
+	Info<<"In solid4GeneralContact::write function "<<__LINE__<<endl;
 	/* os.writeKeyword("master")
         << master_ << token::END_STATEMENT << nl;
-	*/
-	
+	*/	
     const wordList& shadPatchNames = shadowPatchNames();
     if (shadPatchNames.size() == 1)
-    {
+    {		
         os.writeKeyword("shadowPatch")
             << shadPatchNames[0] << token::END_STATEMENT << nl;
     }
     else
-    {
+    {		
         shadowPatchNames().writeEntry("shadowPatches", os);
-    }
-
-    os.writeKeyword("regionOfInterest")
+	}		
+    
+	os.writeKeyword("regionOfInterest")
         << regionOfInterest_ << token::END_STATEMENT << nl;
     os.writeKeyword("regionOfInterestTopCorner")
         << regionOfInterestTopCorner_ << token::END_STATEMENT << nl;
@@ -1915,12 +1917,92 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
             << word(dict_.lookup("downstreamPatchName")) << token::END_STATEMENT
             << nl;
     }
-
+	Info<<"In solid4GeneralContact::write function "<<__LINE__<<endl;
     //if (globalMaster())   //if (master_) //if (localSlave()[shadPatchI]) 
+    //const boolList& locSlave = localSlave();
+	//forAll(activeContactPairs, shadPatchI)
+	//{
+	//if (locSlave[shadPatchI])
     //{
+	//if (localSlave()[shadPatchI]) 
+	{
         os.writeKeyword("rigidMaster") << rigidMaster_
             << token::END_STATEMENT << nl;
+			
+		
+	// Write the dict from the first contact model
 
+    const label shadowI = 0;
+
+    if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
+        FatalError  << "solid4GeneralContactFvPatchVectorField::write: localSlavePtr_ NOT defined:" 
+                    << "Cannot write slave information because no slave identified!"  
+                    << exit(FatalError);; 
+
+    if (localSlave()[shadowI])
+    {
+        os.writeKeyword("generalNormalContactModel")
+            << normalModels()[shadowI].type() << token::END_STATEMENT << nl;
+        normalModels()[shadowI].writeDict(os);
+
+        os.writeKeyword("generalFrictionContactModel")
+            << frictionModels()[shadowI].type() << token::END_STATEMENT << nl;
+        frictionModels()[shadowI].writeDict(os);
+    }
+    else
+    {
+        const volVectorField& field =
+            db().lookupObject<volVectorField>
+            (
+                dimensionedInternalField().name()
+            );
+
+        const solid4GeneralContactFvPatchVectorField& localSlaveField =
+            refCast<const solid4GeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()
+                [
+                    shadowPatchIndices()[shadowI]
+                ]
+            );
+	/*	
+	//My code test
+	{
+		const labelList shadowIDs = shadowPatchIndices();
+		label shadPatchI = -1;
+		forAll(shadowIDs, I)
+		{
+			if (patch().index() == shadowIDs[I])
+			{
+				Info<<"In solid4GeneralContact::write() line:"<<__LINE__<<endl;
+				shadPatchI = I;
+				break;
+			}
+			Info<<"In solid4GeneralContact::write() line:"<<__LINE__<<endl;
+		}
+		Info<<"In solid4GeneralContact::write() line:"<<__LINE__<<endl;
+
+		if (shadPatchI == -1)
+		{
+			FatalErrorIn("solid4GeneralContact::write(os)")
+				<< "shadow patch not found!" << abort(FatalError);
+		}
+	}
+	*/
+        const label localSlaveID =
+            localSlaveField.findShadowID(patch().index());
+
+        os.writeKeyword("generalNormalContactModel")
+            << localSlaveField.normalModels()[localSlaveID].type()
+            << token::END_STATEMENT << nl;
+        localSlaveField.normalModels()[localSlaveID].writeDict(os);
+
+        os.writeKeyword("generalFrictionContactModel")
+            << localSlaveField.frictionModels()[localSlaveID].type()
+            << token::END_STATEMENT << nl;
+        localSlaveField.frictionModels()[localSlaveID].writeDict(os);
+    }
+		
         /*
 		if (shadowPatchNames_.size() == 1)
         {
@@ -1962,16 +2044,36 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
                 )
                 << token::END_STATEMENT << nl;
         }
-		*/
+		*/		
         //else
-        //{
+        //{ 
+		/*
+		boolList activeContactPairs(shadowPatchNames().size(), true);
+		const boolList& locSlave = localSlave();
+		forAll(activeContactPairs, shadPatchI)
+		{
+			if (activeContactPairs[shadPatchI])
+			{
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+				if (locSlave[shadPatchI])
+				os  << patch().name() << "_to_"
+			
+			}
+		}	
+		*/
+			/*
 			wordList& shadowPatchNames = *shadowPatchNames_;
-            forAll(shadowPatchNames, shadPatchI)
+            Info<<"shadowPatchNames in solid4GeneralContact::write function "<<shadowPatchNames<<endl;
+			Info<<"patch().name() in solid4GeneralContact::write function "<<patch().name()<<endl;
+			Info<<"In solid4GeneralContact::write function "<<__LINE__<<endl;
+			forAll(shadowPatchNames, shadPatchI)
             {
+				Info<<"In solid4GeneralContact::write function "<<__LINE__<<endl;
                 os  << patch().name() << "_to_"
                     << shadowPatchNames_[shadPatchI] << "_dict" << nl
                     << '{' << endl;
-
+				Info<<"In solid4GeneralContact::write function "<<__LINE__<<endl;
+				
                 os.writeKeyword("generalNormalContactModel")
                     << normalModels()[shadPatchI].type()
                     << token::END_STATEMENT << nl;
@@ -1984,9 +2086,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
 
                 os  << '}' << endl;
             }
+			*/
         //}
-    //}
-
+    }
+	
     if (writeZoneVTK_)
     {
         if
@@ -2122,6 +2225,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
         dist.write();
         distVecs.write();
     }
+	
 }
 
 

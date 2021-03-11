@@ -953,34 +953,35 @@ Foam::solid4GeneralContactFvPatchVectorField::shadowGZone
 
     return shadowGPatchField.zone();
 }
-			
-Foam::label Foam::solid4GeneralContactFvPatchVectorField::findshadowGID
+
+*/
+Foam::label Foam::solid4GeneralContactFvPatchVectorField::findShadowID
 (
     const label patchID
 ) const
 {
-    label shadowGI = -1;
+    label shadPatchI = -1;
 
-    const labelList shadowGIDs = shadowGPatchIndices();
+    const labelList shadowIDs = shadowPatchIndices();
 
-    forAll(shadowGIDs, I)
+    forAll(shadowIDs, I)
     {
-        if (patchID == shadowGIDs[I])
+        if (patchID == shadowIDs[I])
         {
-            shadowGI = I;
+            shadPatchI = I;
             break;
         }
     }
 
-    if (shadowGI == -1)
+    if (shadPatchI == -1)
     {
-        FatalErrorIn("findshadowGID(const label patchID)")
-            << "shadowG patch not found!" << abort(FatalError);
+        FatalErrorIn("findShadowID(const label patchID)")
+            << "shadow patch not found!" << abort(FatalError);
     }
 
-    return shadowGI;
+    return shadPatchI;
 }
-*/
+
 //*************** END based on solidGeneral**************
 
 
