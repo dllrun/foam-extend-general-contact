@@ -155,17 +155,21 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcGlobalMasterIndex() const
 
     forAll(field.boundaryField(), patchI)
     {
+		Info<<"In calcGlobalMaster line: "<<__LINE__<<endl;
         if
         (
             field.boundaryField()[patchI].type()
             == solid4GeneralContactFvPatchVectorField::typeName
         )
         {
+			Info<<"In calcGlobalMaster line: "<<__LINE__<<endl;
             gMasterID = patchI;
 
             break;
-        }
+        }		
     }
+	Info<<"In calcGlobalMaster line: "<<__LINE__<<endl;
+		Info<<"gMasterID in calcGlobalMaster line: "<<gMasterID<<endl;
 
     // Check there is only one global master
 
@@ -725,7 +729,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 
     // Master creates contact laws
     //if (master_) 
-	if (globalMaster())//if (ocalSlavePtr_)
+	if (globalMasterPtr_)//if (ocalSlavePtr_)
     {
         rigidMaster_ = Switch(dict.lookup("rigidMaster"));
 
@@ -1521,7 +1525,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                     shadowZones()[shadPatchI].globalPatch().faceNormals()
                 );
 			
-			
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Interpolate the master displacement increment to the slave patch
             // as it is required by specific normal and friction contact models
 
@@ -1532,6 +1536,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 vector::zero
             );
 			
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 			
 				if (movingMesh())
 				{
@@ -1548,13 +1553,16 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 				}
 				else
 				{
+					Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
                 // We will lookup the total displacement and old total
                 // displacement
 
                 const volVectorField& D =
                     db().lookupObject<volVectorField>("U");
 				//	db().lookupObject<volVectorField>("D");
-
+				
+				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+				Info<<"patch().index() in updateCoeffs(): "<<patch().index()<<endl;
                 patchDD =
                     D.boundaryField()[patch().index()]
                   - D.oldTime().boundaryField()[patch().index()];
