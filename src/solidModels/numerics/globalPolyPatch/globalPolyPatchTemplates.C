@@ -142,7 +142,10 @@ Foam::tmp<Foam::Field<Type> > Foam::globalPolyPatch::patchFaceToGlobal
     const Field<Type>& pField
 ) const
 {
-    if (pField.size() != patch().size())
+	Info<<"patch().name() in globalPolyPatch::patchFaceToGlobal(): "<<patch().name()<<endl;
+	Info<<"patch().index() in globalPolyPatch::patchFaceToGlobal(): "<<patch().index()<<endl;
+    Info<<"patch().size() in globalPolyPatch::patchFaceToGlobal(): "<<patch().size()<<endl;
+	if (pField.size() != patch().size())
     {
         FatalErrorIn
         (

@@ -169,7 +169,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcGlobalMasterIndex() const
         }		
     }
 	Info<<"In calcGlobalMaster line: "<<__LINE__<<endl;
-		Info<<"gMasterID in calcGlobalMaster line: "<<gMasterID<<endl;
+		Info<<"gMasterID in calcGlobalMaster: "<<gMasterID<<endl;
 
     // Check there is only one global master
 
@@ -230,8 +230,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcLocalSlave() const
             localSlave[shadowI] = true;
 
             Info<< "solid4GeneralContact: "
-                << shadowPatchNames()[shadowI] << " (master)" << " to "
-                << patch().name() << " (slave)" << endl;
+                << patch().name() << " (master)" << " to "
+                << shadowPatchNames()[shadowI] << " (slave)" << endl;
         }
     }
 }
@@ -1007,13 +1007,14 @@ void Foam::solid4GeneralContactFvPatchVectorField::autoMap
             contactPerShadow_[shadI].autoMap(m);
         }
     }
-
+	
     if (shadowPatchNames_)  // if (shadowPatchNames_.size() > 0)
     {
         // Let the contact models know about the mapping
         // Be careful, we must pass slave
         // FIX PC 21-Sep-17: move this check inside if (shadowPatchNames ... )
-        if (!globalMaster())  // if (!localSlave()) 
+        // REPLACE This Check If needed
+		if (!globalMaster())  // if (!localSlave()) 
         {
             normalModelForThisSlave().autoMap(m);
             frictionModelForThisSlave().autoMap(m);

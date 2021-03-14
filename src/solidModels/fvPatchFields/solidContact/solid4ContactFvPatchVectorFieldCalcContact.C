@@ -35,6 +35,7 @@ InClass
 void
 Foam::solid4ContactFvPatchVectorField::moveZonesToDeformedConfiguration()
 {
+	Info<<"IN -- moveZonesToDeformedConfiguration() line:"<<__LINE__<<endl;
     // Only the master moves the zones
     if (!master_)
     {
@@ -186,6 +187,7 @@ Foam::solid4ContactFvPatchVectorField::moveZonesToDeformedConfiguration()
             shadowZones()[shadPatchI].globalPatch().points()
         ) = shadowZoneNewPoints;
     }
+	Info<<"IN -- moveZonesToDeformedConfiguration() line:"<<__LINE__<<endl;
 }
 
 
