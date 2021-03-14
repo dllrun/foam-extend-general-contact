@@ -200,7 +200,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const
         InfoIn("void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const")
             << patch().name() << " : making the zone" << endl;
     }
-
+	
+	// Remove this check for now
+	/*
     if (!globalMaster())
     {
         FatalErrorIn
@@ -208,6 +210,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const
             "void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const"
         )   << "Trying to create zone on a slave" << abort(FatalError);
     }
+	*/
 
     if (zonePtr_)
     {
@@ -295,7 +298,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
         )   << "Zone to zone interpolation already calculated"
             << abort(FatalError);
     }
-
+	
+	Info<< "patch().name() in calcZoneToZones() "<<patch().name()<<endl;
+	Info<< "patch().index() in calcZoneToZones() "<<patch().index()<<endl;
+	Info<<"In calcZoneToZones() line: "<<__LINE__<<endl;
     /*
 	// Check master and slave patch
     const volVectorField& field =
@@ -344,6 +350,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
         
 		if (locSlave[shadPatchI]) //if (globalMaster())
         {
+			Info<<"In calcZoneToZones() line: "<<__LINE__<<endl;
             // Create interpolation for patches
             zoneToZones_.set
             (
@@ -467,17 +474,24 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcContactPerShadow() const
 const Foam::globalPolyPatch&
 Foam::solid4GeneralContactFvPatchVectorField::zone() const
 {
-    if (globalMaster())
-    {
+	Info<< "patch().name() in zone() "<<patch().name()<<endl;
+	Info<< "patch().index() in zone() "<<patch().index()<<endl;
+	Info<<"In zone() line:"<<__LINE__<<endl;
+    
+	//if (globalMaster())
+    //{
+		Info<<"In zone() line:"<<__LINE__<<endl;
         if (!zonePtr_)
         {
             calcZone();
         }
 
         return *zonePtr_;
-    }
-    else
+    //}
+    /*
+	else
     {
+		Info<<"In zone() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -492,22 +506,31 @@ Foam::solid4GeneralContactFvPatchVectorField::zone() const
 
         return shadowPatchField.zone();
     }
+	*/
 }
 
 
 Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 {
-    if (globalMaster())
-    {
+	Info<< "patch().name() in zone() "<<patch().name()<<endl;
+	Info<< "patch().index() in zone() "<<patch().index()<<endl;
+	Info<<"In zone() line:"<<__LINE__<<endl;
+			
+    //if (globalMaster())
+    //{
+		Info<<"In zone() line:"<<__LINE__<<endl;
         if (!zonePtr_)
         {
             calcZone();
         }
 
         return *zonePtr_;
-    }
+    
+	//}
+	/*
     else
     {
+		Info<<"In zone() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -525,6 +548,7 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 		
         return shadowPatchField.zone();
     }
+	*/
 }
 
 

@@ -401,7 +401,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeNormalModels
         const dictionary& contactDict = *contactDictPtr;
 		Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
 		*/
-		
+		Info<<"locSlave[shadPatchI] in makeNormalModels(): "<<locSlave[shadPatchI]<<endl;
 		// Only the local slave creates the contact model
         if (locSlave[shadPatchI])
         {
@@ -482,7 +482,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeFrictionModels
         }
         const dictionary& contactDict = *contactDictPtr;
 		*/
-		
+		Info<<"locSlave[shadPatchI] in makeFrictionModels(): "<<locSlave[shadPatchI]<<endl;
 		if (locSlave[shadPatchI])
         {
 			const dictionary* contactDictPtr = NULL;
@@ -1256,6 +1256,9 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionModels() const
 Foam::generalNormalContactModel&
 Foam::solid4GeneralContactFvPatchVectorField::normalModelForThisSlave()
 {
+	Info<<"In normalModelForThisSlave() line: "<<__LINE__<<endl;
+	Info<< "patch().name() in normalModelForThisSlave() "<<patch().name()<<endl;
+	Info<< "patch().index() in normalModelForThisSlave() "<<patch().index()<<endl;
     if (globalMaster())
     {
         FatalErrorIn
@@ -1510,7 +1513,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	
 		if (activeContactPairs[shadPatchI])
         {
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+			Info<<"Checking mMASTER or sSLAVE in updateCoeffs() line:"<<__LINE__<<endl;
+			Info<<"locSlave[shadPatchI] in updateCoeffs(): "<<locSlave[shadPatchI]<<endl;
 			if (locSlave[shadPatchI])  //MASTER starts
             {
 			// Reset the traction to zero as we will accumulate it over all the
@@ -1685,7 +1689,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         traction() =
             frictionModelForThisSlave().slaveTraction()
           + normalModelForThisSlave().slavePressure();
-
+		
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+		
         // TESTING - START
         // Scale traction vectors on faces, which share an edge with the
         // downstream patch
@@ -1696,7 +1702,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 				traction() *= scaleTractionField();
 				}
         // TESTING - END
-
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+		
         // Update contactPerShadow field
         // Note: this is used by thermalContact to know which faces
         // are in contact
@@ -1717,6 +1724,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 			}// SLAVE
 		} // if contact pair is active
 	}// forAll contact pairs
+	
+	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 
     // Accumulate the contact indicator field
     contact_ = 0.0;
