@@ -208,7 +208,7 @@ void solidTractionFvPatchVectorField::updateCoeffs()
 //	Info<<"Here I am in solidTraction's updateCoeffs()"<<__LINE__<<endl;
     if (updated())
     {
-		Info<<"Here I am in solidTraction's updateCoeffs()"<<__LINE__<<endl;
+		Info<<"if (updated()) check in solidTraction's updateCoeffs()"<<__LINE__<<endl;
         return;
     }
 
@@ -236,8 +236,10 @@ void solidTractionFvPatchVectorField::updateCoeffs()
 
 void solidTractionFvPatchVectorField::evaluate(const Pstream::commsTypes)
 {
+	Info<<"Here I am in solidTraction's evaluate(..)"<<__LINE__<<endl;
     if (!this->updated())
     {
+		Info<<"!this->updated() check in solidTraction's evaluate(..)"<<__LINE__<<endl;
         this->updateCoeffs();
     }
 

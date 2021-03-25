@@ -73,7 +73,7 @@ bool Foam::solid4GeneralContactFvPatchVectorField::movingMesh() const
 //******************* based on solid General******************
 bool Foam::solid4GeneralContactFvPatchVectorField::globalMaster() const
 {
-    if (!globalMasterPtr_)
+    if (!firstPatchPtr_)
     {
         calcGlobalMaster();
     }
@@ -81,22 +81,22 @@ bool Foam::solid4GeneralContactFvPatchVectorField::globalMaster() const
 	Info<< "The current field in globalMaster() is "<< dimensionedInternalField().name()<< endl;
 	Info<< "The current patch in globalMaster()) is "<< patch().name()<< endl;			
 	Info<< "The size of current patch in globalMaster() is "<< patch().size()<< endl;
-	Info<< "*globalMasterPtr_ in globalMaster() is "<<*globalMasterPtr_<< endl;
+	Info<< "*firstPatchPtr_ in globalMaster() is "<<*firstPatchPtr_<< endl;
     */
-	return *globalMasterPtr_;
+	return *firstPatchPtr_;
 }
 
 
 void Foam::solid4GeneralContactFvPatchVectorField::calcGlobalMaster() const   //// CHECK method to calculate global master
 {
 	
-    if (globalMasterPtr_)
+    if (firstPatchPtr_)
     {
         FatalErrorIn
             (
                 "void Foam::solid4GeneralContactFvPatchVectorField::"
                 "calcGlobalMaster() const"
-            )   << "globalMasterPtr_ already set" << abort(FatalError);
+            )   << "firstPatchPtr_ already set" << abort(FatalError);
     }
 
     // The global master is the first solid4GeneralContact patch i.e. the one
@@ -109,11 +109,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcGlobalMaster() const   //
 	*/
 	if (globalMasterIndex() == patch().index())
     {
-        globalMasterPtr_ = new bool(true);
+        firstPatchPtr_ = new bool(true);
     }
     else
     {
-        globalMasterPtr_ = new bool(false);
+        firstPatchPtr_ = new bool(false);
     }
 	
 }
@@ -345,9 +345,12 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeShadowPatchNames()const
             && patchI != patch().index()
         )
         {
+			Info<<"shadPatchI in makeShadowPatchNames(): "<<shadPatchI<<endl;	
             shadowPatchNames[shadPatchI] = patch().boundaryMesh()[patchI].name();           
 			Info<<"shadowPatchNames[shadPatchI] in makeShadowPatchNames(): "<<shadowPatchNames[shadPatchI]<<endl;	
 			shadowPatchIndices[shadPatchI++] = patchI;
+			Info<<"shadPatchI in makeShadowPatchNames(): "<<shadPatchI<<endl;
+			Info<<"patchI in makeShadowPatchNames(): "<<patchI<<endl;
 		}
     }
 	
@@ -521,7 +524,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::clearOut()
         )   << patch().name() << " : clearOut" << endl;
     }
 	//************ based on solid General*************
-	deleteDemandDrivenData(globalMasterPtr_);
+	deleteDemandDrivenData(firstPatchPtr_);
     deleteDemandDrivenData(globalMasterIndexPtr_);
     deleteDemandDrivenData(localSlavePtr_);
 	//************ END based on solid General*************
@@ -606,7 +609,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 :	
     solidTractionFvPatchVectorField(p, iF),
 	//******** based on solid General***************
-    globalMasterPtr_(NULL),
+    firstPatchPtr_(NULL),
     globalMasterIndexPtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
@@ -648,7 +651,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 )
 :   solidTractionFvPatchVectorField(p, iF),
 	//******** based on solid General***************
-    globalMasterPtr_(NULL),
+    firstPatchPtr_(NULL),
     globalMasterIndexPtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
@@ -729,7 +732,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 
     // Master creates contact laws
     //if (master_) 
-	if (globalMasterPtr_)//if (ocalSlavePtr_)
+	if (firstPatchPtr_)//if (ocalSlavePtr_)
     {
         rigidMaster_ = Switch(dict.lookup("rigidMaster"));
 
@@ -781,7 +784,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 :
     solidTractionFvPatchVectorField(ptf, p, iF, mapper),
     //******** based on solid General***************
-    globalMasterPtr_(NULL),
+    firstPatchPtr_(NULL),
     globalMasterIndexPtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
@@ -819,9 +822,9 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 	
 	//******************* based on solid General******************
 	// Copy pointer objects
-    if (ptf.globalMasterPtr_)
+    if (ptf.firstPatchPtr_)
     {
-        globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
+        firstPatchPtr_ = new bool(*ptf.firstPatchPtr_);
     }
 	
 	if (ptf.globalMasterIndexPtr_)
@@ -844,7 +847,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 :
     solidTractionFvPatchVectorField(ptf),
 	//******** based on solid General***************
-    globalMasterPtr_(NULL),
+    firstPatchPtr_(NULL),
     globalMasterIndexPtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
@@ -882,9 +885,9 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 	
 	//******************* based on solid General******************
 	// Copy pointer objects
-	if (ptf.globalMasterPtr_)
+	if (ptf.firstPatchPtr_)
     {
-        globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
+        firstPatchPtr_ = new bool(*ptf.firstPatchPtr_);
     }
 
     if (ptf.globalMasterIndexPtr_)
@@ -908,7 +911,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 :
     solidTractionFvPatchVectorField(ptf, iF),
 	//******** based on solid General***************
-    globalMasterPtr_(NULL),
+    firstPatchPtr_(NULL),
     globalMasterIndexPtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
@@ -946,9 +949,9 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 	
 	//******************* based on solid General******************
 	/*// Copy pointer objects
-	if (ptf.globalMasterPtr_)
+	if (ptf.firstPatchPtr_)
     {
-        globalMasterPtr_ = new bool(*ptf.globalMasterPtr_);
+        firstPatchPtr_ = new bool(*ptf.firstPatchPtr_);
     }
 
     if (ptf.globalMasterIndexPtr_)
@@ -1089,6 +1092,7 @@ Foam::solid4GeneralContactFvPatchVectorField::shadowPatchIndices() const
     {
         makeShadowPatchNames(); //calcShadowPatchIndices();
     }
+	Info<<"*shadowPatchIndicesPtr_ in shadowPatchIndices(): "<<*shadowPatchIndicesPtr_<<endl;
 
     return *shadowPatchIndicesPtr_;
 }
@@ -1259,7 +1263,8 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModelForThisSlave()
 	Info<<"In normalModelForThisSlave() line: "<<__LINE__<<endl;
 	Info<< "patch().name() in normalModelForThisSlave() "<<patch().name()<<endl;
 	Info<< "patch().index() in normalModelForThisSlave() "<<patch().index()<<endl;
-    if (globalMaster())
+    Info<< "*localSlavePtr_ in normalModelForThisSlave() "<<*localSlavePtr_<<endl;
+	if (globalMaster())
     {
         FatalErrorIn
         (
@@ -1281,13 +1286,16 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModelForThisSlave()
         FatalError
             << "shadowPatchIndices().size() == 0" << exit(FatalError);
     }
-
-    const solid4GeneralContactFvPatchVectorField& masterPatchField =
+	
+	Info<<"shadowPatchIndices()[0] in normalModelForThisSlave() line: "<<shadowPatchIndices()[0]<<endl;
+    Info<<"In normalModelForThisSlave() line: "<<__LINE__<<endl;
+	const solid4GeneralContactFvPatchVectorField& masterPatchField =
         refCast<const solid4GeneralContactFvPatchVectorField>
         (
             field.boundaryField()[shadowPatchIndices()[0]]
         );
-
+		
+	
     // The master may have multiple slaves so we need to find which model
     // corresponds to the current slave patch
     const wordList& shadPatchNames = masterPatchField.shadowPatchNames();
@@ -1297,9 +1305,16 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModelForThisSlave()
         if (shadPatchNames[shadPatchI] == patch().name())
         {
             masterShadowID = shadPatchI;
+			Info<<"In normalModelForThisSlave() line: "<<__LINE__<<endl;
+			Info<<"masterShadowID in normalModelForThisSlave() line: "<<masterShadowID<<endl;
             break;
         }
     }
+	
+	Info<<"In normalModelForThisSlave() line: "<<__LINE__<<endl;
+	Info<< "patch().name() in normalModelForThisSlave() "<<patch().name()<<endl;
+	Info<< "patch().index() in normalModelForThisSlave() "<<patch().index()<<endl;
+	
 
     if (masterShadowID == -1)
     {
@@ -1372,11 +1387,12 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 {
     if (this->updated())
     {
+		Info<<"if (updated()) check in solid4GeneralContact's updateCoeffs()"<<__LINE__<<endl;
         return;
     }
 	Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
-	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
-	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;	
+	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;	
 	//*************** based on solidGeneral*****************
 	boolList activeContactPairs(shadowPatchNames().size(), true);
 	//*************** END based on solidGeneral**************
@@ -1386,9 +1402,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	Info<< "curTimeIndex_ "<<curTimeIndex_<<endl;
     if (curTimeIndex_ != this->db().time().timeIndex())
     {
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;		
         // Update old quantities at the start of a new time-step
         curTimeIndex_ = this->db().time().timeIndex();
+		
 
         if (globalMaster())
         {			
@@ -1406,6 +1423,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 zoneToZones()[shadPatchI].clearPrevCandidateMasterNeighbors();
             }
         }
+		
     }
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
     // Move the master and slave zone to the deformed configuration
@@ -1415,7 +1433,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	moveZonesToDeformedConfiguration();
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	}
-	
+		
     // Delete the zone-to-zone interpolator weights as the zones have moved
     // const wordList& shadPatchNames = shadowPatchNames();
     forAll(activeContactPairs, shadPatchI)
@@ -1712,6 +1730,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         scalarField& contactForThisShadow = contactPerShadow()[0];
 				forAll(contactForThisShadow, faceI)
 				{
+					Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 					if (magTraction[faceI] > tol)
 					{
 					contactForThisShadow[faceI] = 1.0;
@@ -1721,6 +1740,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 					contactForThisShadow[faceI] = 0.0;
 					}
 				}
+				Info<<"End of SLAVE computation in updateCoeffs() line:"<<__LINE__<<endl;
 			}// SLAVE
 		} // if contact pair is active
 	}// forAll contact pairs

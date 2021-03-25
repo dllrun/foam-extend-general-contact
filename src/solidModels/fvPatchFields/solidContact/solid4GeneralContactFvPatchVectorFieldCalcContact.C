@@ -151,7 +151,8 @@ Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
             // Lookup the current total displacement field
             const volVectorField& D = db().lookupObject<volVectorField>("U");
 		//	const volVectorField& D = db().lookupObject<volVectorField>("D");
-
+			Info<<"D.size() internal field size in moveZonesToDeformedConfiguration(): "<<D.size()<<endl;
+			
             // Take a reference to the patch face total displacement field
             const vectorField& shadowPatchD =
                 D.boundaryField()[shadowPatchIndices()[shadPatchI]];

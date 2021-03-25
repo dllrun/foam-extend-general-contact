@@ -81,18 +81,22 @@ Foam::solid4ContactFvPatchVectorField::moveZonesToDeformedConfiguration()
         // Lookup the current total displacement field
         const volVectorField& D = db().lookupObject<volVectorField>("U");
 	//	const volVectorField& D = db().lookupObject<volVectorField>("D");
-
+	Info<<"D.size() internal field size in moveZonesToDeformedConfiguration(): "<<D.size()<<endl;
+	
         // Take a reference to the patch face total displacement field
         const vectorField& patchD =
             D.boundaryField()[patch().index()];
-
+	Info<<"In moveZonesToDeformedConfiguration() line:"<<__LINE__<<endl;
+	Info<<"patchD in moveZonesToDeformedConfiguration() :"<<patchD<<endl;
         zoneD = zone().patchFaceToGlobal(patchD);
+	Info<<"zoneD in moveZonesToDeformedConfiguration() :"<<zoneD<<endl;
     }
 
     // Interpolate the zone face field to the zone points
     const pointField zonePointD =
         zone().interpolator().faceToPointInterpolate(zoneD);
-
+	Info<<"zonePointD.size() in moveZonesToDeformedConfiguration(): "<<zonePointD.size()<<endl;
+	
     // The zone deformed points are the initial position plus the
     // displacement
     const pointField zoneNewPoints =
@@ -108,7 +112,9 @@ Foam::solid4ContactFvPatchVectorField::moveZonesToDeformedConfiguration()
     // We need to use const_cast to move the standAlonePatch points as the
     // movePoints function only clears weights
     // Also, be careful to move the points as opposed to the localPoints
-    const_cast<pointField&>(zone().globalPatch().points()) = zoneNewPoints;
+    Info<<"zone().globalPatch().points() in moveZonesToDeformedConfiguration(): "<<zone().globalPatch().points()<<endl;
+	const_cast<pointField&>(zone().globalPatch().points()) = zoneNewPoints;
+	Info<<"zone().globalPatch().points() in moveZonesToDeformedConfiguration(): "<<zone().globalPatch().points()<<endl;
 
     // Secondly we will move the shadow zones
 

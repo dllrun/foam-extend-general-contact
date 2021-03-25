@@ -95,7 +95,7 @@ class solid4GeneralContactFvPatchVectorField
 		//- Is this the global master patch: the global master patches keeps a
         // copy of mesh.allPoints() and updates them to the deformed position
         // each time before the contact is corrected
-        mutable bool* globalMasterPtr_;
+        mutable bool* firstPatchPtr_;
 		
 		//- Patch index of global master patch
         mutable label* globalMasterIndexPtr_;

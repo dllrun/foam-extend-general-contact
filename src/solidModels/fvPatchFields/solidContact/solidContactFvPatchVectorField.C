@@ -598,8 +598,10 @@ void solidContactFvPatchVectorField::rmap
 
 void solidContactFvPatchVectorField::updateCoeffs()
 {
+	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
     if (this->updated())
     {
+		Info<<"this->updated() in updateCoeffs() line:"<<__LINE__<<endl;
         return;
     }
 
@@ -863,8 +865,9 @@ void solidContactFvPatchVectorField::updateCoeffs()
                 incremental
             );
     }
-
+		
     directionMixedFvPatchVectorField::updateCoeffs();
+	Info<<"After directionMixedFvPatchVectorField in updateCoeffs() line:"<<__LINE__<<endl;
 }
 
 
@@ -1262,7 +1265,8 @@ bool solidContactFvPatchVectorField::checkPatchAndFaceZones
 
 void solidContactFvPatchVectorField::evaluate(const Pstream::commsTypes)
 {
-    if (!this->updated())
+	Info<<"In evaluate(..) line:"<<__LINE__<<endl;
+	if (!this->updated())
     {
         this->updateCoeffs();
     }
@@ -1290,6 +1294,7 @@ void solidContactFvPatchVectorField::evaluate(const Pstream::commsTypes)
     Field<vector>::operator=(normalValue + transformGradValue);
 
     fvPatchField<vector>::evaluate();
+	Info<<"After fvPatchField<vector> in evaluate(..) line:"<<__LINE__<<endl;
 }
 
 Foam::tmp<Foam::Field<vector> > solidContactFvPatchVectorField::

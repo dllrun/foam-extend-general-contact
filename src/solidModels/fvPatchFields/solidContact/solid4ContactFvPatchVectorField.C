@@ -1027,11 +1027,13 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
 {
     if (this->updated())
     {
+		Info<<"this->updated() in updateCoeffs() line:"<<__LINE__<<endl;
         return;
     }
 	
 	Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
+	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	Info<< "this->db().time().timeIndex() "<<this->db().time().timeIndex()<<endl;
 	Info<< "curTimeIndex_ "<<curTimeIndex_<<endl;
 	
@@ -1040,7 +1042,8 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         // Update old quantities at the start of a new time-step
         curTimeIndex_ = this->db().time().timeIndex();
-
+		
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         if (master_)
         {
 			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
@@ -1073,11 +1076,14 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
         );
     }
 	
-	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-    // Calculate and apply contact forces
+	Info<<"Checking mMASTER or sSLAVE in updateCoeffs() line:"<<__LINE__<<endl;
+	// Calculate and apply contact forces
     if (master_)
     {
-        // Reset the traction to zero as we will accumulate it over all the
+		Info<<"MASTER in updateCoeffs() line:"<<__LINE__<<endl;
+        Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
+		Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
+		// Reset the traction to zero as we will accumulate it over all the
         // shadow patches
         traction() = vector::zero;
 	
@@ -1212,12 +1218,15 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
                     );
 
                 // Accumulate the traction on the master patch
+				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+				Info<<"tractionForThisShadow in updateCoeffs() "<<tractionForThisShadow<<endl;
                 traction() += tractionForThisShadow;
-
+				
                 // Update contactPerShadow field
                 // Note: this is used by thermalContact to know which faces
                 // are in contact
                 const scalarField magTraction = mag(tractionForThisShadow);
+				Info<<"magTraction in updateCoeffs() "<<magTraction<<endl;
                 const scalar tol = 1e-6*gMax(magTraction);
                 scalarField& contactForThisShadow =
                     contactPerShadow()[shadPatchI];
@@ -1240,7 +1249,9 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
     else
     {
 		Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
-        // Set the traction on the slave patch
+        Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
+		Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
+		// Set the traction on the slave patch
         // The master stores the friction and normal models, so we need to find
         // which models correspond to the current shadow
         traction() =
@@ -1275,6 +1286,7 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
                 contactForThisShadow[faceI] = 0.0;
             }
         }
+		Info<<"End of SLAVE computation in updateCoeffs() line:"<<__LINE__<<endl;
     }
 
     // Accumulate the contact indicator field
@@ -1284,6 +1296,7 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
     {
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         contact_ += contactPerShadow[shadI];
+		Info<<"contact_ in updateCoeffs(): "<<contact_<<endl;
     }
 
     // Scale any face in contact with more than one shadow
