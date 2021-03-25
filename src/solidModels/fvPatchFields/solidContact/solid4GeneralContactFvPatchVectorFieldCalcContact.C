@@ -39,7 +39,7 @@ Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
 {
 	Info<<"IN -- moveZonesToDeformedConfiguration() line:"<<__LINE__<<endl;
     // Only the master moves the zones
-    if (!globalMaster())
+    if (!firstPatchInList())
     {
         return;
     }
@@ -204,7 +204,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const
 	
 	// Remove this check for now
 	/*
-    if (!globalMaster())
+    if (!firstPatchInList())
     {
         FatalErrorIn
         (
@@ -241,7 +241,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcShadowZones() const
         )   << patch().name() << " : making the shadow zones" << endl;
     }
 
-    if (!globalMaster())
+    if (!firstPatchInList())
     {
         FatalErrorIn
         (
@@ -325,7 +325,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
                 field.boundaryField()[shadowPatchIndices()[shadPatchI]]
             );
 
-        if (globalMaster())
+        if (firstPatchInList())
         {
             if (shadowPatchField.master() == true)
             {
@@ -349,7 +349,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
         }
 		*/
         
-		if (locSlave[shadPatchI]) //if (globalMaster())
+		if (locSlave[shadPatchI]) //if (firstPatchInList())
         {
 			Info<<"In calcZoneToZones() line: "<<__LINE__<<endl;
             // Create interpolation for patches
@@ -479,7 +479,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zone() const
 	Info<< "patch().index() in zone() "<<patch().index()<<endl;
 	Info<<"In zone() line:"<<__LINE__<<endl;
     
-	//if (globalMaster())
+	//if (firstPatchInList())
     //{
 		Info<<"In zone() line:"<<__LINE__<<endl;
         if (!zonePtr_)
@@ -517,7 +517,7 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 	Info<< "patch().index() in zone() "<<patch().index()<<endl;
 	Info<<"In zone() line:"<<__LINE__<<endl;
 			
-    //if (globalMaster())
+    //if (firstPatchInList())
     //{
 		Info<<"In zone() line:"<<__LINE__<<endl;
         if (!zonePtr_)
@@ -556,7 +556,7 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 const Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solid4GeneralContactFvPatchVectorField::shadowZones() const
 {
-    if (globalMaster())
+    if (firstPatchInList())
     {
         if (shadowZones_.empty())
         {
@@ -587,7 +587,7 @@ Foam::solid4GeneralContactFvPatchVectorField::shadowZones() const
 Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solid4GeneralContactFvPatchVectorField::shadowZones()
 {
-    if (globalMaster())
+    if (firstPatchInList())
     {
         if (shadowZones_.empty())
         {
@@ -621,7 +621,7 @@ Foam::solid4GeneralContactFvPatchVectorField::shadowZones()
 const Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
 Foam::solid4GeneralContactFvPatchVectorField::zoneToZones() const
 {
-    if (globalMaster())
+    if (firstPatchInList())
     {
         if (zoneToZones_.empty())
         {
@@ -652,7 +652,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones() const
 Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
 Foam::solid4GeneralContactFvPatchVectorField::zoneToZones()
 {
-    if (globalMaster())
+    if (firstPatchInList())
     {
         if (zoneToZones_.empty())
         {
@@ -689,7 +689,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones()
 const Foam::newGgiStandAlonePatchInterpolation&
 Foam::solid4GeneralContactFvPatchVectorField::zoneToZoneForThisSlave() const
 {
-    if (globalMaster())
+    if (firstPatchInList())
     {
         FatalErrorIn
         (
@@ -732,7 +732,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZoneForThisSlave() const
 const Foam::globalPolyPatch&
 Foam::solid4GeneralContactFvPatchVectorField::zoneForThisSlave() const
 {
-    if (globalMaster())
+    if (firstPatchInList())
     {
         FatalErrorIn
         (
