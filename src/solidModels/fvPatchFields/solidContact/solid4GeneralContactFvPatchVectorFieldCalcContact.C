@@ -479,8 +479,8 @@ Foam::solid4GeneralContactFvPatchVectorField::zone() const
 	Info<< "patch().index() in zone() "<<patch().index()<<endl;
 	Info<<"In zone() line:"<<__LINE__<<endl;
     
-	//if (firstPatchInList())
-    //{
+	if (firstPatchInList())
+    {
 		Info<<"In zone() line:"<<__LINE__<<endl;
         if (!zonePtr_)
         {
@@ -488,8 +488,8 @@ Foam::solid4GeneralContactFvPatchVectorField::zone() const
         }
 
         return *zonePtr_;
-    //}
-    /*
+    }
+    
 	else
     {
 		Info<<"In zone() line:"<<__LINE__<<endl;
@@ -507,7 +507,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zone() const
 
         return shadowPatchField.zone();
     }
-	*/
+	
 }
 
 

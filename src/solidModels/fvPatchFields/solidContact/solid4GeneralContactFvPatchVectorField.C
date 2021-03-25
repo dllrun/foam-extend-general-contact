@@ -1433,22 +1433,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	moveZonesToDeformedConfiguration();
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	}
-		
-    // Delete the zone-to-zone interpolator weights as the zones have moved
-    // const wordList& shadPatchNames = shadowPatchNames();
-    forAll(activeContactPairs, shadPatchI)
-    {
-		if (localSlave()[shadPatchI])
-		{
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-        zoneToZones()[shadPatchI].movePoints
-        (
-            tensorField(0), tensorField(0), vectorField(0)
-        );
-		}
-    }
-		
-		// Only the local masters calculates the contact force and the local
+	
+	// Only the local masters calculates the contact force and the local
         // master interpolates this force
         const boolList& locSlave = localSlave();
 		
@@ -1485,9 +1471,27 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
             }
         }
 	
+	
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-	forAll(activeContactPairs, shadPatchI)
-	{
+    // Delete the zone-to-zone interpolator weights as the zones have moved
+    // const wordList& shadPatchNames = shadowPatchNames();
+    forAll(activeContactPairs, shadPatchI)
+    {
+		if (locSlave[shadPatchI])//if (localSlave()[shadPatchI])
+		{
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+        zoneToZones()[shadPatchI].movePoints
+        (
+            tensorField(0), tensorField(0), vectorField(0)
+        );
+		}
+    //}
+		
+		
+	
+	
+	//forAll(activeContactPairs, shadPatchI)
+	//{
 		Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 		Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
 			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
