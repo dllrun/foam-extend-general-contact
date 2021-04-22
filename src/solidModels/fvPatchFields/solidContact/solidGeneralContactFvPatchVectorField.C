@@ -1473,6 +1473,7 @@ solidGeneralContactFvPatchVectorField::solidGeneralContactFvPatchVectorField
 Foam::solidGeneralContactFvPatchVectorField::
 ~solidGeneralContactFvPatchVectorField()
 {
+	Info<<"Does it enter destructor?"<<__LINE__<<endl;
     if (debug)
     {
         InfoIn

@@ -104,17 +104,17 @@ class solid4GeneralContactFvPatchVectorField
         // The local slave is the patch with the lower patch index
         mutable boolList* localSlavePtr_;
 		
-		//- List of shadowG patch names
-        mutable List<word>* shadowGPatchNamesPtr_;
+		//- List of slaveG patch names
+        mutable List<word>* slaveGPatchNamesPtr_;
 
-        //YYY- List of shadowG patch indices 
-        mutable List<label>* shadowGPatchIndicesPtr_;
+        //YYY- List of slaveG patch indices 
+        mutable List<label>* slaveGPatchIndicesPtr_;
 		
-		//- List of shadowG zone names
-        mutable List<word>* shadowGZoneNamesPtr_;
+		//- List of slaveG zone names
+        mutable List<word>* slaveGZoneNamesPtr_;
 
-        //- List of shadowG zone indices
-        mutable List<label>* shadowGZoneIndicesPtr_;
+        //- List of slaveG zone indices
+        mutable List<label>* slaveGZoneIndicesPtr_;
 	//*************** END based on solidGeneral**************
 	
         //- Store a copy of the patch dictionary
@@ -131,15 +131,15 @@ class solid4GeneralContactFvPatchVectorField
         //- Write the contact point distances fields for viewing
         const Switch writePointDistanceFields_;
 
-        //- Shadow patch names
-    //    mutable wordList shadowPatchNames_;
+        //- Slave patch names
+    //    mutable wordList slavePatchNames_;
 		
 		//************ based on solidGeneralContact****************
-		mutable List<word>* shadowPatchNames_;
+		mutable List<word>* slavePatchNames_;
 		//************ END based on solidGeneralContact****************
 
-        //- Shadow patch indices
-        mutable labelList* shadowPatchIndicesPtr_;
+        //- Slave patch indices
+        mutable labelList* slavePatchIndicesPtr_;
 
         //- Is the contact boundary active
         Switch rigidMaster_;
@@ -156,9 +156,9 @@ class solid4GeneralContactFvPatchVectorField
         //- Master face zone kept in deformed configuration
         mutable globalPolyPatch* zonePtr_;
 
-        //- Shadow face zones kept in deformed configuration
+        //- Slave face zones kept in deformed configuration
         //  Stored by the master patch
-        mutable PtrList<globalPolyPatch> shadowZones_;
+        mutable PtrList<globalPolyPatch> slaveZones_;
 
         //- Zone-to-zone interpolations
         mutable PtrList<newGgiStandAlonePatchInterpolation> zoneToZones_;
@@ -183,11 +183,11 @@ class solid4GeneralContactFvPatchVectorField
         //  0 means not in contact
         scalarField contact_;
 
-        //- Contact field corresponding to each shadow patch, stored on the
+        //- Contact field corresponding to each slave patch, stored on the
         //  current patch
         //  1 means in contact
         //  0 means not in contact
-        mutable PtrList<scalarField> contactPerShadow_;
+        mutable PtrList<scalarField> contactPerSlave_;
 
         //- Flag to enable approach for scaling traction near the downstream
         //  patch to fix an issue with unphysical behaviour
@@ -210,15 +210,15 @@ class solid4GeneralContactFvPatchVectorField
         //- Is a moving mesh (e.g. updated Lagrangian) approach be used
         bool movingMesh() const;
 
-        //- Make the shadow patch names
-        //void makeShadowPatchNames(const dictionary& dict) const;
+        //- Make the slave patch names
+        //void makeSlavePatchNames(const dictionary& dict) const;
 		
 		// ************ based on solidGeneral ****New declaration ***
-		//- Make the shadow patch names
-        void makeShadowPatchNames() const;
+		//- Make the slave patch names
+        void makeSlavePatchNames() const;
 
-        //- Calculate the shadow patch indices
-        void calcShadowPatchIndices() const;
+        //- Calculate the slave patch indices
+        void calcSlavePatchIndices() const;
 
         //- Make normal contact models
         void makeNormalModels(const dictionary& dict) const;
@@ -232,8 +232,8 @@ class solid4GeneralContactFvPatchVectorField
         //- Create the zone
         void calcZone() const;
 
-        //- Create the shadow zones
-        void calcShadowZones() const;
+        //- Create the slave zones
+        void calcSlaveZones() const;
 
         //- Create the zone-to-zone interpolators
         void calcZoneToZones() const;
@@ -241,8 +241,8 @@ class solid4GeneralContactFvPatchVectorField
         //- Move the master and slave zones to the deformed configuration
         void moveZonesToDeformedConfiguration();
 		
-        // Set the contactPerShadow field
-        void calcContactPerShadow() const;
+        // Set the contactPerSlave field
+        void calcContactPerSlave() const;
 		
 		//*************** based on solidGeneral*****************
 		//- Check global master patch
@@ -257,11 +257,11 @@ class solid4GeneralContactFvPatchVectorField
 		//- Return local slaves
 			const boolList& localSlave() const;
 			
-		//- Calculate shadowG patch names
-        void calcshadowGPatchNames() const;
+		//- Calculate slaveG patch names
+        void calcslaveGPatchNames() const;
 
-        //- Calculate shadowG zone names
-        void calcshadowGZoneNames() const;
+        //- Calculate slaveG zone names
+        void calcslaveGZoneNames() const;
 		//*************** END based on solidGeneral*****************
 
         // //- Interpolate zone face values to points
@@ -377,27 +377,27 @@ public:
             //- Return index of global master patch
             label firstPatchIndexInList() const;
 			
-			//Step1 - Return the list of shadowG patch names
-            const List<word>& shadowGPatchNames() const;
+			//Step1 - Return the list of slaveG patch names
+            const List<word>& slaveGPatchNames() const;
 
-            //Step3 - Return the list of shadowG patch indices
-            const List<label>& shadowGPatchIndices() const;
+            //Step3 - Return the list of slaveG patch indices
+            const List<label>& slaveGPatchIndices() const;
         
-            //- Return the list of shadowG zone names
-            const List<word>& shadowGZoneNames() const;
+            //- Return the list of slaveG zone names
+            const List<word>& slaveGZoneNames() const;
 
-            //- Return the list of shadowG zone indices
-            const List<label>& shadowGZoneIndices() const;
+            //- Return the list of slaveG zone indices
+            const List<label>& slaveGZoneIndices() const;
 			
 			//Step2's - Return const reference to deformed master zone
-            const standAlonePatch& shadowGZone(const label shadowGI) const;
+            const standAlonePatch& slaveGZone(const label slaveGI) const;
 
             //- Return reference to deformed master zone
-            standAlonePatch& shadowGZone(const label shadowGI);
+            standAlonePatch& slaveGZone(const label slaveGI);
 			
-			//- Given the patch index of a shadowG, return the position in the
-            // shadowG list of the current patch
-            label findshadowGID(const label patchID) const;
+			//- Given the patch index of a slaveG, return the position in the
+            // slaveG list of the current patch
+            label findslaveGID(const label patchID) const;
 			//*************** END based on solidGeneral*****************
 			
             //- Return if this patch is the slave
@@ -406,20 +406,20 @@ public:
                 return master_;
             }
 
-            //- Return the shadow patch names
-            //const wordList& shadowPatchNames() const;
+            //- Return the slave patch names
+            //const wordList& slavePatchNames() const;
 			
 			//*************** based on solidGeneral*****************
-			//- Return the list of shadow patch names
-            const List<word>& shadowPatchNames() const;
+			//- Return the list of slave patch names
+            const List<word>& slavePatchNames() const;
 			//*************** END based on solidGeneral*****************
 
-            //- Return the shadow patch indices
-            const labelList& shadowPatchIndices() const;
+            //- Return the slave patch indices
+            const labelList& slavePatchIndices() const;
 
-            //- Return the shadow patch
-            //  This function is not allowed if shadowPatchIndices.size() > 1
-            const solid4GeneralContactFvPatchVectorField& shadowPatchField() const;
+            //- Return the slave patch
+            //  This function is not allowed if slavePatchIndices.size() > 1
+            const solid4GeneralContactFvPatchVectorField& slavePatchField() const;
 
             //- Return reference to the normal contact models
             PtrList<generalNormalContactModel>& normalModels();
@@ -447,11 +447,11 @@ public:
             //- Return reference to deformed zone
             globalPolyPatch& zone();
 
-            //- Return const reference to deformed shadow zones
-            const PtrList<globalPolyPatch>& shadowZones() const;
+            //- Return const reference to deformed slave zones
+            const PtrList<globalPolyPatch>& slaveZones() const;
 
-            //- Return reference to deformed shadow zones
-            PtrList<globalPolyPatch>& shadowZones();
+            //- Return reference to deformed slave zones
+            PtrList<globalPolyPatch>& slaveZones();
 
             //- Return const reference to patch-to-patch interpolation
             const PtrList<newGgiStandAlonePatchInterpolation>&
@@ -476,16 +476,16 @@ public:
                 return contact_;
             }
 
-            //- Return reference to contactPerShadow fields
-            PtrList<scalarField>& contactPerShadow();
+            //- Return reference to contactPerSlave fields
+            PtrList<scalarField>& contactPerSlave();
 
-            //- Return const reference to contactPerShadow fields
-            const PtrList<scalarField>& contactPerShadow() const;
+            //- Return const reference to contactPerSlave fields
+            const PtrList<scalarField>& contactPerSlave() const;
 			
 			//************** based on solidGeneral************
-			//- Given the patch index of a shadow, return the position in the
-            // shadow list of the current patch
-            label findShadowID(const label patchID) const;
+			//- Given the patch index of a slave, return the position in the
+            // slave list of the current patch
+            label findSlaveID(const label patchID) const;
 			//************** END based on solidGeneral**********
 
         // Mapping functions

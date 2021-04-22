@@ -471,7 +471,7 @@ Foam::solid4ContactFvPatchVectorField::zone() const
         {
             calcZone();
         }
-
+		
         return *zonePtr_;
     }
     else
@@ -535,6 +535,7 @@ Foam::solid4ContactFvPatchVectorField::shadowZones() const
         {
             calcShadowZones();
         }
+		
 
         return shadowZones_;
     }

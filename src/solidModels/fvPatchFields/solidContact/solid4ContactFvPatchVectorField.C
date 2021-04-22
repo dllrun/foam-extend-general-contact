@@ -1140,9 +1140,10 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
                         shadowPatchIndices()[shadPatchI]
                     ];
             }
-
+						
             // Master zone DD
             const vectorField zoneDD = zone().patchFaceToGlobal(patchDD);
+			Info<<"zoneDD in updateCoeffs(): "<<zoneDD<<endl;
 			
 			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Master patch DD interpolated to the slave patch
