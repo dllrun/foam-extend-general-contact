@@ -278,6 +278,7 @@ void Foam::solid4ContactFvPatchVectorField::makeFrictionModels
 
 void Foam::solid4ContactFvPatchVectorField::clearOut()
 {
+	Info<<"In clearOut() line:"<<__LINE__<<endl;
     if (debug)
     {
         InfoIn
@@ -635,6 +636,7 @@ Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
 Foam::solid4ContactFvPatchVectorField::
 ~solid4ContactFvPatchVectorField()
 {
+	Info<<"Does it enter destructor?"<<__LINE__<<endl;
     clearOut();
 }
 

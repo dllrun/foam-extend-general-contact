@@ -191,6 +191,54 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcFirstPatchIndexInList() c
     }
 }
 
+//******************* current master **********************
+bool Foam::solid4GeneralContactFvPatchVectorField::currentMaster() const
+{
+    if (!currentMasterPtr_)
+    {
+        calcCurrentMaster();
+    }
+	Info<< "In currentMaster() "<<__LINE__<<endl;
+	Info<< "patch().index() in currentMaster() "<<patch().index()<<endl;
+	Info<< "patch().name() in currentMaster() "<<patch().name()<<endl;
+	return *currentMasterPtr_;
+}
+
+
+void Foam::solid4GeneralContactFvPatchVectorField::calcCurrentMaster() const   //// CHECK method to calculate global master
+{
+	
+    if (currentMasterPtr_)
+    {
+        FatalErrorIn
+            (
+                "void Foam::solid4GeneralContactFvPatchVectorField::"
+                "calcCurrentMaster() const"
+            )   << "currentMasterPtr_ already set" << abort(FatalError);
+    }
+
+    // The global master is the first solid4GeneralContact patch i.e. the one
+    // with the lowest patch index
+	
+	const boolList& locSlave = localSlave();
+	
+	Info<< "In calcCurrentMaster() "<<__LINE__<<endl;
+	Info<< "patch().index() in calcCurrentMaster() "<<patch().index()<<endl;
+    forAll(locSlave, shadowI)
+    {
+        if (locSlave[shadowI])
+        {
+			currentMasterPtr_ = new bool(true);
+		}
+		else
+		{
+			currentMasterPtr_ = new bool(false);
+		}
+    }	
+		
+}
+
+//***************** end current master ********************
 
 const Foam::boolList&
 Foam::solid4GeneralContactFvPatchVectorField::localSlave() const
@@ -516,6 +564,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeFrictionModels
 
 void Foam::solid4GeneralContactFvPatchVectorField::clearOut()
 {
+	Info<<"In clearOut() line:"<<__LINE__<<endl;
     if (debug)
     {
         InfoIn
@@ -526,6 +575,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::clearOut()
 	//************ based on solid General*************
 	deleteDemandDrivenData(firstPatchPtr_);
     deleteDemandDrivenData(firstPatchIndexInListPtr_);
+	deleteDemandDrivenData(currentMasterPtr_);
+    deleteDemandDrivenData(currentMasterIndexPtr_);
     deleteDemandDrivenData(localSlavePtr_);
 	//************ END based on solid General*************
     
@@ -611,6 +662,8 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 	//******** based on solid General***************
     firstPatchPtr_(NULL),
     firstPatchIndexInListPtr_(NULL),
+	currentMasterPtr_(NULL),
+    currentMasterIndexPtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
     dict_(),
@@ -653,6 +706,8 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 	//******** based on solid General***************
     firstPatchPtr_(NULL),
     firstPatchIndexInListPtr_(NULL),
+	currentMasterPtr_(NULL),
+    currentMasterIndexPtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
     dict_(dict),
@@ -750,6 +805,25 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
                 << "patch!" << endl;
         }
     }
+	
+	if (currentMasterPtr_)//if (ocalSlavePtr_)
+    {
+        rigidMaster_ = Switch(dict.lookup("rigidMaster"));
+
+        if (debug)
+        {
+            Info<< "    writePointDistanceFields: " << writePointDistanceFields_
+                << endl;
+        }
+
+        if (scaleFaceTractionsNearDownstreamPatch_)
+        {
+            WarningIn(type() + "::" + type())
+                << "scaleFaceTractionsNearDownstreamPatch can only be applied on"
+                << "the slave patch: this option will be ignored for the master "
+                << "patch!" << endl;
+        }
+    }
 
     if (dict.found("gradient"))
     {
@@ -786,6 +860,8 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     //******** based on solid General***************
     firstPatchPtr_(NULL),
     firstPatchIndexInListPtr_(NULL),
+	currentMasterPtr_(NULL),
+    currentMasterIndexPtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
 	dict_(ptf.dict_),
@@ -832,6 +908,16 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
         firstPatchIndexInListPtr_ = new label(*ptf.firstPatchIndexInListPtr_);
     }
 	
+	if (ptf.currentMasterPtr_)
+    {
+        currentMasterPtr_ = new bool(*ptf.currentMasterPtr_);
+    }
+	
+	if (ptf.currentMasterIndexPtr_)
+    {
+        currentMasterIndexPtr_ = new label(*ptf.currentMasterIndexPtr_);
+    }
+	
 	if (ptf.localSlavePtr_)
     {
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
@@ -849,6 +935,8 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 	//******** based on solid General***************
     firstPatchPtr_(NULL),
     firstPatchIndexInListPtr_(NULL),
+	currentMasterPtr_(NULL),
+    currentMasterIndexPtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
     dict_(ptf.dict_),
@@ -894,6 +982,16 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     {
         firstPatchIndexInListPtr_ = new label(*ptf.firstPatchIndexInListPtr_);
     }
+	
+	if (ptf.currentMasterPtr_)
+    {
+        currentMasterPtr_ = new bool(*ptf.currentMasterPtr_);
+    }
+
+    if (ptf.currentMasterIndexPtr_)
+    {
+        currentMasterIndexPtr_ = new label(*ptf.currentMasterIndexPtr_);
+    }
 
     if (ptf.localSlavePtr_)
     {
@@ -913,6 +1011,8 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 	//******** based on solid General***************
     firstPatchPtr_(NULL),
     firstPatchIndexInListPtr_(NULL),
+	currentMasterPtr_(NULL),
+    currentMasterIndexPtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
     dict_(ptf.dict_),
@@ -974,6 +1074,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 Foam::solid4GeneralContactFvPatchVectorField::
 ~solid4GeneralContactFvPatchVectorField()
 {
+	Info<<"Does it enter destructor?"<<__LINE__<<endl;
     clearOut();
 }
 
@@ -1485,13 +1586,13 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
             tensorField(0), tensorField(0), vectorField(0)
         );
 		}
-    //}
+    }
 		
 		
 	
 	
-	//forAll(activeContactPairs, shadPatchI)
-	//{
+	forAll(activeContactPairs, shadPatchI)
+	{
 		Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 		Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
 			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;

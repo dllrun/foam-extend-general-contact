@@ -100,6 +100,12 @@ class solid4GeneralContactFvPatchVectorField
 		//- Patch index of global master patch
         mutable label* firstPatchIndexInListPtr_;
 		
+		//- Is this the current master patch
+        mutable bool* currentMasterPtr_;
+		
+		//- Patch index of current master patch
+        mutable label* currentMasterIndexPtr_;
+		
 		//- If the current patch is the local slave of the contact pair
         // The local slave is the patch with the lower patch index
         mutable boolList* localSlavePtr_;
@@ -251,6 +257,12 @@ class solid4GeneralContactFvPatchVectorField
         //- Check global master patch index
         void calcFirstPatchIndexInList() const;
 		
+		//- Check current master patch
+        void calcCurrentMaster() const;
+		
+		//- Check current master patch index
+        void calcCurrentMasterIndex() const;
+		
 		//- Calculate local slaves
         void calcLocalSlave() const;
 		
@@ -376,6 +388,12 @@ public:
 
             //- Return index of global master patch
             label firstPatchIndexInList() const;
+			
+			//- Return true if this patch is the current master
+            bool currentMaster() const;
+
+            //- Return index of current master patch
+            label currentMasterIndex() const;			
 			
 			//Step1 - Return the list of slaveG patch names
             const List<word>& slaveGPatchNames() const;
