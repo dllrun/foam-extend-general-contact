@@ -87,10 +87,10 @@ Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
         // Take a reference to the patch face total displacement field
         const vectorField& patchD =
             D.boundaryField()[patch().index()];
+			
+		Info<<"patchD IN -- moveZonesToDeformedConfiguration(): "<<patchD<<endl;
 
-        Info<<"patchD IN -- moveZonesToDeformedConfiguration(): "<<patchD<<endl;
-		
-		zoneD = zone().patchFaceToGlobal(patchD);
+        zoneD = zone().patchFaceToGlobal(patchD);
     }
 
     // Interpolate the zone face field to the zone points
@@ -153,8 +153,7 @@ Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
             // Lookup the current total displacement field
             const volVectorField& D = db().lookupObject<volVectorField>("U");
 		//	const volVectorField& D = db().lookupObject<volVectorField>("D");
-			Info<<"D.size() internal field size in moveZonesToDeformedConfiguration(): "<<D.size()<<endl;
-			
+
             // Take a reference to the patch face total displacement field
             const vectorField& slavePatchD =
                 D.boundaryField()[slavePatchIndices()[shadPatchI]];
@@ -203,9 +202,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const
         InfoIn("void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const")
             << patch().name() << " : making the zone" << endl;
     }
-	
-	// Remove this check for now
-	
+
     if (!currentMaster())
     {
         FatalErrorIn
@@ -213,7 +210,6 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const
             "void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const"
         )   << "Trying to create zone on a slave" << abort(FatalError);
     }
-	
 
     if (zonePtr_)
     {
@@ -281,7 +277,6 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcSlaveZones() const
     }
 }
 
-
 void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
 {
     if (debug)
@@ -297,31 +292,23 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
     {
         FatalErrorIn
         (
-            "void solidContactFvPatchScalarField::calcZoneToZones() const"
+            "void solid4GeneralContactFvPatchScalarField::calcZoneToZones() const"
         )   << "Zone to zone interpolation already calculated"
             << abort(FatalError);
     }
-	
-	Info<< "patch().name() in calcZoneToZones() "<<patch().name()<<endl;
-	Info<< "patch().index() in calcZoneToZones() "<<patch().index()<<endl;
-	Info<<"In calcZoneToZones() line: "<<__LINE__<<endl;
-    
-	// Check master and slave patch
+
+    // Check master and slave patch
     const volVectorField& field =
         db().lookupObject<volVectorField>
         (
             this->dimensionedInternalField().name()
         );
-	
-	
-	const boolList& locSlave = localSlave();
 
     zoneToZones_.setSize(slavePatchNames().size());
 
     forAll (zoneToZones_, shadPatchI)
     {
-        
-		const solid4GeneralContactFvPatchVectorField& slavePatchField =
+        const solid4GeneralContactFvPatchVectorField& slavePatchField =
             refCast<const solid4GeneralContactFvPatchVectorField>
             (
                 field.boundaryField()[slavePatchIndices()[shadPatchI]]
@@ -333,7 +320,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
             {
                 FatalErrorIn
                 (
-                    "void solidContactFvPatchScalarField::"
+                    "void solid4GeneralContactFvPatchScalarField::"
                     "calcZoneToZones() const"
                 )   << "There are two master patches!" << abort(FatalError);
             }
@@ -344,16 +331,15 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
             {
                 FatalErrorIn
                 (
-                    "void solidContactFvPatchScalarField::"
+                    "void solid4GeneralContactFvPatchScalarField::"
                     "calcZoneToZones() const"
                 )   << "There is no master patch!" << abort(FatalError);
             }
         }
-		
-        
-		if (locSlave[shadPatchI]) //if (firstPatchInList())
+
+        if (currentMaster())
         {
-			Info<<"In calcZoneToZones() line: "<<__LINE__<<endl;
+			Info<<"IN -- CalcZoneToZones() line:"<<__LINE__<<endl;
             // Create interpolation for patches
             zoneToZones_.set
             (
@@ -446,6 +432,169 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
     }
 }
 
+//************************ commited calcZoneToZones ***********
+/*
+void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
+{
+    if (debug)
+    {
+        InfoIn
+        (
+            "void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const"
+        )   << patch().name() << " : making the zoneToZone" << endl;
+    }
+
+    // Create zone-to-zone interpolation
+    if (!zoneToZones_.empty())
+    {
+        FatalErrorIn
+        (
+            "void solid4GeneralContactFvPatchScalarField::calcZoneToZones() const"
+        )   << "Zone to zone interpolation already calculated"
+            << abort(FatalError);
+    }
+
+    /..
+	// Check master and slave patch
+    const volVectorField& field =
+        db().lookupObject<volVectorField>
+        (
+            this->dimensionedInternalField().name()
+        );
+	../
+	
+	const boolList& locSlave = localSlave();
+
+    zoneToZones_.setSize(slavePatchNames().size());
+
+    forAll (zoneToZones_, shadPatchI)
+    {
+        /..
+		const solid4GeneralContactFvPatchVectorField& slavePatchField =
+            refCast<const solid4GeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[slavePatchIndices()[shadPatchI]]
+            );
+
+        if (currentMaster())
+        {
+            if (slavePatchField.master() == true)
+            {
+                FatalErrorIn
+                (
+                    "void solid4GeneralContactFvPatchScalarField::"
+                    "calcZoneToZones() const"
+                )   << "There are two master patches!" << abort(FatalError);
+            }
+        }
+        else
+        {
+            if (slavePatchField.master() == false)
+            {
+                FatalErrorIn
+                (
+                    "void solid4GeneralContactFvPatchScalarField::"
+                    "calcZoneToZones() const"
+                )   << "There is no master patch!" << abort(FatalError);
+            }
+        }
+		../
+        
+		if (locSlave[shadPatchI]) //if (currentMaster())
+        {
+            // Create interpolation for patches
+            zoneToZones_.set
+            (
+                shadPatchI,
+                new newGgiStandAlonePatchInterpolation
+                (
+                    zone().globalPatch(),
+                    slaveZones()[shadPatchI].globalPatch(),
+                    tensorField(0),
+                    tensorField(0),
+                    vectorField(0), // Slave-to-master separation. Bug fix
+                    true,           // global data
+                    0,              // Master non-overlapping face tolerances
+                    0,              // Slave non-overlapping face tolerances
+                    // Do not rescale weighting factors, as it is wrong on
+                    // partially covered faces
+                    false,
+                    quickReject_,
+                    regionOfInterest_
+                )
+            );
+
+            // Check which point distance calculation method to use
+            const Switch useNewPointDistanceMethod =
+                dict_.lookupOrDefault<Switch>
+                (
+                    "useNewPointDistanceMethod", false
+                );
+
+            Info<< "    " << type() << ": " << patch().name() << nl
+                << "        useNewPointDistanceMethod: "
+                << useNewPointDistanceMethod
+                << endl;
+
+            zoneToZones_[shadPatchI].useNewPointDistanceMethod() =
+                useNewPointDistanceMethod;
+
+            // Check if the projectPointsToPatchBoundary switch is set
+            const Switch projectPointsToPatchBoundary =
+                dict_.lookupOrDefault<Switch>
+                (
+                    "projectPointsToPatchBoundary",
+                    false
+                );
+
+            Info<< "        projectPointsToPatchBoundary: "
+                << projectPointsToPatchBoundary
+                << endl;
+
+            zoneToZones_[shadPatchI].projectPointsToPatchBoundary() =
+                projectPointsToPatchBoundary;
+
+            if (dict_.found("checkPointDistanceOrientations"))
+            {
+                const Switch checkPointDistanceOrientations =
+                    Switch(dict_.lookup("checkPointDistanceOrientations"));
+
+                Info<< "        checkPointDistanceOrientations: "
+                    << checkPointDistanceOrientations
+                    << endl;
+
+                zoneToZones_[shadPatchI].checkPointDistanceOrientations() =
+                    checkPointDistanceOrientations;
+            }
+
+            // Check if the usePrevCandidateMasterNeighbors switch is set
+            const Switch usePrevCandidateMasterNeighbors =
+                dict_.lookupOrDefault<Switch>
+                (
+                    "usePrevCandidateMasterNeighbors",
+                    false
+                );
+
+            Info<< "        usePrevCandidateMasterNeighbors: "
+                << usePrevCandidateMasterNeighbors
+                << endl;
+
+            zoneToZones_[shadPatchI].usePrevCandidateMasterNeighbors() =
+                usePrevCandidateMasterNeighbors;
+        }
+        else
+        {
+            FatalErrorIn
+            (
+                "void solid4GeneralContactFvPatchVectorField::"
+                "calcZoneToZones() const"
+            )   << "Attempting to create GGIInterpolation on a slave patch"
+                << abort(FatalError);
+        }
+    }
+}
+*/
+//****************** END commited calcZoneToZones ***************
 
 void Foam::solid4GeneralContactFvPatchVectorField::calcContactPerSlave() const
 {
@@ -477,24 +626,21 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcContactPerSlave() const
 const Foam::globalPolyPatch&
 Foam::solid4GeneralContactFvPatchVectorField::zone() const
 {
-	Info<< "patch().name() in zone() "<<patch().name()<<endl;
-	Info<< "patch().index() in zone() "<<patch().index()<<endl;
-	Info<<"In zone() line:"<<__LINE__<<endl;
-    
-	if (currentMaster())
+	Info<<"IN -- zone() line:"<<__LINE__<<endl;
+	
+	//findSlaveID(patch().index())
+    if (currentMaster())  //if (globalMaster())
     {
-		Info<<"In zone() line:"<<__LINE__<<endl;
         if (!zonePtr_)
         {
+			Info<<"IN -- if (!zonePtr_) of zone() line:"<<__LINE__<<endl;
             calcZone();
         }
 
         return *zonePtr_;
     }
-    
-	else
+    else
     {
-		Info<<"In zone() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -509,30 +655,26 @@ Foam::solid4GeneralContactFvPatchVectorField::zone() const
 
         return slavePatchField.zone();
     }
-	
 }
 
 
 Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 {
-	Info<< "patch().name() in zone() "<<patch().name()<<endl;
-	Info<< "patch().index() in zone() "<<patch().index()<<endl;
-	Info<<"In zone() line:"<<__LINE__<<endl;
-			
-    if (currentMaster())
+	Info<<"IN -- zone() line:"<<__LINE__<<endl;
+    if (currentMaster())   //if (globalMaster())
     {
-		Info<<"In zone() line:"<<__LINE__<<endl;
+		Info<<"IN -- zone() line:"<<__LINE__<<endl;
         if (!zonePtr_)
         {
+			Info<<"IN -- if (!zonePtr_) of zone() line:"<<__LINE__<<endl;
             calcZone();
         }
 
         return *zonePtr_;
-    
-	}	
+    }
     else
     {
-		Info<<"In zone() line:"<<__LINE__<<endl;
+		Info<<"IN -- zone() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -549,17 +691,19 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
             );
 		
         return slavePatchField.zone();
-    }	
+    }
 }
 
 
 const Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solid4GeneralContactFvPatchVectorField::slaveZones() const
 {
+	Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
     if (currentMaster())
     {
         if (slaveZones_.empty())
         {
+			Info<<"IN -- if (slaveZones_.empty()) of slaveZones() line:"<<__LINE__<<endl;
             calcSlaveZones();
         }
 
@@ -587,17 +731,21 @@ Foam::solid4GeneralContactFvPatchVectorField::slaveZones() const
 Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solid4GeneralContactFvPatchVectorField::slaveZones()
 {
+	Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
     if (currentMaster())
     {
+		Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
         if (slaveZones_.empty())
         {
             calcSlaveZones();
         }
 		
+		Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
         return slaveZones_;
     }
     else
     {
+		Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -612,7 +760,8 @@ Foam::solid4GeneralContactFvPatchVectorField::slaveZones()
                     field.boundaryField()[slavePatchIndices()[0]]
                 )
             );
-
+		
+		Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
         return slavePatchField.slaveZones();
     }
 }
@@ -622,13 +771,13 @@ const Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
 Foam::solid4GeneralContactFvPatchVectorField::zoneToZones() const
 {
 	Info<<"IN -- zoneToZones() line:"<<__LINE__<<endl;
-    if (currentMaster())
+    if (currentMaster()) //if (globalMaster())
     {
         if (zoneToZones_.empty())
         {
             calcZoneToZones();
         }
-
+	
         return zoneToZones_;
     }
     else
@@ -653,14 +802,15 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones() const
 Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
 Foam::solid4GeneralContactFvPatchVectorField::zoneToZones()
 {
-    Info<<"IN -- zoneToZones() line:"<<__LINE__<<endl;
-    if (currentMaster())
+	Info<<"IN -- zoneToZones() line:"<<__LINE__<<endl;
+    if (currentMaster()) //if (globalMaster())
     {
         if (zoneToZones_.empty())
         {
             calcZoneToZones();
         }
-
+		
+	Info<<"IN -- zoneToZones() line:"<<__LINE__<<endl;
         return zoneToZones_;
     }
     else
@@ -681,7 +831,8 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones()
                     field.boundaryField()[slavePatchIndices()[0]]
                 )
             );
-
+			
+		Info<<"IN -- zoneToZones() line:"<<__LINE__<<endl;
         return slavePatchField.zoneToZones();
     }
 
@@ -691,6 +842,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones()
 const Foam::newGgiStandAlonePatchInterpolation&
 Foam::solid4GeneralContactFvPatchVectorField::zoneToZoneForThisSlave() const
 {
+	Info<<"IN -- zoneToZoneForThisSlave() line:"<<__LINE__<<endl;
     if (currentMaster())
     {
         FatalErrorIn
@@ -734,6 +886,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZoneForThisSlave() const
 const Foam::globalPolyPatch&
 Foam::solid4GeneralContactFvPatchVectorField::zoneForThisSlave() const
 {
+	Info<<"IN -- zoneToZoneForThisSlave() line:"<<__LINE__<<endl;
     if (currentMaster())
     {
         FatalErrorIn

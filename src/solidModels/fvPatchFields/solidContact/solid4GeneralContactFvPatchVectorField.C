@@ -1636,13 +1636,18 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	
 		if (activeContactPairs[shadPatchI])
         {
+			if(currentMaster())
+			{
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;	
+			}
+			
 			Info<<"Checking mMASTER or sSLAVE in updateCoeffs() line:"<<__LINE__<<endl;
 			Info<<"locSlave[shadPatchI] in updateCoeffs(): "<<locSlave[shadPatchI]<<endl;
 			if (locSlave[shadPatchI])  //MASTER starts
             {
 			// Reset the traction to zero as we will accumulate it over all the
 			// slave patches
-			traction() = vector::zero;
+			//traction() = vector::zero;
 			
 			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Calculate the slave patch face unit normals as they are used by
