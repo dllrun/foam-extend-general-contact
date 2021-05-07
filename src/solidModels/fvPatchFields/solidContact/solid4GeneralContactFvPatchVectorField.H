@@ -206,6 +206,9 @@ class solid4GeneralContactFvPatchVectorField
         label curTimeIndex_;
 		
 		//*************** based on solidGeneral*****************
+		//- The current patch tractions for each contatc pair
+        mutable List<vectorField>* curPatchTractionPtr_;
+		
 		//- Offset used if bounding box of patch has a zero dimension
         mutable scalar bbOffset_;
 		//*************** END based on solidGeneral*****************
@@ -274,6 +277,9 @@ class solid4GeneralContactFvPatchVectorField
 
         //- Calculate slaveG zone names
         void calcslaveGZoneNames() const;
+		
+		//- Make the current patch traction list
+        void makeCurPatchTractions() const;
 		//*************** END based on solidGeneral*****************
 
         // //- Interpolate zone face values to points
@@ -416,6 +422,12 @@ public:
 			//- Given the patch index of a slaveG, return the position in the
             // slaveG list of the current patch
             label findslaveGID(const label patchID) const;
+			
+			//- Return the current patch traction for slaveI
+            const vectorField& curPatchTractions(const label slaveI) const;
+			
+			//- Return the current patch traction for slaveI
+            vectorField& curPatchTractions(const label slaveI);
 			//*************** END based on solidGeneral*****************
 			
             //- Return if this patch is the slave

@@ -224,9 +224,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcCurrentMaster() const   /
 	
 	Info<< "In calcCurrentMaster() "<<__LINE__<<endl;
 	Info<< "patch().index() in calcCurrentMaster() "<<patch().index()<<endl;
-    forAll(locSlave, shadowI)
+    forAll(locSlave, slaveI)
     {
-        if (locSlave[shadowI])
+        if (locSlave[slaveI])
         {
 			currentMasterPtr_ = new bool(true);
 		}
@@ -578,6 +578,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::clearOut()
 	deleteDemandDrivenData(currentMasterPtr_);
     deleteDemandDrivenData(currentMasterIndexPtr_);
     deleteDemandDrivenData(localSlavePtr_);
+	deleteDemandDrivenData(curPatchTractionPtr_);
 	//************ END based on solid General*************
     
 	deleteDemandDrivenData(slavePatchIndicesPtr_);
@@ -689,6 +690,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     scaleTractionFieldPtr_(),
     curTimeIndex_(-1),
 	//******** based on solid General*************
+	curPatchTractionPtr_(NULL),
 	bbOffset_(0.0)
 	//******** END based on solid General*************
 {
@@ -775,6 +777,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     scaleTractionFieldPtr_(),
     curTimeIndex_(-1),
 	//******** based on solid General*************
+	curPatchTractionPtr_(NULL),
 	bbOffset_(0.0)
 	//******** END based on solid General*************
 {
@@ -890,6 +893,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     scaleTractionFieldPtr_(),
     curTimeIndex_(ptf.curTimeIndex_),
 	//******** based on solid General*************
+	curPatchTractionPtr_(NULL),
 	bbOffset_(ptf.bbOffset_)
 	//******** END based on solid General*************
 {
@@ -921,6 +925,12 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
 	if (ptf.localSlavePtr_)
     {
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+    }
+	
+	if (ptf.curPatchTractionPtr_)
+    {
+        curPatchTractionPtr_ =
+            new List<vectorField>(*ptf.curPatchTractionPtr_);
     }
 	//******************* END based on solid General******************
 }
@@ -965,6 +975,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     scaleTractionFieldPtr_(),
     curTimeIndex_(ptf.curTimeIndex_),
 	//******** based on solid General*************
+	curPatchTractionPtr_(NULL),
 	bbOffset_(ptf.bbOffset_)
 	//******** END based on solid General*************
 {
@@ -996,6 +1007,12 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     if (ptf.localSlavePtr_)
     {
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+    }
+	
+	if (ptf.curPatchTractionPtr_)
+    {
+        curPatchTractionPtr_ =
+            new List<vectorField>(*ptf.curPatchTractionPtr_);
     }
 	//******************* END based on solid General******************
 }
@@ -1041,6 +1058,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     scaleTractionFieldPtr_(),
     curTimeIndex_(ptf.curTimeIndex_),
 	//******** based on solid General*************
+	curPatchTractionPtr_(NULL),
 	bbOffset_(ptf.bbOffset_)
 	//******** END based on solid General*************
 {
@@ -1062,6 +1080,12 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     if (ptf.localSlavePtr_)
     {
         localSlavePtr_ = new boolList(*ptf.localSlavePtr_);
+    }
+	
+	if (ptf.curPatchTractionPtr_)
+    {
+        curPatchTractionPtr_ =
+            new List<vectorField>(*ptf.curPatchTractionPtr_);
     }
 	*/
 	//******************* END based on solid General******************
@@ -1202,6 +1226,7 @@ Foam::solid4GeneralContactFvPatchVectorField::slavePatchIndices() const
 const Foam::solid4GeneralContactFvPatchVectorField&
 Foam::solid4GeneralContactFvPatchVectorField::slavePatchField() const
 {
+	Info<<"In slavePatchField() line:"<<__LINE__<<endl;
     if (slavePatchIndices().size() != 1)
     {
         FatalErrorIn
@@ -1239,6 +1264,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels()
     }
     else
     {
+		Info<<"ELSE in normalModels() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -1273,6 +1299,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels() const
     }
     else
     {
+		Info<<"ELSE in normalModels() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -1528,7 +1555,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
     }
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
     // Move the master and slave zone to the deformed configuration
-    if (firstPatchInList())
+    if (currentMaster())   //(firstPatchInList())
     {
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	moveZonesToDeformedConfiguration();
@@ -1588,7 +1615,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 		}
     }
 		
-		
+	// Accumulated traction for the current patch
+        vectorField curPatchTraction(patch().size(), vector::zero);
+	//	Info<<"What is curPatchTraction? "<<curPatchTraction<<endl;
 	
 	
 	forAll(activeContactPairs, shadPatchI)
@@ -1785,8 +1814,12 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                     );
 
                 // Accumulate the traction on the master patch
-                traction() += tractionForThisSlave;
-
+                curPatchTractions(shadPatchI) = tractionForThisSlave;
+				//traction() += tractionForThisSlave;
+				curPatchTraction += curPatchTractions(shadPatchI);
+				
+				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+				Info<<"MASTER curPatchTraction in updateCoeffs() :"<<curPatchTraction<<endl;
                 // Update contactPerSlave field
                 // Note: this is used by thermalContact to know which faces
                 // are in contact
@@ -1814,11 +1847,16 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         // Set the traction on the slave patch
         // The master stores the friction and normal models, so we need to find
         // which models correspond to the current slave
-        traction() =
+        //traction() =
+		curPatchTractions(shadPatchI) =
             frictionModelForThisSlave().slaveTraction()
           + normalModelForThisSlave().slavePressure();
 		
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+		
+		curPatchTraction += curPatchTractions(shadPatchI);
+		
+		Info<<"SLAVE curPatchTraction in updateCoeffs() :"<<curPatchTraction<<endl;
 		
         // TESTING - START
         // Scale traction vectors on faces, which share an edge with the
@@ -1827,7 +1865,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         // deform unphysically when being drawn into the die
 				if (scaleFaceTractionsNearDownstreamPatch_)
 				{
-				traction() *= scaleTractionField();
+				//traction() *= scaleTractionField();
+				curPatchTractions(shadPatchI) *= scaleTractionField();
 				}
         // TESTING - END
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
@@ -1835,8 +1874,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         // Update contactPerSlave field
         // Note: this is used by thermalContact to know which faces
         // are in contact
-        const scalarField magTraction = mag(traction());
-        const scalar tol = 1e-6*gMax(magTraction);
+        //const scalarField magTraction = mag(traction());
+        const scalarField magTraction = mag(curPatchTractions(shadPatchI));
+		const scalar tol = 1e-6*gMax(magTraction);
         scalarField& contactForThisSlave = contactPerSlave()[0];
 				forAll(contactForThisSlave, faceI)
 				{
@@ -1856,6 +1896,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	}// forAll contact pairs
 	
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+	
+	// Set master gradient based on accumulated traction
+    traction() = curPatchTraction;
+	
+	Info<<"traction() in updateCoeffs():"<<traction()<<endl;
 
     // Accumulate the contact indicator field
     contact_ = 0.0;

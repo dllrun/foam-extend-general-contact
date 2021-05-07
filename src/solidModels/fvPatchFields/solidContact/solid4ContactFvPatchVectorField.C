@@ -1225,6 +1225,8 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
 				Info<<"tractionForThisShadow in updateCoeffs() "<<tractionForThisShadow<<endl;
                 traction() += tractionForThisShadow;
 				
+				Info<<"traction() in updateCoeffs():"<<traction()<<endl;
+				
                 // Update contactPerShadow field
                 // Note: this is used by thermalContact to know which faces
                 // are in contact

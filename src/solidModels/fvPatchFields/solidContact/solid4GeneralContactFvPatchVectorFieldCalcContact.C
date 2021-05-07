@@ -39,7 +39,7 @@ Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
 {
 	Info<<"IN -- moveZonesToDeformedConfiguration() line:"<<__LINE__<<endl;
     // Only the master moves the zones
-    if (!firstPatchInList())
+    if (!currentMaster())   //(!firstPatchInList())
     {
         return;
     }
@@ -926,6 +926,46 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneForThisSlave() const
 
 
 //*************** based on solidGeneral*****************
+const Foam::vectorField&
+Foam::solid4GeneralContactFvPatchVectorField::curPatchTractions
+(
+    const label slaveI
+) const
+{
+	Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
+    if (!curPatchTractionPtr_)
+    {
+        makeCurPatchTractions();
+    }
+
+    return (*curPatchTractionPtr_)[slaveI];
+}
+
+
+Foam::vectorField&
+Foam::solid4GeneralContactFvPatchVectorField::curPatchTractions
+(
+    const label slaveI
+)
+{
+	Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
+    if (!curPatchTractionPtr_)
+    {
+		Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
+        makeCurPatchTractions();
+    }
+	
+	/*
+	Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
+	Info<< "The current patch in curPatchTractions() is "<< patch().name()<< endl;			
+	Info<< "patch().size() in curPatchTractions() is "<< patch().size()<< endl;
+	
+	Info<<"(*curPatchTractionPtr_) in curPatchTractions(..) "<<(*curPatchTractionPtr_)<<endl;
+    */
+	return (*curPatchTractionPtr_)[slaveI];
+}
+
+
 /*
 // Private GeneralMember functions
 void Foam::solid4GeneralContactFvPatchVectorField::calcslaveGPatchNames() const
@@ -1162,6 +1202,31 @@ Foam::label Foam::solid4GeneralContactFvPatchVectorField::findSlaveID
     }
 
     return shadPatchI;
+}
+
+void Foam::solid4GeneralContactFvPatchVectorField::makeCurPatchTractions() const
+{
+	Info<<"In makeCurPatchTractions() line "<<__LINE__<<endl;
+	
+	if (curPatchTractionPtr_)
+    {
+        FatalErrorIn
+        (
+            "void Foam::solid4GeneralContactFvPatchVectorField::"
+            "makeCurPatchTractions() const"
+        )   << "curPatchTractionPtr_ already set" << abort(FatalError);
+    }
+	
+	Info<< "The current patch in makeCurPatchTractions() is "<< patch().name()<< endl;			
+	Info<< "vectorField(patch().size() in makeCurPatchTractions() is "<< patch().size()<< endl;
+    Info<< "slavePatchNames().size() in makeCurPatchTractions() is "<< slavePatchNames().size()<< endl;
+
+    curPatchTractionPtr_ =
+        new List<vectorField>
+        (
+            slavePatchNames().size(),
+            vectorField(patch().size(), vector::zero)
+        );
 }
 
 //*************** END based on solidGeneral**************
