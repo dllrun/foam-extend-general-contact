@@ -698,12 +698,12 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 const Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solid4GeneralContactFvPatchVectorField::slaveZones() const
 {
-	Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+	//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
     if (currentMaster())
     {
         if (slaveZones_.empty())
         {
-			Info<<"IN -- if (slaveZones_.empty()) of slaveZones() line:"<<__LINE__<<endl;
+			//Info<<"IN -- if (slaveZones_.empty()) of slaveZones() line:"<<__LINE__<<endl;
             calcSlaveZones();
         }
 
@@ -731,21 +731,21 @@ Foam::solid4GeneralContactFvPatchVectorField::slaveZones() const
 Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solid4GeneralContactFvPatchVectorField::slaveZones()
 {
-	Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+	//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
     if (currentMaster())
     {
-		Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+		//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
         if (slaveZones_.empty())
         {
             calcSlaveZones();
         }
 		
-		Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+		//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
         return slaveZones_;
     }
     else
     {
-		Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+		//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -761,7 +761,7 @@ Foam::solid4GeneralContactFvPatchVectorField::slaveZones()
                 )
             );
 		
-		Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+		//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
         return slavePatchField.slaveZones();
     }
 }

@@ -240,6 +240,60 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcCurrentMaster() const   /
 
 //***************** end current master ********************
 
+
+//******************* current slave **********************
+bool Foam::solid4GeneralContactFvPatchVectorField::currentSlave() const
+{
+    if (!currentSlavePtr_)
+    {
+        calcCurrentSlave();
+    }
+	Info<< "In currentSlave() "<<__LINE__<<endl;
+	Info<< "patch().index() in currentSlave() "<<patch().index()<<endl;
+	Info<< "patch().name() in currentSlave() "<<patch().name()<<endl;
+	return *currentSlavePtr_;
+}
+
+
+void Foam::solid4GeneralContactFvPatchVectorField::calcCurrentSlave() const   //// CHECK method to calculate global master
+{
+	
+    if (currentSlavePtr_)
+    {
+        FatalErrorIn
+            (
+                "void Foam::solid4GeneralContactFvPatchVectorField::"
+                "calcCurrentSlave() const"
+            )   << "currentSlavePtr_ already set" << abort(FatalError);
+    }
+
+    // The global master is the first solid4GeneralContact patch i.e. the one
+    // with the lowest patch index 
+	
+	//const List<Foam::word>& curSlave = slavePatchNames();
+	
+	Info<< "In calcCurrentSlave() "<<__LINE__<<endl;
+	Info<< "patch().index() in calcCurrentSlave() "<<patch().index()<<endl;
+    /*
+	forAll(curSlave, slaveI)
+    {
+        if (curSlave[slaveI])
+        {
+			currentSlavePtr_ = new bool(true);
+		}
+		else
+		{
+			currentSlavePtr_ = new bool(false);
+		}
+    }
+	*/	
+		
+}
+
+//***************** end current slave ********************
+
+
+
 const Foam::boolList&
 Foam::solid4GeneralContactFvPatchVectorField::localSlave() const
 {
@@ -302,10 +356,15 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcBbOffset() const
 
     if (patch().size() > 0)
     {
+		Info<<"patch().magSf() in calcBbOffset() is "<<patch().magSf()<< endl;
+		Info<<"sqrt(patch().magSf()) in calcBbOffset() is "<<sqrt(patch().magSf())<< endl;
+		Info<<"min(sqrt(patch().magSf())) in calcBbOffset() is "<<min(sqrt(patch().magSf()))<< endl;
         minDim = min(sqrt(patch().magSf()));
     }
-
-    bbOffset_ = 5.0*returnReduce(minDim, minOp<scalar>());
+	
+	Info<<"bbOffset_ in calcBbOffset() is "<<bbOffset_<< endl;
+    bbOffset_ = 2.0*returnReduce(minDim, minOp<scalar>());
+	Info<<"bbOffset_ in calcBbOffset() is "<<bbOffset_<< endl;
 
     if (debug)
     {
@@ -319,9 +378,91 @@ Foam::scalar Foam::solid4GeneralContactFvPatchVectorField::bbOffset() const
     {
         calcBbOffset();
     }
+	Info<<"The bbOffset bbOffset() is "<<bbOffset_<< endl;
 
     return bbOffset_;
 }
+
+
+//slave bbOff functions
+
+void Foam::solid4GeneralContactFvPatchVectorField::calcSlaveBbOffset() const
+{
+	Info<<"In calcSlaveBbOffset() line:"<<__LINE__<<endl;
+    if (!slaveBbOffsetList_.empty())
+    {
+        FatalErrorIn
+        (
+            "Foam::scalar Foam::solid4GeneralContactFvPatchVectorField::"
+            "calcSlaveBbOffset() const"
+        )   << "already set" << abort(FatalError);
+    }
+
+    // We will set the BB offset to five times the average dimension of the
+    // smallest face on the zone
+
+    scalarField minDimList(slavePatchNames().size(),GREAT);
+	
+	Info<<"In calcSlaveBbOffset() line:"<<__LINE__<<endl;
+    if (patch().size() > 0)
+    {
+		//const List<Foam::word>& curSlave = slavePatchNames();
+		forAll(minDimList, shadPatchI)
+		{
+			/*	
+			patch().patch().boundaryMesh()
+                [
+                    slavePatchIndices()[0]
+                ].meshPoints();
+			*/
+		
+		minDimList[shadPatchI] = min(sqrt(patch().boundaryMesh()[slavePatchIndices()[shadPatchI]].magSf()));
+		
+		Info<<"In calcSlaveBbOffset() line:"<<__LINE__<<endl;
+		Info<<"minDimList[shadPatchI] calcSlaveBbOffset() :"<<minDimList[shadPatchI]<<endl;
+		//Info<<"slavePatchNames()[shadPatchI] calcSlaveBbOffset() :"<<slavePatchNames()[shadPatchI]<<endl;
+		}
+		
+    }	
+		//Info<<"slaveBbOffsetList_.size() in calcSlaveBbOffset() :"<<slavePatchNames().size()<<endl;
+		scalarField slaveBbOff (slavePatchNames().size(),0.0);
+			
+		Info<<"In calcSlaveBbOffset() line:"<<__LINE__<<endl;
+		
+		forAll(slaveBbOff, shadPatchI)
+		{
+			Info<<"In calcSlaveBbOffset() line:"<<__LINE__<<endl;
+		slaveBbOff[shadPatchI] = 2.0*returnReduce(minDimList[shadPatchI], minOp<scalar>());
+		}
+				
+		Info<<"In calcSlaveBbOffset() line:"<<__LINE__<<endl;
+		Info<<"slaveBbOffsetList_ in calcSlaveBbOffset() is "<<slaveBbOffsetList_<< endl;
+		slaveBbOffsetList_ = slaveBbOff;
+		Info<<"In calcSlaveBbOffset() line:"<<__LINE__<<endl;
+		Info<<"slaveBbOffsetList_ in calcSlaveBbOffset() is "<<slaveBbOffsetList_<< endl;
+		
+	
+    if (debug)
+    {
+        Info<< nl << "The bbOffset is " << slaveBbOffsetList_ << endl;
+    }
+}
+
+
+Foam::scalarField 
+Foam::solid4GeneralContactFvPatchVectorField::slaveBbOffset() const
+{
+    //if (slaveBbOffsetList_ == 0)
+	if(slaveBbOffsetList_.empty())
+    {
+       calcSlaveBbOffset();
+    }
+	//Info<<"The slavePatchNames_ in slaveBbOffset() is "<<slavePatchNames_<< endl;
+	Info<<"The bbOffset slaveBbOffset() is "<<slaveBbOffsetList_<< endl;
+
+    return slaveBbOffsetList_;
+}
+
 //******************** END based on solid General*****************
 
 
@@ -332,7 +473,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeSlavePatchNames()const
     const dictionary& dict
 ) const */
 {
-	Info<<"In makeSlavePatchNames() line:"<<__LINE__<<endl;
+	//Info<<"In makeSlavePatchNames() line:"<<__LINE__<<endl;
 	//********************** based on solid General*************
 	if (slavePatchNames_ || slavePatchIndicesPtr_)
     {
@@ -371,9 +512,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeSlavePatchNames()const
 	
 	
 	slavePatchNames_ = new wordList(nShadPatches);
-	Info<<"In makeSlavePatchNames() line:"<<__LINE__<<endl;	
+	//Info<<"In makeSlavePatchNames() line:"<<__LINE__<<endl;	
 	wordList& slavePatchNames = *slavePatchNames_;
-	Info<<"slavePatchNames in makeSlavePatchNames() "<<slavePatchNames<<endl;
+	//Info<<"slavePatchNames in makeSlavePatchNames() "<<slavePatchNames<<endl;
 	
 	slavePatchIndicesPtr_ = new labelList(nShadPatches);
     labelList& slavePatchIndices = *slavePatchIndicesPtr_;
@@ -384,8 +525,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeSlavePatchNames()const
 
     forAll(field.boundaryField(), patchI)
     {
-		Info<<"In makeSlavePatchNames() line:"<<__LINE__<<endl;
-		Info<<"patch().index() in makeSlavePatchNames(): "<<patch().index()<<endl;	
+		//Info<<"In makeSlavePatchNames() line:"<<__LINE__<<endl;
+		//Info<<"patch().index() in makeSlavePatchNames(): "<<patch().index()<<endl;	
         if
         (
             field.boundaryField()[patchI].type()
@@ -393,12 +534,12 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeSlavePatchNames()const
             && patchI != patch().index()
         )
         {
-			Info<<"shadPatchI in makeSlavePatchNames(): "<<shadPatchI<<endl;	
+			//Info<<"shadPatchI in makeSlavePatchNames(): "<<shadPatchI<<endl;	
             slavePatchNames[shadPatchI] = patch().boundaryMesh()[patchI].name();           
-			Info<<"slavePatchNames[shadPatchI] in makeSlavePatchNames(): "<<slavePatchNames[shadPatchI]<<endl;	
+			//Info<<"slavePatchNames[shadPatchI] in makeSlavePatchNames(): "<<slavePatchNames[shadPatchI]<<endl;	
 			slavePatchIndices[shadPatchI++] = patchI;
-			Info<<"shadPatchI in makeSlavePatchNames(): "<<shadPatchI<<endl;
-			Info<<"patchI in makeSlavePatchNames(): "<<patchI<<endl;
+			//Info<<"shadPatchI in makeSlavePatchNames(): "<<shadPatchI<<endl;
+			//Info<<"patchI in makeSlavePatchNames(): "<<patchI<<endl;
 		}
     }
 	
@@ -665,6 +806,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     firstPatchIndexInListPtr_(NULL),
 	currentMasterPtr_(NULL),
     currentMasterIndexPtr_(NULL),
+	currentSlavePtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
     dict_(),
@@ -691,7 +833,8 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     curTimeIndex_(-1),
 	//******** based on solid General*************
 	curPatchTractionPtr_(NULL),
-	bbOffset_(0.0)
+	bbOffset_(0.0),
+	slaveBbOffsetList_(0.0)
 	//******** END based on solid General*************
 {
 	Info<<"Does it enter here? in C1(p, iF)"<<__LINE__<<endl;
@@ -710,6 +853,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     firstPatchIndexInListPtr_(NULL),
 	currentMasterPtr_(NULL),
     currentMasterIndexPtr_(NULL),
+	currentSlavePtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
     dict_(dict),
@@ -778,7 +922,8 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     curTimeIndex_(-1),
 	//******** based on solid General*************
 	curPatchTractionPtr_(NULL),
-	bbOffset_(0.0)
+	bbOffset_(0.0),
+	slaveBbOffsetList_(0.0)
 	//******** END based on solid General*************
 {
 	Info<<"Does it enter here? in C2(p, iF, dict)"<<__LINE__<<endl;
@@ -865,6 +1010,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     firstPatchIndexInListPtr_(NULL),
 	currentMasterPtr_(NULL),
     currentMasterIndexPtr_(NULL),
+	currentSlavePtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
 	dict_(ptf.dict_),
@@ -894,7 +1040,8 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     curTimeIndex_(ptf.curTimeIndex_),
 	//******** based on solid General*************
 	curPatchTractionPtr_(NULL),
-	bbOffset_(ptf.bbOffset_)
+	bbOffset_(ptf.bbOffset_),
+	slaveBbOffsetList_(ptf.bbOffset_)
 	//******** END based on solid General*************
 {
     Info<<"Does it enter here? in C3(ptf, p, iF, mapper)"<<__LINE__<<endl;
@@ -947,6 +1094,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     firstPatchIndexInListPtr_(NULL),
 	currentMasterPtr_(NULL),
     currentMasterIndexPtr_(NULL),
+	currentSlavePtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
     dict_(ptf.dict_),
@@ -976,7 +1124,8 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     curTimeIndex_(ptf.curTimeIndex_),
 	//******** based on solid General*************
 	curPatchTractionPtr_(NULL),
-	bbOffset_(ptf.bbOffset_)
+	bbOffset_(ptf.bbOffset_),
+	slaveBbOffsetList_(ptf.bbOffset_)
 	//******** END based on solid General*************
 {
     Info<<"Does it enter here? in C4(ptf)"<<__LINE__<<endl;
@@ -1030,6 +1179,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     firstPatchIndexInListPtr_(NULL),
 	currentMasterPtr_(NULL),
     currentMasterIndexPtr_(NULL),
+	currentSlavePtr_(NULL),
 	localSlavePtr_(NULL),
 	//******** END based on solid General*************
     dict_(ptf.dict_),
@@ -1059,7 +1209,8 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     curTimeIndex_(ptf.curTimeIndex_),
 	//******** based on solid General*************
 	curPatchTractionPtr_(NULL),
-	bbOffset_(ptf.bbOffset_)
+	bbOffset_(ptf.bbOffset_),
+	slaveBbOffsetList_(ptf.bbOffset_)
 	//******** END based on solid General*************
 {
     Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
@@ -1198,13 +1349,13 @@ void Foam::solid4GeneralContactFvPatchVectorField::rmap
 const Foam::List<Foam::word>&
 Foam::solid4GeneralContactFvPatchVectorField::slavePatchNames() const
 {
-	Info<<"In slavePatchNames() line:"<<__LINE__<<endl;
+	//Info<<"In slavePatchNames() line:"<<__LINE__<<endl;
     if (!slavePatchNames_) //if (slavePatchNames_.size() == 0)
     {
-		Info<<"In slavePatchNames() line:"<<__LINE__<<endl;
+		//Info<<"In slavePatchNames() line:"<<__LINE__<<endl;
        makeSlavePatchNames(); //makeSlavePatchNames(dict_);
     }
-	Info<<"*slavePatchNames_ in slavePatchNames(): "<<*slavePatchNames_<<endl;
+	//Info<<"*slavePatchNames_ in slavePatchNames(): "<<*slavePatchNames_<<endl;
 
     return *slavePatchNames_;
 }
@@ -1217,7 +1368,7 @@ Foam::solid4GeneralContactFvPatchVectorField::slavePatchIndices() const
     {
         makeSlavePatchNames(); //calcSlavePatchIndices();
     }
-	Info<<"*slavePatchIndicesPtr_ in slavePatchIndices(): "<<*slavePatchIndicesPtr_<<endl;
+	//Info<<"*slavePatchIndicesPtr_ in slavePatchIndices(): "<<*slavePatchIndicesPtr_<<endl;
 
     return *slavePatchIndicesPtr_;
 }
@@ -1520,9 +1671,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
     }
 	Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;	
+	Info<< "slavePatchNames().size() in updateCoeffs() "<<slavePatchNames().size()<<endl;	
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;	
 	//*************** based on solidGeneral*****************
-	boolList activeContactPairs(slavePatchNames().size(), true);
+	boolList activeContactPairs(slavePatchNames().size(), false);
 	//*************** END based on solidGeneral**************
 	Info<<"activeContactPairs in updateCoeffs() "<<activeContactPairs<<endl;
 	
@@ -1561,6 +1713,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	moveZonesToDeformedConfiguration();
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	}
+	Info<<"zone().patch().localPoints() in updateCoeffs():"<<zone().patch().localPoints()<<endl;
+	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	
 	// Only the local masters calculates the contact force and the local
         // master interpolates this force
@@ -1568,35 +1722,49 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 		
 		// Create master bounding box used for quick check
         boundBox masterBb(zone().patch().localPoints(), false);
+		Info<<"zone().patch().localPoints() in updateCoeffs(): "<<zone().patch().localPoints()<<endl;
+		Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
+		Info<< "zone().patch().name() in updateCoeffs() "<<zone().patch().name()<<endl;
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;		
+		Info<<"masterBb in updateCoeffs(): "<<masterBb<<endl;
 		
 		// The BB may have zero thickness in one of the directions e.g. for a
         // flat patch, so we will check for this and, if found, create an offset
         const scalar bbOff = bbOffset();
+		Info<<"masterBb.minDim() in updateCoeffs(): "<<masterBb.minDim()<<endl;
 		Info<<"What is bbOff? in updateCoeffs():"<<bbOff<<endl;
 		if (masterBb.minDim() < bbOff)
         {
             const vector bbDiag = masterBb.max() - masterBb.min();
-
+			Info<<"bbDiag in updateCoeffs():"<<bbDiag<<endl;
             if (bbDiag.x() < bbOff)
             {
 				Info<<"Does it enter this check? in updateCoeffs():"<<__LINE__<<endl;
+				Info<<"masterBb.min() in updateCoeffs():"<<masterBb.min()<<endl;
+				Info<<"masterBb.max() in updateCoeffs():"<<masterBb.max()<<endl;
                 vector offset(bbOff, 0, 0);
                 masterBb.min() -= offset;
                 masterBb.max() += offset;
-				Info<<"What is offset? in updateCoeffs():"<<offset<<endl;
+				Info<<"What is offset? in updateCoeffs():"<<offset<<endl;				
             }
-            else if (bbDiag.y() < bbOff)
+			//else if (bbDiag.y() < bbOff)
+            if (bbDiag.y() < bbOff)
             {
+				Info<<"Does it enter this check? in updateCoeffs():"<<__LINE__<<endl;
                 vector offset(0, bbOff, 0);
                 masterBb.min() -= offset;
                 masterBb.max() += offset;
+				Info<<"What is Y offset? in updateCoeffs():"<<offset<<endl;
             }
-            else if (bbDiag.z() < bbOff)
+			//else if (bbDiag.z() < bbOff)
+            if (bbDiag.z() < bbOff)
             {
                 vector offset(0, 0, bbOff);
                 masterBb.min() -= offset;
                 masterBb.max() += offset;
             }
+			Info<<"masterBb.min() in updateCoeffs():"<<masterBb.min()<<endl;
+			Info<<"masterBb.max() in updateCoeffs():"<<masterBb.max()<<endl;
         }
 	
 	
@@ -1619,49 +1787,72 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         vectorField curPatchTraction(patch().size(), vector::zero);
 	//	Info<<"What is curPatchTraction? "<<curPatchTraction<<endl;
 	
-	
-	forAll(activeContactPairs, shadPatchI)
+	// The BB may have zero thickness in one of the directions e.g. for a
+	// flat patch, so we will check for this and, if found, create an offset
+		const scalarField slaveBbOff = slaveBbOffset();
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+		Info<<"slaveBbOff in updateCoeffs() :"<<slaveBbOff<<endl;
+			
+	forAll(activeContactPairs,shadPatchI)	
 	{
 		Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 		Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+		//Info<<"activeContactPairs[shadPatchI] in updateCoeffs():"<<activeContactPairs[shadPatchI]<<endl;
 			// Create slave bounding box
             boundBox slaveBb(slaveZones()[shadPatchI].patch().localPoints(), false);
-			
+			Info<< "slavePatchNames()[shadPatchI] in updateCoeffs() "<<slavePatchNames()[shadPatchI]<<endl;
+			Info<<"slaveBb in updateCoeffs(): "<<slaveBb<<endl;
+			Info<<"slaveBb.minDim() in updateCoeffs(): "<<slaveBb.minDim()<<endl;
+			Info<<"slaveBbOff[shadPatchI] in updateCoeffs(): "<<slaveBbOff[shadPatchI]<<endl;
 			// Check for a zero dimension in the slaveBb
-            if (slaveBb.minDim() < bbOff)
+            if (slaveBb.minDim() < slaveBbOff[shadPatchI])
             {
                 const vector bbDiag = slaveBb.max() - slaveBb.min();
 
-                if (bbDiag.x() < bbOff)
+                if (bbDiag.x() < slaveBbOff[shadPatchI])
                 {
-                    vector offset(bbOff, 0, 0);
+					Info<<"Does it enter this check? in updateCoeffs():"<<__LINE__<<endl;
+				Info<<"slaveBb.min() in updateCoeffs():"<<slaveBb.min()<<endl;
+				Info<<"slaveBb.max() in updateCoeffs():"<<slaveBb.max()<<endl;
+                    vector offset(slaveBbOff[shadPatchI], 0, 0);
                     slaveBb.min() -= offset;
                     slaveBb.max() += offset;
                 }
-                else if (bbDiag.y() < bbOff)
+				//else if (bbDiag.y() < slaveBbOff)
+                if (bbDiag.y() < slaveBbOff[shadPatchI])
                 {
-                    vector offset(0, bbOff, 0);
+					Info<<"In updateCoeffs():"<<__LINE__<<endl;
+                    vector offset(0, slaveBbOff[shadPatchI], 0);
                     slaveBb.min() -= offset;
                     slaveBb.max() += offset;
                 }
-                else if (bbDiag.z() < bbOff)
+				//else if (bbDiag.z() < slaveBbOff)
+                if (bbDiag.z() < slaveBbOff[shadPatchI])
                 {
-                    vector offset(0, 0, bbOff);
+					Info<<"In updateCoeffs():"<<__LINE__<<endl;
+                    vector offset(0, 0, slaveBbOff[shadPatchI]);
                     slaveBb.min() -= offset;
                     slaveBb.max() += offset;
                 }
+				Info<<"slaveBb.min() in updateCoeffs():"<<slaveBb.min()<<endl;
+				Info<<"slaveBb.max() in updateCoeffs():"<<slaveBb.max()<<endl;
+				Info<<"bbDiag in updateCoeffs():"<<bbDiag<<endl;
+				Info<<"bbDiag.x() updateCoeffs():"<<bbDiag.x()<<endl;
+				Info<<"bbDiag.y() updateCoeffs():"<<bbDiag.y()<<endl;
+				Info<<"bbDiag.z() updateCoeffs():"<<bbDiag.z()<<endl;
             }
 			
+			Info<<"In updateCoeffs():"<<__LINE__<<endl;
+			Info<<"masterBb in updateCoeffs():"<<masterBb<<endl;
+			Info<<"slaveBb in updateCoeffs():"<<slaveBb<<endl;
+			Info<<"masterBb.overlaps(slaveBb) in updateCoeffs():"<<masterBb.overlaps(slaveBb)<<endl;
 			if (masterBb.overlaps(slaveBb))
             {
 				Info<<"In updateCoeffs():"<<__LINE__<<endl;
                 activeContactPairs[shadPatchI] = true;
             }
-			/*else
-			{
-				//activeContactPairs[shadPatchI] = false;
-			}*/
+			Info<<"activeContactPairs[shadPatchI] in updateCoeffs():"<<activeContactPairs[shadPatchI]<<endl;
 	
 		if (activeContactPairs[shadPatchI])
         {

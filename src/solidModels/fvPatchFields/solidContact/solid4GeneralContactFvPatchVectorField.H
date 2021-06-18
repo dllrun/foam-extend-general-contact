@@ -106,6 +106,9 @@ class solid4GeneralContactFvPatchVectorField
 		//- Patch index of current master patch
         mutable label* currentMasterIndexPtr_;
 		
+		//- Is this the current slave patch
+        mutable bool* currentSlavePtr_;
+		
 		//- If the current patch is the local slave of the contact pair
         // The local slave is the patch with the lower patch index
         mutable boolList* localSlavePtr_;
@@ -211,6 +214,8 @@ class solid4GeneralContactFvPatchVectorField
 		
 		//- Offset used if bounding box of patch has a zero dimension
         mutable scalar bbOffset_;
+		
+		mutable scalarField slaveBbOffsetList_;
 		//*************** END based on solidGeneral*****************
 
 
@@ -266,6 +271,9 @@ class solid4GeneralContactFvPatchVectorField
 		//- Check current master patch index
         void calcCurrentMasterIndex() const;
 		
+		//- Check current slave patch
+        void calcCurrentSlave() const;
+		
 		//- Calculate local slaves
         void calcLocalSlave() const;
 		
@@ -307,9 +315,13 @@ class solid4GeneralContactFvPatchVectorField
 		//*************** based on solidGeneral*****************
 		//- Calculate the bounding box offset
         void calcBbOffset() const;
+		
+		void calcSlaveBbOffset() const;
 
         //- Return the bounding box offset
         scalar bbOffset() const;
+		
+		scalarField slaveBbOffset() const;
 		//*************** END based on solidGeneral*****************
 
 
@@ -399,7 +411,10 @@ public:
             bool currentMaster() const;
 
             //- Return index of current master patch
-            label currentMasterIndex() const;			
+            label currentMasterIndex() const;
+
+			//- Return true if this patch is the current slave
+            bool currentSlave() const;
 			
 			//Step1 - Return the list of slaveG patch names
             const List<word>& slaveGPatchNames() const;
