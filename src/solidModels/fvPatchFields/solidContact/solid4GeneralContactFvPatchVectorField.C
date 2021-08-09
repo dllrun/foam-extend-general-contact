@@ -363,7 +363,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcBbOffset() const
     }
 	
 	Info<<"bbOffset_ in calcBbOffset() is "<<bbOffset_<< endl;
-    bbOffset_ = 2.0*returnReduce(minDim, minOp<scalar>());
+    bbOffset_ = 6.5*returnReduce(minDim, minOp<scalar>());
 	Info<<"bbOffset_ in calcBbOffset() is "<<bbOffset_<< endl;
 
     if (debug)
@@ -432,7 +432,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcSlaveBbOffset() const
 		forAll(slaveBbOff, shadPatchI)
 		{
 			Info<<"In calcSlaveBbOffset() line:"<<__LINE__<<endl;
-		slaveBbOff[shadPatchI] = 2.0*returnReduce(minDimList[shadPatchI], minOp<scalar>());
+		slaveBbOff[shadPatchI] = 6.0*returnReduce(minDimList[shadPatchI], minOp<scalar>());
 		}
 				
 		Info<<"In calcSlaveBbOffset() line:"<<__LINE__<<endl;
@@ -1720,7 +1720,23 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         // master interpolates this force
         const boolList& locSlave = localSlave();
 		
-		// Create master bounding box used for quick check
+	
+	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+    // Delete the zone-to-zone interpolator weights as the zones have moved
+    // const wordList& shadPatchNames = slavePatchNames();
+    forAll(activeContactPairs, shadPatchI)
+    {
+		if (locSlave[shadPatchI])//if (localSlave()[shadPatchI])
+		{
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+        zoneToZones()[shadPatchI].movePoints
+        (
+            tensorField(0), tensorField(0), vectorField(0)
+        );
+		}
+    }
+	
+	// Create master bounding box used for quick check
         boundBox masterBb(zone().patch().localPoints(), false);
 		Info<<"zone().patch().localPoints() in updateCoeffs(): "<<zone().patch().localPoints()<<endl;
 		Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
@@ -1766,22 +1782,6 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 			Info<<"masterBb.min() in updateCoeffs():"<<masterBb.min()<<endl;
 			Info<<"masterBb.max() in updateCoeffs():"<<masterBb.max()<<endl;
         }
-	
-	
-	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-    // Delete the zone-to-zone interpolator weights as the zones have moved
-    // const wordList& shadPatchNames = slavePatchNames();
-    forAll(activeContactPairs, shadPatchI)
-    {
-		if (locSlave[shadPatchI])//if (localSlave()[shadPatchI])
-		{
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-        zoneToZones()[shadPatchI].movePoints
-        (
-            tensorField(0), tensorField(0), vectorField(0)
-        );
-		}
-    }
 		
 	// Accumulated traction for the current patch
         vectorField curPatchTraction(patch().size(), vector::zero);
@@ -1789,49 +1789,50 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	
 	// The BB may have zero thickness in one of the directions e.g. for a
 	// flat patch, so we will check for this and, if found, create an offset
-		const scalarField slaveBbOff = slaveBbOffset();
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-		Info<<"slaveBbOff in updateCoeffs() :"<<slaveBbOff<<endl;
+	//	const scalarField slaveBbOff = slaveBbOffset();
+	//	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+	//	Info<<"slaveBbOff in updateCoeffs() :"<<slaveBbOff<<endl;
 			
 	forAll(activeContactPairs,shadPatchI)	
 	{
 		Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 		Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
+		Info<< "slavePatchNames()[shadPatchI] in updateCoeffs() "<<slavePatchNames()[shadPatchI]<<endl;
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 		//Info<<"activeContactPairs[shadPatchI] in updateCoeffs():"<<activeContactPairs[shadPatchI]<<endl;
 			// Create slave bounding box
             boundBox slaveBb(slaveZones()[shadPatchI].patch().localPoints(), false);
-			Info<< "slavePatchNames()[shadPatchI] in updateCoeffs() "<<slavePatchNames()[shadPatchI]<<endl;
 			Info<<"slaveBb in updateCoeffs(): "<<slaveBb<<endl;
 			Info<<"slaveBb.minDim() in updateCoeffs(): "<<slaveBb.minDim()<<endl;
-			Info<<"slaveBbOff[shadPatchI] in updateCoeffs(): "<<slaveBbOff[shadPatchI]<<endl;
+			Info<<"bbOff in updateCoeffs(): "<<bbOff<<endl;
 			// Check for a zero dimension in the slaveBb
-            if (slaveBb.minDim() < slaveBbOff[shadPatchI])
+            if (slaveBb.minDim() < bbOff)
             {
+				Info<<"In updateCoeffs():"<<__LINE__<<endl;
                 const vector bbDiag = slaveBb.max() - slaveBb.min();
 
-                if (bbDiag.x() < slaveBbOff[shadPatchI])
+                if (bbDiag.x() < bbOff)
                 {
-					Info<<"Does it enter this check? in updateCoeffs():"<<__LINE__<<endl;
+				Info<<"Does it enter this check? in updateCoeffs():"<<__LINE__<<endl;
 				Info<<"slaveBb.min() in updateCoeffs():"<<slaveBb.min()<<endl;
 				Info<<"slaveBb.max() in updateCoeffs():"<<slaveBb.max()<<endl;
-                    vector offset(slaveBbOff[shadPatchI], 0, 0);
+                    vector offset(bbOff, 0, 0);
                     slaveBb.min() -= offset;
                     slaveBb.max() += offset;
                 }
-				//else if (bbDiag.y() < slaveBbOff)
-                if (bbDiag.y() < slaveBbOff[shadPatchI])
+				//else if (bbDiag.y() < bbOff)
+                if (bbDiag.y() < bbOff)
                 {
 					Info<<"In updateCoeffs():"<<__LINE__<<endl;
-                    vector offset(0, slaveBbOff[shadPatchI], 0);
+                    vector offset(0, bbOff, 0);
                     slaveBb.min() -= offset;
                     slaveBb.max() += offset;
                 }
-				//else if (bbDiag.z() < slaveBbOff)
-                if (bbDiag.z() < slaveBbOff[shadPatchI])
+				//else if (bbDiag.z() < bbOff)
+                if (bbDiag.z() < bbOff)
                 {
 					Info<<"In updateCoeffs():"<<__LINE__<<endl;
-                    vector offset(0, 0, slaveBbOff[shadPatchI]);
+                    vector offset(0, 0, bbOff);
                     slaveBb.min() -= offset;
                     slaveBb.max() += offset;
                 }
@@ -1842,7 +1843,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 				Info<<"bbDiag.y() updateCoeffs():"<<bbDiag.y()<<endl;
 				Info<<"bbDiag.z() updateCoeffs():"<<bbDiag.z()<<endl;
             }
-			
+			Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
+			Info<< "slavePatchNames()[shadPatchI] in updateCoeffs() "<<slavePatchNames()[shadPatchI]<<endl;			
 			Info<<"In updateCoeffs():"<<__LINE__<<endl;
 			Info<<"masterBb in updateCoeffs():"<<masterBb<<endl;
 			Info<<"slaveBb in updateCoeffs():"<<slaveBb<<endl;
