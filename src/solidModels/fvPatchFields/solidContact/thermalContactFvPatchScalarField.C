@@ -36,13 +36,17 @@ License
 
 void Foam::thermalContactFvPatchScalarField::checkConsistentMaster() const
 {
-    if (master_ != solidContactPatch().master())
+	Info<<"In thermalContact::checkConsistentMaster() line:"<<__LINE__<<endl;
+	Info<<"master_ in thermalContact::checkConsistentMaster(): "<<master_<<endl;
+    Info<<"solid4ContactPatch().master() in thermalContact::checkConsistentMaster(): "<<solid4ContactPatch().master()<<endl;
+	if (master_ != solid4ContactPatch().master())
     {
         FatalErrorIn("void checkConsistentMaster() const")
-            << "The solidContact master patch should be the same as the "
+            << "The solid4Contact master patch should be the same as the "
             << "thermalContact master patch!" << nl
             << abort(FatalError);
     }
+	Info<<"In thermalContact::checkConsistentMaster() line:"<<__LINE__<<endl;
 }
 
 
@@ -50,7 +54,7 @@ const Foam::thermalContactFvPatchScalarField&
 Foam::thermalContactFvPatchScalarField::shadowPatchField() const
 {
     const labelList& shadowPatchIndices =
-        solidContactPatch().shadowPatchIndices();
+        solid4ContactPatch().shadowPatchIndices();
 
     if (shadowPatchIndices.size() != 1)
     {
@@ -85,7 +89,7 @@ Foam::thermalContactFvPatchScalarField::shadowPatchField
     }
 
     const labelList& shadowPatchIndices =
-        solidContactPatch().shadowPatchIndices();
+        solid4ContactPatch().shadowPatchIndices();
 
     if (shadI >= shadowPatchIndices.size())
     {
@@ -110,11 +114,12 @@ Foam::thermalContactFvPatchScalarField::shadowPatchField
 }
 
 
-const Foam::solidContactFvPatchVectorField&
-Foam::thermalContactFvPatchScalarField::solidContactPatch() const
+const Foam::solid4ContactFvPatchVectorField&
+Foam::thermalContactFvPatchScalarField::solid4ContactPatch() const
 {
+	Info<<"In thermalContact::solid4ContactPatch() line:"<<__LINE__<<endl;
     return
-        refCast<const solidContactFvPatchVectorField>
+        refCast<const solid4ContactFvPatchVectorField>
         (
             patch().lookupPatchField<volVectorField, vector>(DUName_)
         );
@@ -141,6 +146,7 @@ Foam::thermalContactFvPatchScalarField::thermalContactFvPatchScalarField
     DUName_("undefined"),
     curTimeIndex_(-1)
 {
+	Info<<"In thermalContact c1(p,iF) line:"<<__LINE__<<endl;
     fvPatchScalarField::operator=(patchInternalField());
     gradient() = 0.0;
 }
@@ -165,7 +171,9 @@ Foam::thermalContactFvPatchScalarField::thermalContactFvPatchScalarField
     UTS_(ptf.UTS_),
     DUName_(ptf.DUName_),
     curTimeIndex_(ptf.curTimeIndex_)
-{}
+{
+	Info<<"In thermalContact c2(ptf,p,iF,mapper) line:"<<__LINE__<<endl;
+}
 
 
 Foam::thermalContactFvPatchScalarField::thermalContactFvPatchScalarField
@@ -184,10 +192,12 @@ Foam::thermalContactFvPatchScalarField::thermalContactFvPatchScalarField
     Rc_(0.0),
     beta_(0.0),
     UTS_(0.0),
-    DUName_(dict.lookupOrDefault<word>("DUName", "DU")),
+    DUName_(dict.lookupOrDefault<word>("DUName", "U")), //("DUName", "DU"))
     curTimeIndex_(-1)
 {
-    if (debug)
+	Info<<"In thermalContact c3(p,iF,dict) line:"<<__LINE__<<endl;
+    Info<<"master() in thermalContact c3(p,iF,dict): "<<master()<<endl;
+	if (debug)
     {
         Info<< patch().name() << ": " << type() << endl;
     }
@@ -252,7 +262,9 @@ Foam::thermalContactFvPatchScalarField::thermalContactFvPatchScalarField
     UTS_(ptf.UTS_),
     DUName_(ptf.DUName_),
     curTimeIndex_(ptf.curTimeIndex_)
-{}
+{
+	Info<<"In thermalContact c4(ptf) line:"<<__LINE__<<endl;
+}
 
 
 Foam::thermalContactFvPatchScalarField::thermalContactFvPatchScalarField
@@ -272,7 +284,9 @@ Foam::thermalContactFvPatchScalarField::thermalContactFvPatchScalarField
     UTS_(ptf.UTS_),
     DUName_(ptf.DUName_),
     curTimeIndex_(ptf.curTimeIndex_)
-{}
+{
+	Info<<"In thermalContact c5(ptf,iF) line:"<<__LINE__<<endl;
+}
 
 
 
@@ -288,20 +302,20 @@ Foam::thermalContactFvPatchScalarField::~thermalContactFvPatchScalarField()
 const Foam::wordList&
 Foam::thermalContactFvPatchScalarField::shadowPatchNames() const
 {
-    return solidContactPatch().shadowPatchNames();
+    return solid4ContactPatch().shadowPatchNames();
 }
 
 
 const Foam::labelList&
 Foam::thermalContactFvPatchScalarField::shadowPatchIndices() const
 {
-    return solidContactPatch().shadowPatchIndices();
+    return solid4ContactPatch().shadowPatchIndices();
 }
 
 
 const Foam::scalarField& Foam::thermalContactFvPatchScalarField::contact() const
 {
-    return solidContactPatch().contact();
+    return solid4ContactPatch().contact();
 }
 
 
@@ -383,7 +397,7 @@ Foam::tmp<Foam::scalarField> Foam::thermalContactFvPatchScalarField::Hc() const
 
     // Contact resistance is the reciprocal of contact conductance
 
-    // Lookup contact field from DU solidContact patch
+    // Lookup contact field from DU solid4Contact patch
 
     // Unit normals
     // Note: the mesh should be in the deformed position so these should be the
@@ -392,7 +406,7 @@ Foam::tmp<Foam::scalarField> Foam::thermalContactFvPatchScalarField::Hc() const
 
     // Calculate contact pressure and limit to avoid division by zero in pow
     const scalarField contactPressure =
-        max(-n & solidContactPatch().traction(), SMALL);
+        max(-n & solid4ContactPatch().traction(), SMALL);
 
     // Hmnn formula says use Vicker's hardness, but surely it should be
     // Vicker's hardness by 1e6
@@ -414,18 +428,18 @@ Foam::thermalContactFvPatchScalarField::frictionFluxRateForThisPatch() const
         new scalarField(patch().size(), 0.0)
     );
 
-    // Check the DU patch is of type solidContact
+    // Check the DU patch is of type solid4Contact
     if
     (
-        solidContactPatch().type()
-     != solidContactFvPatchVectorField::typeName
+        solid4ContactPatch().type()
+     != solid4ContactFvPatchVectorField::typeName
     )
     {
         FatalErrorIn
         (
             "thermalContactFvPatchScalarField::frictionFluxRateForThisPatch()"
         )   << "DU patch " << patch().boundaryMesh()[patch().index()].name()
-            << " should be of type solidContact "
+            << " should be of type solid4Contact "
             << abort(FatalError);
     }
     else
@@ -435,31 +449,31 @@ Foam::thermalContactFvPatchScalarField::frictionFluxRateForThisPatch() const
 
         if (master_)
         {
-            fricFlux = solidContactPatch().frictionHeatRate();
+            fricFlux = solid4ContactPatch().frictionHeatRate();
         }
         else
         {
             // Heat flux on the master global patch
             const scalarField masterZoneFricFlux =
-                solidContactPatch().shadowPatchField().zone().patchFaceToGlobal
+                solid4ContactPatch().shadowPatchField().zone().patchFaceToGlobal
                 (
-                    solidContactPatch().shadowPatchField().frictionHeatRate()()
+                    solid4ContactPatch().shadowPatchField().frictionHeatRate()()
                 );
 
             // Interpolate the heat flux from the master global patch to the
             // shadow global patch
             const scalarField shadowZoneFricFlux =
-                solidContactPatch().zoneToZoneForThisSlave().masterToSlave
+                solid4ContactPatch().zoneToZoneForThisSlave().masterToSlave
                 (
                     masterZoneFricFlux
                 );
 
             // Convert the global shadow patch to the shadow patch
-            // Note: solidContactPatch().zone() always returns the master zone
-            // and solidContactPatch().shadowZones() always returns the slave
+            // Note: solid4ContactPatch().zone() always returns the master zone
+            // and solid4ContactPatch().shadowZones() always returns the slave
             // zones
             fricFlux =
-                solidContactPatch().zoneForThisSlave().globalFaceToPatch
+                solid4ContactPatch().zoneForThisSlave().globalFaceToPatch
                 (
                     shadowZoneFricFlux
                 );
@@ -480,8 +494,9 @@ Foam::thermalContactFvPatchScalarField::frictionFluxRateForThisPatch() const
         // Here we assume the lossCoeff is zero
 
         // Lookup the thermal conductivity field
+		//Note: k is replaced by DT (e.g. you have DT in createFields.H of elasticThermalSolid)
         const volScalarField& k =
-            db().lookupObject<volScalarField>("k");
+            db().lookupObject<volScalarField>("DT");
 
         // Lookup density times specific heat field
         const volScalarField& rhoC =
@@ -516,8 +531,8 @@ Foam::thermalContactFvPatchScalarField::frictionFluxRateForThisPatch() const
 
             // Interpolate shadow fields to the curPatch
 
-            // Note: solidContactPatch().zone() always returns the master zone
-            // and solidContactPatch().shadowZones() always returns the slave
+            // Note: solid4ContactPatch().zone() always returns the master zone
+            // and solid4ContactPatch().shadowZones() always returns the slave
             // zones
 
             scalarField shadowPatchKOnCurPatch;
@@ -526,36 +541,36 @@ Foam::thermalContactFvPatchScalarField::frictionFluxRateForThisPatch() const
             if (master_)
             {
                 const scalarField shadowZoneK =
-                    solidContactPatch().shadowZones()[shadI].patchFaceToGlobal
+                    solid4ContactPatch().shadowZones()[shadI].patchFaceToGlobal
                     (
                         shadowPatchK
                     );
 
                 const scalarField shadowZoneRhoC =
-                    solidContactPatch().shadowZones()[shadI].patchFaceToGlobal
+                    solid4ContactPatch().shadowZones()[shadI].patchFaceToGlobal
                     (
                         shadowPatchRhoC
                     );
 
                 const scalarField shadowZoneKOnCurPatch =
-                    solidContactPatch().zoneToZones()[shadI].slaveToMaster
+                    solid4ContactPatch().zoneToZones()[shadI].slaveToMaster
                     (
                         shadowZoneK
                     );
 
                 const scalarField shadowZoneRhoCOnCurPatch =
-                    solidContactPatch().zoneToZones()[shadI].slaveToMaster
+                    solid4ContactPatch().zoneToZones()[shadI].slaveToMaster
                     (
                         shadowZoneRhoC
                     );
                 shadowPatchKOnCurPatch =
-                    solidContactPatch().zone().globalFaceToPatch
+                    solid4ContactPatch().zone().globalFaceToPatch
                     (
                         shadowZoneKOnCurPatch
                     );
 
                 shadowPatchRhoCOnCurPatch =
-                    solidContactPatch().zone().globalFaceToPatch
+                    solid4ContactPatch().zone().globalFaceToPatch
                     (
                         shadowZoneRhoCOnCurPatch
                     );
@@ -563,37 +578,37 @@ Foam::thermalContactFvPatchScalarField::frictionFluxRateForThisPatch() const
             else
             {
                 const scalarField shadowZoneK =
-                    solidContactPatch().zone().patchFaceToGlobal
+                    solid4ContactPatch().zone().patchFaceToGlobal
                     (
                         shadowPatchK
                     );
 
                 const scalarField shadowZoneRhoC =
-                    solidContactPatch().zone().patchFaceToGlobal
+                    solid4ContactPatch().zone().patchFaceToGlobal
                     (
                         shadowPatchRhoC
                     );
 
                 const scalarField shadowZoneKOnCurPatch =
-                    solidContactPatch().zoneToZoneForThisSlave().masterToSlave
+                    solid4ContactPatch().zoneToZoneForThisSlave().masterToSlave
                     (
                         shadowZoneK
                     );
 
                 const scalarField shadowZoneRhoCOnCurPatch =
-                    solidContactPatch().zoneToZoneForThisSlave().masterToSlave
+                    solid4ContactPatch().zoneToZoneForThisSlave().masterToSlave
                     (
                         shadowZoneRhoC
                     );
 
                 shadowPatchKOnCurPatch =
-                    solidContactPatch().shadowZones()[shadI].globalFaceToPatch
+                    solid4ContactPatch().shadowZones()[shadI].globalFaceToPatch
                     (
                         shadowZoneKOnCurPatch
                     );
 
                 shadowPatchRhoCOnCurPatch =
-                    solidContactPatch().shadowZones()[shadI].globalFaceToPatch
+                    solid4ContactPatch().shadowZones()[shadI].globalFaceToPatch
                     (
                         shadowZoneRhoCOnCurPatch
                     );
@@ -605,7 +620,7 @@ Foam::thermalContactFvPatchScalarField::frictionFluxRateForThisPatch() const
               + curPatchK;
 
             tfrictionFluxRateForThisPatch() +=
-                solidContactPatch().contactPerShadow()[shadI]
+                solid4ContactPatch().contactPerShadow()[shadI]
                 *fricFlux*(curPatchK/curPatchKsi);
         }
     }
@@ -642,15 +657,18 @@ void Foam::thermalContactFvPatchScalarField::rmap
 
 void Foam::thermalContactFvPatchScalarField::updateCoeffs()
 {
+	Info<<"In thermalContact::updateCoeffs() line:"<<__LINE__<<endl;
     if (updated())
     {
         return;
     }
-
+	
     // Delete ggi interpolation at the begining of each time step
     if (curTimeIndex_ != db().time().timeIndex())
     {
+		Info<<"In thermalContact::updateCoeffs() line:"<<__LINE__<<endl;
         checkConsistentMaster();
+		Info<<"In thermalContact::updateCoeffs() line:"<<__LINE__<<endl;
         curTimeIndex_ = db().time().timeIndex();
     }
 
@@ -660,10 +678,13 @@ void Foam::thermalContactFvPatchScalarField::updateCoeffs()
     //     (
     //         this->dimensionedInternalField().name()
     //     );
-
+	
+	Info<<"In thermalContact::updateCoeffs() line:"<<__LINE__<<endl;
     // Lookup the thermal conductivity field
-    const volScalarField& k = db().lookupObject<volScalarField>("k");
-
+	//Note: k is replaced by DT (e.g. you have DT in createFields.H of elasticThermalSolid)
+    const volScalarField& k = db().lookupObject<volScalarField>("DT"); 
+	Info<<"In thermalContact::updateCoeffs() line:"<<__LINE__<<endl;
+	
     // K on the current patch
     const scalarField& curPatchK = k.boundaryField()[patch().index()];
 
@@ -682,25 +703,25 @@ void Foam::thermalContactFvPatchScalarField::updateCoeffs()
         scalarField shadowPatchTOnCurPatch;
         if (master())
         {
-            // Note: solidContactPatch().zone() always returns the master zone
-            // and solidContactPatch().shadowZones() always returns the slave
+            // Note: solid4ContactPatch().zone() always returns the master zone
+            // and solid4ContactPatch().shadowZones() always returns the slave
             // zones
             const scalarField shadowZoneT =
-                solidContactPatch().shadowZones()[shadI].patchFaceToGlobal
+                solid4ContactPatch().shadowZones()[shadI].patchFaceToGlobal
                 (
                     shadowPatchField(shadI)
                 );
 
             // Interpolate shadow temperature field to the current zone
             const scalarField shadowZoneTOnCurPatch =
-                solidContactPatch().zoneToZones()[shadI].slaveToMaster
+                solid4ContactPatch().zoneToZones()[shadI].slaveToMaster
                 (
                     shadowZoneT
                 );
 
             // Create the temperature field for this patch
             shadowPatchTOnCurPatch =
-                solidContactPatch().zone().globalFaceToPatch
+                solid4ContactPatch().zone().globalFaceToPatch
                 (
                     shadowZoneTOnCurPatch
                 );
@@ -711,21 +732,21 @@ void Foam::thermalContactFvPatchScalarField::updateCoeffs()
             // Note 2: the slave always has only one master i.e.
             // one shadowPatchField
             const scalarField shadowZoneT =
-                solidContactPatch().zone().patchFaceToGlobal
+                solid4ContactPatch().zone().patchFaceToGlobal
                 (
                     shadowPatchField()
                 );
 
             // Interpolate shadow temperature field to the current zone
             const scalarField shadowZoneTOnCurPatch =
-                solidContactPatch().zoneToZoneForThisSlave().masterToSlave
+                solid4ContactPatch().zoneToZoneForThisSlave().masterToSlave
                 (
                     shadowZoneT
                 );
 
             // Create the temperature field for this patch
             shadowPatchTOnCurPatch =
-                solidContactPatch().shadowZones()[shadI].globalFaceToPatch
+                solid4ContactPatch().shadowZones()[shadI].globalFaceToPatch
                 (
                     shadowZoneTOnCurPatch
                 );
@@ -742,7 +763,7 @@ void Foam::thermalContactFvPatchScalarField::updateCoeffs()
 
         // Get the contact indicator field for this contact pair
         const scalarField contactPerShadow =
-            solidContactPatch().contactPerShadow()[shadI];
+            solid4ContactPatch().contactPerShadow()[shadI];
 
         // Convert flux to normal gradient
         // fluxInContactArea == k*snGradTInContactArea
@@ -761,12 +782,12 @@ void Foam::thermalContactFvPatchScalarField::updateCoeffs()
     // surface, therefore:
     // snGradTsnGradTNotInContact = -(alpha/k)*(T - Tinf)
     // Info<< nl
-    //     << solidContactPatch().contact().size() << nl
+    //     << solid4ContactPatch().contact().size() << nl
     //     << alpha_.size() << nl
     //     << this->size() << nl
     //     << curPatchK.size() << endl;
     const scalarField curPatchPatchSnGradNotInContact =
-        (1.0 - solidContactPatch().contact())
+        (1.0 - solid4ContactPatch().contact())
        *(-alpha_/curPatchK)*(*this - Tinf_);
 
     // Merge contributions for "in contact" and "not in contact" regions

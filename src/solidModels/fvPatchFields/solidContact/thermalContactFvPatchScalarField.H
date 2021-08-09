@@ -42,7 +42,7 @@ Author
 
 #include "fixedGradientFvPatchFields.H"
 #include "Switch.H"
-#include "solidContactFvPatchVectorField.H"
+#include "solid4ContactFvPatchVectorField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -97,7 +97,7 @@ class thermalContactFvPatchScalarField
 
     // Private member functions
 
-        //- Check that thermalContact and solidContact both use the same master
+        //- Check that thermalContact and solid4Contact both use the same master
         //  patch
         void checkConsistentMaster() const;
 
@@ -115,8 +115,8 @@ class thermalContactFvPatchScalarField
             const label shadI
         ) const;
 
-        //- Return the solidContact patch field on this patch
-        const solidContactFvPatchVectorField& solidContactPatch() const;
+        //- Return the solid4Contact patch field on this patch
+        const solid4ContactFvPatchVectorField& solid4ContactPatch() const;
 
 
 public:
@@ -198,6 +198,7 @@ public:
             //- Return if this patch is the master
             Switch master() const
             {
+				Info<<"In thermalContact.H::master() line:"<<__LINE__<<endl;
                 return master_;
             }
 
@@ -241,7 +242,7 @@ public:
             tmp<scalarField> Hc() const;
 
             //- Return friction flux for this patch
-            //  This partitions the frictionFluxRate from solidContact into the
+            //  This partitions the frictionFluxRate from solid4Contact into the
             //  master contribution and slave contribution
             //  Note: this function was formerly known as Qc() and we renamed it
             //  to be more clear
