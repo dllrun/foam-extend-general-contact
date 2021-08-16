@@ -61,7 +61,9 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
 #       include "readSolidMechanicsControls.H"
-
+		
+		Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
+		
         int iCorr = 0;
         scalar initialResidual = 1.0;
         scalar relResT = 1.0;
@@ -75,14 +77,21 @@ int main(int argc, char *argv[])
         Info<< "Solving for " << T.name() << nl;
         do
         {
+			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
             T.storePrevIter();
+			
+			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
 
             fvScalarMatrix TEqn
             (
                 rhoC*fvm::ddt(T) == fvm::laplacian(k, T, "laplacian(k,T)")
             );
-
+			
+			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
+			
             solverPerfT = TEqn.solve();
+			
+			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
 
             T.relax();
 
@@ -95,13 +104,17 @@ int main(int argc, char *argv[])
                     << ", relative res = " << relResT
                     << ", inner iters = " << solverPerfT.nIterations() << endl;
             }
+			
+			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
         }
         while
         (
             relResT > convergenceToleranceT
          && ++iCorr < nCorr
         );
-
+		
+		Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
+		
         Info<< "Solved for " << T.name()
             << " using " << solverPerfT.solverName()
             << " in " << iCorr << " iterations"
@@ -121,6 +134,7 @@ int main(int argc, char *argv[])
         Info<< "Solving for " << U.name() << nl;
         do
         {
+			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
             U.storePrevIter();
 
 #           include "calculateDivSigmaExp.H"
@@ -166,6 +180,8 @@ int main(int argc, char *argv[])
                 }
                 Info<< ", inner iters = " << solverPerfU.nIterations() << endl;
             }
+			
+			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
         }
         while
         (
