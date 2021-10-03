@@ -251,6 +251,7 @@ Foam::generalStandardPenaltyFriction::generalStandardPenaltyFriction
     ),
     contactIterNum_(0)
 {
+	Info<<"In generalStandardPenaltyFriction c1(name, patch, dict, ID, ID) line:"<<__LINE__<<endl;
     // Create friction law
     frictionLawPtr_.set
     (

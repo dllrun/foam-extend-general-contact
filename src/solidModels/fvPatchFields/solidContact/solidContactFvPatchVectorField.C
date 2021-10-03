@@ -1272,6 +1272,9 @@ void solidContactFvPatchVectorField::evaluate(const Pstream::commsTypes)
     }
 
     vectorField normalValue = transform(valueFraction(), refValue());
+	
+	Info<<"fieldName_ in solidContact::evaluate(..) line:"<<fieldName_<<endl;
+	Info<<"In solidContact::evaluate(..) line:"<<__LINE__<<endl;
 
     //- non-orthogonal correction vectors needed to calculate gradValue
     const fvPatchField<tensor>& gradField =
@@ -1279,6 +1282,8 @@ void solidContactFvPatchVectorField::evaluate(const Pstream::commsTypes)
         (
             "grad(" + fieldName_ + ")"
         );
+		
+		Info<<"In solidContact::evaluate(..) line:"<<__LINE__<<endl;
     vectorField n = patch().nf();
     vectorField delta = patch().delta();
     vectorField k = delta - n*(n&delta);

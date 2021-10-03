@@ -20,6 +20,7 @@ $(boundaryConditions)/solidContact/solid4ContactFvPatchVectorFieldCalcContact.C
 $(boundaryConditions)/solidContact/solidContactFvPatchVectorField.C
 
 $(boundaryConditions)/solidContact/thermalContactFvPatchScalarField.C
+$(boundaryConditions)/solidContact/thermalGeneralContactFvPatchScalarField.C 
 
 $(boundaryConditions)/solidDirectionMixed/solidDirectionMixedFvPatchVectorField.C
 $(boundaryConditions)/solidTraction/solidTractionFvPatchVectorField.C
