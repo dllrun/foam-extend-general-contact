@@ -42,7 +42,7 @@ Author
 
 #include "fixedGradientFvPatchFields.H"
 #include "Switch.H"
-#include "solid4ContactFvPatchVectorField.H"
+#include "solid4GeneralContactFvPatchVectorField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -97,7 +97,7 @@ class thermalGeneralContactFvPatchScalarField
 
     // Private member functions
 
-        //- Check that thermalGeneralContact and solid4Contact both use the same master
+        //- Check that thermalGeneralContact and solid4GeneralContact both use the same master
         //  patch
         void checkConsistentMaster() const;
 
@@ -105,7 +105,7 @@ class thermalGeneralContactFvPatchScalarField
         //  This function is not allowed if shadowPatchIndices.size() > 1
         //  i.e. it is always OK for the slave(s) to call this function but not
         //  for the master when there are multiple slaves
-        const thermalGeneralContactFvPatchScalarField& shadowPatchField() const;
+        const thermalGeneralContactFvPatchScalarField& slavePatchField() const;
 
         //- Return the shadow patch for shadowI
         //  All slaves will only have one shadow whereas the master can have
@@ -115,8 +115,8 @@ class thermalGeneralContactFvPatchScalarField
             const label shadI
         ) const;
 
-        //- Return the solid4Contact patch field on this patch
-        const solid4ContactFvPatchVectorField& solid4ContactPatch() const;
+        //- Return the solid4GeneralContact patch field on this patch
+        const solid4GeneralContactFvPatchVectorField& solid4GeneralContactPatch() const;
 
 
 public:
@@ -203,10 +203,10 @@ public:
             }
 
             //- Return the shadow patch names
-            const wordList& shadowPatchNames() const;
+            const wordList& slavePatchNames() const;
 
             //- Return the shadow patch indices
-            const labelList& shadowPatchIndices() const;
+            const labelList& slavePatchIndices() const;
 
             //- Return zone index
             // label zoneIndex() const;
@@ -242,7 +242,7 @@ public:
             tmp<scalarField> Hc() const;
 
             //- Return friction flux for this patch
-            //  This partitions the frictionFluxRate from solid4Contact into the
+            //  This partitions the frictionFluxRate from solid4GeneralContact into the
             //  master contribution and slave contribution
             //  Note: this function was formerly known as Qc() and we renamed it
             //  to be more clear
