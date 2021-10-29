@@ -201,6 +201,7 @@ bool Foam::solid4GeneralContactFvPatchVectorField::currentMaster() const
 	Info<< "In currentMaster() "<<__LINE__<<endl;
 	Info<< "patch().index() in currentMaster() "<<patch().index()<<endl;
 	Info<< "patch().name() in currentMaster() "<<patch().name()<<endl;
+	Info<< "*currentMasterPtr_ in currentMaster() "<<*currentMasterPtr_<<endl;
 	return *currentMasterPtr_;
 }
 
@@ -2319,11 +2320,15 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
 	// Write the dict from the first contact model
 
     const label slaveI = 0;
+	
+	Info<<"In solid4GeneralContact::write function "<<__LINE__<<endl;
 
+	
     if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
         FatalError  << "solid4GeneralContactFvPatchVectorField::write: localSlavePtr_ NOT defined:" 
                     << "Cannot write slave information because no slave identified!"  
                     << exit(FatalError);; 
+					
 
     if (localSlave()[slaveI])
     {

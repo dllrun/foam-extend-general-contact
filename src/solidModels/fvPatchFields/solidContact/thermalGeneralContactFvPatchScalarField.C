@@ -302,6 +302,7 @@ Foam::thermalGeneralContactFvPatchScalarField::~thermalGeneralContactFvPatchScal
 const Foam::wordList&
 Foam::thermalGeneralContactFvPatchScalarField::slavePatchNames() const
 {
+	Info<<"In thermalGeneralContact::slavePatchNames() line:"<<__LINE__<<endl;
     return solid4GeneralContactPatch().slavePatchNames();
 }
 
@@ -373,14 +374,17 @@ Foam::scalar Foam::thermalGeneralContactFvPatchScalarField::UTS() const
 
 Foam::tmp<Foam::scalarField> Foam::thermalGeneralContactFvPatchScalarField::Hc() const
 {
-    checkConsistentMaster();
+	Info<<"In thermalGeneralContact::Hc() line:"<<__LINE__<<endl;
+	// Test without checkConsistentMaster()
+    //checkConsistentMaster();
 
     tmp<scalarField> tHc
     (
         new scalarField(patch().size(), 0.0)
     );
-
-    scalarField& Hc = tHc();
+	
+	
+    scalarField& Hc = tHc();	
 
     // Contact resistance dependent on contact pressure
 
@@ -403,17 +407,19 @@ Foam::tmp<Foam::scalarField> Foam::thermalGeneralContactFvPatchScalarField::Hc()
     // Note: the mesh should be in the deformed position so these should be the
     // deformed configuration normals
     const vectorField n = patch().nf();
+	
 
     // Calculate contact pressure and limit to avoid division by zero in pow
     const scalarField contactPressure =
         max(-n & solid4GeneralContactPatch().traction(), SMALL);
-
+	
     // Hmnn formula says use Vicker's hardness, but surely it should be
     // Vicker's hardness by 1e6
     // as Vicker's hardness = 0.3*UTS in MPa
 
     Hc = Foam::pow(contactPressure/(0.3*UTS()), beta())/Rc();
-
+	Info<<"In thermalGeneralContact::Hc() line:"<<__LINE__<<endl;
+	
     return tHc;
 }
 
@@ -421,7 +427,8 @@ Foam::tmp<Foam::scalarField> Foam::thermalGeneralContactFvPatchScalarField::Hc()
 Foam::tmp<Foam::scalarField>
 Foam::thermalGeneralContactFvPatchScalarField::frictionFluxRateForThisPatch() const
 {
-    checkConsistentMaster();
+	// Test without checkConsistentMaster()
+    //checkConsistentMaster();
 
     tmp<scalarField> tfrictionFluxRateForThisPatch
     (
@@ -446,8 +453,10 @@ Foam::thermalGeneralContactFvPatchScalarField::frictionFluxRateForThisPatch() co
     {
         // Heat flux generated due to friction, stored on the master surface
         scalarField fricFlux(patch().size(), 0.0);
-
-        if (master_)
+		
+		Info<<"In thermalGeneralContact::frictionFluxRateForThisPatch() line:"<<__LINE__<<endl;
+		//test currentMaster()
+        if (solid4GeneralContactPatch().currentMaster())  //(master_)
         {
             fricFlux = solid4GeneralContactPatch().frictionHeatRate();
         }
@@ -537,8 +546,10 @@ Foam::thermalGeneralContactFvPatchScalarField::frictionFluxRateForThisPatch() co
 
             scalarField shadowPatchKOnCurPatch;
             scalarField shadowPatchRhoCOnCurPatch;
-
-            if (master_)
+			
+			Info<<"In thermalGeneralContact::frictionFluxRateForThisPatch() line:"<<__LINE__<<endl;
+			//test currentMaster()
+            if(solid4GeneralContactPatch().currentMaster())  //(master_)
             {
                 const scalarField shadowZoneK =
                     solid4GeneralContactPatch().slaveZones()[shadI].patchFaceToGlobal
@@ -667,7 +678,8 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
     if (curTimeIndex_ != db().time().timeIndex())
     {
 		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
-        checkConsistentMaster();
+        // Test without checkConsistentMaster()
+		//checkConsistentMaster();
 		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         curTimeIndex_ = db().time().timeIndex();
     }
@@ -693,10 +705,12 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
     // whereas the master can have multiple shadow patches (i.e. multiple
     // slaves)
     const wordList& shadowPatchNames = this->slavePatchNames();
-
+	Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
+	
     // Accumulate the normal gradient field in the contact areas
     scalarField curPatchSnGradInContactArea(patch().size(), 0.0);
-
+	
+	Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
     forAll(shadowPatchNames, shadI)
     {
         // Create the shadow zone temperature field
@@ -751,15 +765,20 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
                     shadowZoneTOnCurPatch
                 );
         }
-
+		
+		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         // Calculate current contact conductance
         const scalarField curPatchH = Hc();
+		
+		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
 
         // Calculate the heat flux through the current patch (in the contact
         // area)
         const scalarField curPatchFluxInContactArea =
           - curPatchH*(shadowPatchTOnCurPatch - *this)
           - frictionFluxRateForThisPatch();
+		  
+		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
 
         // Get the contact indicator field for this contact pair
         const scalarField contactPerShadow =
