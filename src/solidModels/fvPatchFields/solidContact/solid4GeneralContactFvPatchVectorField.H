@@ -399,6 +399,16 @@ public:
     // Member functions
 
         // Access
+		
+		//*************** to help thermalGeneralContact *************
+		//- Return local slaves
+			const boolList& localTSlave() const
+			{
+				Info<<"In solid4GeneralContact.H::localTSlave() line:"<<__LINE__<<endl;
+                return localSlave();
+            }
+		
+		//************** end to help thermalGeneralContact *************
 			
 			//*************** based on solidGeneral*****************
 			//- Return true if this patch is the global master

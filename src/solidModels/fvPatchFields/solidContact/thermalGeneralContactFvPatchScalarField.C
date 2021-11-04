@@ -315,6 +315,16 @@ Foam::thermalGeneralContactFvPatchScalarField::slavePatchIndices() const
     return solid4GeneralContactPatch().slavePatchIndices();
 }
 
+//*******************begin new solid4GeneralContact functions*************
+const Foam::boolList& 
+Foam::thermalGeneralContactFvPatchScalarField::localSlave() const
+{
+	//return solid4GeneralContactPatch().localSlave();
+}
+			
+			
+//*******************end new solid4GeneralContact functions*************
+
 
 const Foam::scalarField& Foam::thermalGeneralContactFvPatchScalarField::contact() const
 {
@@ -682,7 +692,8 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
     if (curTimeIndex_ != db().time().timeIndex())
     {
 		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
-        // Test without checkConsistentMaster()
+        Info<<"solid4GeneralContactPatch().contact() in thermalGeneralContact::updateCoeffs()"<<solid4GeneralContactPatch().contact()<<endl; 
+		// Test without checkConsistentMaster()
 		checkConsistentMaster();
 		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         curTimeIndex_ = db().time().timeIndex();

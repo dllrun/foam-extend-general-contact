@@ -201,6 +201,13 @@ public:
 				Info<<"In thermalGeneralContact.H::master() line:"<<__LINE__<<endl;
                 return master_;
             }
+			
+			//*******************begin new solid4GeneralContact functions*************
+			//- Return local slaves
+			const boolList& localSlave() const;
+			
+			
+			//*******************end new solid4GeneralContact functions*************
 
             //- Return the shadow patch names
             const wordList& slavePatchNames() const;
