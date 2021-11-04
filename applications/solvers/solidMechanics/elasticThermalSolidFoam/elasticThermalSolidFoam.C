@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
 #   include "createTime.H"
 #   include "createMesh.H"
 #   include "createFields.H"
+#   include "createHistory.H"
 #   include "readDivSigmaExpMethod.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -80,12 +81,14 @@ int main(int argc, char *argv[])
 			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
             T.storePrevIter();
 			
-			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
+			Info<<"BEFORE TEqn build: Here I am in thermal solver line"<<__LINE__<<endl;
 
             fvScalarMatrix TEqn
             (
                 rhoC*fvm::ddt(T) == fvm::laplacian(k, T, "laplacian(k,T)")
             );
+			
+			Info<<"AFTER TEqn build: Here I am in thermal solver line"<<__LINE__<<endl;
 			
 			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
 			
@@ -138,6 +141,8 @@ int main(int argc, char *argv[])
             U.storePrevIter();
 
 #           include "calculateDivSigmaExp.H"
+			
+			Info<<"BEFORE build: Here I am in thermal solver line"<<__LINE__<<endl;
 
             // Linear momentum equaiton
             fvVectorMatrix UEqn
@@ -147,8 +152,12 @@ int main(int argc, char *argv[])
                 fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
               + divSigmaExp
             );
+			
+			Info<<"AFTER build: Here I am in thermal solver line"<<__LINE__<<endl;
 
             solverPerfU = UEqn.solve();
+			
+			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
 
             if (aitkenRelax)
             {
@@ -160,6 +169,8 @@ int main(int argc, char *argv[])
             }
 
             gradU = fvc::grad(U);
+			
+			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
 
 #           include "calculateRelResU.H"
 
@@ -167,6 +178,8 @@ int main(int argc, char *argv[])
             {
                 initialResidual = solverPerfU.initialResidual();
             }
+			
+			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
 
             if (iCorr % infoFrequency == 0)
             {
@@ -204,6 +217,7 @@ int main(int argc, char *argv[])
 
 #       include "calculateEpsilonSigma.H"
 #       include "writeFields.H"
+#       include "writeHistory.H"
 
         Info<< "ExecutionTime = "
             << runTime.elapsedCpuTime()
