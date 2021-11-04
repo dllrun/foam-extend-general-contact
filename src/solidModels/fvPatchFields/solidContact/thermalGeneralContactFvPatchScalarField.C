@@ -184,7 +184,8 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 )
 :
     fixedGradientFvPatchScalarField(p, iF),
-    master_(dict.lookupOrDefault<Switch>("master", false)),
+    //master_(currentMasterPtr_),
+	master_(dict.lookupOrDefault<Switch>("master", false)),
     dict_(dict),
     underRelaxation_(1),
     alpha_("alpha", dict, p.size()),
@@ -274,7 +275,8 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 )
 :
     fixedGradientFvPatchScalarField(ptf, iF),
-    master_(ptf.master_),
+    //master_(currentMasterPtr_),
+	master_(ptf.master_),
     dict_(ptf.dict_),
     underRelaxation_(ptf.underRelaxation_),
     alpha_(ptf.alpha_),
@@ -376,7 +378,7 @@ Foam::tmp<Foam::scalarField> Foam::thermalGeneralContactFvPatchScalarField::Hc()
 {
 	Info<<"In thermalGeneralContact::Hc() line:"<<__LINE__<<endl;
 	// Test without checkConsistentMaster()
-    //checkConsistentMaster();
+    checkConsistentMaster();
 
     tmp<scalarField> tHc
     (
@@ -428,7 +430,7 @@ Foam::tmp<Foam::scalarField>
 Foam::thermalGeneralContactFvPatchScalarField::frictionFluxRateForThisPatch() const
 {
 	// Test without checkConsistentMaster()
-    //checkConsistentMaster();
+    checkConsistentMaster();
 
     tmp<scalarField> tfrictionFluxRateForThisPatch
     (
@@ -530,6 +532,7 @@ Foam::thermalGeneralContactFvPatchScalarField::frictionFluxRateForThisPatch() co
 
         forAll(shadowPatchNames, shadI)
         {
+			Info<<"forAll loop in thermalGeneralContact::frictionFluxRateForThisPatch() line:"<<__LINE__<<endl;
             // Get k on the shadow patch
             const scalarField& shadowPatchK =
                 k.boundaryField()[slavePatchIndices()[shadI]];
@@ -671,6 +674,7 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
 	Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
     if (updated())
     {
+		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         return;
     }
 	
@@ -679,7 +683,7 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
     {
 		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         // Test without checkConsistentMaster()
-		//checkConsistentMaster();
+		checkConsistentMaster();
 		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         curTimeIndex_ = db().time().timeIndex();
     }
@@ -713,10 +717,12 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
 	Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
     forAll(shadowPatchNames, shadI)
     {
+		Info<<"forAll loop in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         // Create the shadow zone temperature field
         scalarField shadowPatchTOnCurPatch;
         if (master())
         {
+			Info<<"MASTER in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
             // Note: solid4GeneralContactPatch().zone() always returns the master zone
             // and solid4GeneralContactPatch().slaveZones() always returns the slave
             // zones
@@ -739,9 +745,11 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
                 (
                     shadowZoneTOnCurPatch
                 );
+			Info<<"End MASTER in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         }
         else
         {
+			Info<<"SLAVE in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
             // Note: zone() is the master global patch
             // Note 2: the slave always has only one master i.e.
             // one shadowPatchField
@@ -764,6 +772,8 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
                 (
                     shadowZoneTOnCurPatch
                 );
+				
+			Info<<"End SLAVE in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         }
 		
 		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
@@ -830,6 +840,7 @@ void Foam::thermalGeneralContactFvPatchScalarField::evaluate
 	Info<<"In thermalGeneralContact::evaluate(..) line:"<<__LINE__<<endl;
     if (!this->updated())
     {
+		Info<<"In thermalGeneralContact::evaluate(..) line:"<<__LINE__<<endl;
         this->updateCoeffs();
     }
 
@@ -864,6 +875,7 @@ void Foam::thermalGeneralContactFvPatchScalarField::evaluate
 
 void Foam::thermalGeneralContactFvPatchScalarField::write(Ostream& os) const
 {
+	Info<<"In thermalGeneralContact::write() line:"<<__LINE__<<endl;
     os.writeKeyword("master")
         << master_ << token::END_STATEMENT << nl;
     alpha_.writeEntry("alpha", os);
