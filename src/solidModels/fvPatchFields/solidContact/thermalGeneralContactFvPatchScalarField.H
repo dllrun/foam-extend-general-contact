@@ -98,7 +98,8 @@ class thermalGeneralContactFvPatchScalarField
 		//- Is this the global master patch: the global master patches keeps a
         // copy of mesh.allPoints() and updates them to the deformed position
         // each time before the contact is corrected
-        mutable bool* firstPatchTPtr_;
+		/*       
+	   mutable bool* firstPatchTPtr_;
 		
 		//- Patch index of global master patch
         mutable label* firstPatchIndexInListTPtr_;
@@ -111,6 +112,7 @@ class thermalGeneralContactFvPatchScalarField
 		
 		//- Is this the current slave patch
         mutable bool* currentSlaveTPtr_;
+		*/
 		
 		//- If the current patch is the local slave of the contact pair
         // The local slave is the patch with the lower patch index

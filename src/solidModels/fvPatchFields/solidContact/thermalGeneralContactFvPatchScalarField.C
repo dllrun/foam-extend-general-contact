@@ -143,10 +143,13 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 	currentMasterTPtr_(NULL),
     currentMasterIndexTPtr_(NULL),
 	currentSlaveTPtr_(NULL),
-	localSlaveTPtr_(NULL),
+	
 	*/
+	localSlaveTPtr_(NULL),
 	//*************** end append objects based on solid4General*****************
-    master_(false),
+    /* Comment this for the moment
+	master_(false),
+	*/
     dict_(),
     underRelaxation_(1),
     alpha_(p.size(), 0),
@@ -180,10 +183,13 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 	currentMasterTPtr_(NULL),
     currentMasterIndexTPtr_(NULL),
 	currentSlaveTPtr_(NULL),
-	localSlaveTPtr_(NULL),
+	
 	*/
+	localSlaveTPtr_(NULL),
 	//*************** end append objects based on solid4General*****************
+	/* Comment this for the moment
 	master_(ptf.master_),
+	*/
     dict_(ptf.dict_),
     underRelaxation_(ptf.underRelaxation_),
     alpha_(ptf.alpha_, mapper),
@@ -215,11 +221,14 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 	currentMasterTPtr_(NULL),
     currentMasterIndexTPtr_(NULL),
 	currentSlaveTPtr_(NULL),
-	localSlaveTPtr_(NULL),
+	
 	*/
+	localSlaveTPtr_(NULL),
 	//*************** end append objects based on solid4General*****************
+	/* Comment this for the moment
 	master_(dict.lookupOrDefault<Switch>("master", false)),
-    dict_(dict),
+    */
+	dict_(dict),
     underRelaxation_(1),
     alpha_("alpha", dict, p.size()),
     Tinf_(readScalar(dict.lookup("Tinf"))),
@@ -294,10 +303,13 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 	currentMasterTPtr_(NULL),
     currentMasterIndexTPtr_(NULL),
 	currentSlaveTPtr_(NULL),
-	localSlaveTPtr_(NULL),
+	
 	*/
+	localSlaveTPtr_(NULL),
 	//*************** end append objects based on solid4General*****************
+	/* Comment this for the moment
 	master_(ptf.master_),
+	*/
     dict_(ptf.dict_),
     underRelaxation_(ptf.underRelaxation_),
     alpha_(ptf.alpha_),
@@ -327,11 +339,14 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 	currentMasterTPtr_(NULL),
     currentMasterIndexTPtr_(NULL),
 	currentSlaveTPtr_(NULL),
-	localSlaveTPtr_(NULL),
+	
 	*/
+	localSlaveTPtr_(NULL),
 	//*************** end append objects based on solid4General*****************
     //master_(currentMasterPtr_),
+	/* Comment this for the moment
 	master_(ptf.master_),
+	*/
     dict_(ptf.dict_),
     underRelaxation_(ptf.underRelaxation_),
     alpha_(ptf.alpha_),
@@ -428,6 +443,7 @@ Foam::scalar Foam::thermalGeneralContactFvPatchScalarField::beta() const
 
 Foam::scalar Foam::thermalGeneralContactFvPatchScalarField::UTS() const
 {
+	Info<<"In thermalGeneralContact::UTS() line:"<<__LINE__<<endl;
     if (master())
     {
         return UTS_;
@@ -443,15 +459,21 @@ Foam::tmp<Foam::scalarField> Foam::thermalGeneralContactFvPatchScalarField::Hc()
 {
 	Info<<"In thermalGeneralContact::Hc() line:"<<__LINE__<<endl;
 	// Test without checkConsistentMaster()
-    checkConsistentMaster();
+    //checkConsistentMaster();
+	
+	Info<<"In thermalGeneralContact::Hc() line:"<<__LINE__<<endl;
 
     tmp<scalarField> tHc
     (
         new scalarField(patch().size(), 0.0)
     );
 	
+	Info<<"In thermalGeneralContact::Hc() line:"<<__LINE__<<endl;
 	
-    scalarField& Hc = tHc();	
+	
+    scalarField& Hc = tHc();
+
+	Info<<"In thermalGeneralContact::Hc() line:"<<__LINE__<<endl;
 
     // Contact resistance dependent on contact pressure
 
@@ -475,11 +497,13 @@ Foam::tmp<Foam::scalarField> Foam::thermalGeneralContactFvPatchScalarField::Hc()
     // deformed configuration normals
     const vectorField n = patch().nf();
 	
+	Info<<"In thermalGeneralContact::Hc() line:"<<__LINE__<<endl;
 
     // Calculate contact pressure and limit to avoid division by zero in pow
     const scalarField contactPressure =
         max(-n & solid4GeneralContactPatch().traction(), SMALL);
 	
+	Info<<"In thermalGeneralContact::Hc() line:"<<__LINE__<<endl;
     // Hmnn formula says use Vicker's hardness, but surely it should be
     // Vicker's hardness by 1e6
     // as Vicker's hardness = 0.3*UTS in MPa
@@ -786,8 +810,10 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
 		Info<<"forAll loop in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         // Create the shadow zone temperature field
         scalarField shadowPatchTOnCurPatch;
-        if (master())
-        {
+        
+		//if (master())
+        if (localSlave()[shadI])
+		{
 			Info<<"MASTER in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
             // Note: solid4GeneralContactPatch().zone() always returns the master zone
             // and solid4GeneralContactPatch().slaveZones() always returns the slave
