@@ -319,7 +319,7 @@ Foam::thermalGeneralContactFvPatchScalarField::slavePatchIndices() const
 const Foam::boolList& 
 Foam::thermalGeneralContactFvPatchScalarField::localSlave() const
 {
-	//return solid4GeneralContactPatch().localSlave();
+	return solid4GeneralContactPatch().localTSlave();
 }
 			
 			
