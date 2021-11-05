@@ -135,6 +135,17 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 )
 :
     fixedGradientFvPatchScalarField(p, iF),
+	//*************** append objects based on solid4General*****************
+	/*
+	fixedGradientFvPatchScalarField(p, iF),
+	firstPatchTPtr_(NULL),
+    firstPatchIndexInListTPtr_(NULL),
+	currentMasterTPtr_(NULL),
+    currentMasterIndexTPtr_(NULL),
+	currentSlaveTPtr_(NULL),
+	localSlaveTPtr_(NULL),
+	*/
+	//*************** end append objects based on solid4General*****************
     master_(false),
     dict_(),
     underRelaxation_(1),
@@ -161,7 +172,18 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 )
 :
     fixedGradientFvPatchScalarField(ptf, p, iF, mapper),
-    master_(ptf.master_),
+    //*************** append objects based on solid4General*****************
+	/*
+	fixedGradientFvPatchScalarField(p, iF),
+	firstPatchTPtr_(NULL),
+    firstPatchIndexInListTPtr_(NULL),
+	currentMasterTPtr_(NULL),
+    currentMasterIndexTPtr_(NULL),
+	currentSlaveTPtr_(NULL),
+	localSlaveTPtr_(NULL),
+	*/
+	//*************** end append objects based on solid4General*****************
+	master_(ptf.master_),
     dict_(ptf.dict_),
     underRelaxation_(ptf.underRelaxation_),
     alpha_(ptf.alpha_, mapper),
@@ -184,7 +206,18 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 )
 :
     fixedGradientFvPatchScalarField(p, iF),
-    //master_(currentMasterPtr_),
+    //master_(solid4GeneralContactPatch().currentMasterPtr_),
+	//*************** append objects based on solid4General*****************
+	/*
+	fixedGradientFvPatchScalarField(p, iF),
+	firstPatchTPtr_(NULL),
+    firstPatchIndexInListTPtr_(NULL),
+	currentMasterTPtr_(NULL),
+    currentMasterIndexTPtr_(NULL),
+	currentSlaveTPtr_(NULL),
+	localSlaveTPtr_(NULL),
+	*/
+	//*************** end append objects based on solid4General*****************
 	master_(dict.lookupOrDefault<Switch>("master", false)),
     dict_(dict),
     underRelaxation_(1),
@@ -253,7 +286,18 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 )
 :
     fixedGradientFvPatchScalarField(ptf),
-    master_(ptf.master_),
+    //*************** append objects based on solid4General*****************
+	/*
+	fixedGradientFvPatchScalarField(p, iF),
+	firstPatchTPtr_(NULL),
+    firstPatchIndexInListTPtr_(NULL),
+	currentMasterTPtr_(NULL),
+    currentMasterIndexTPtr_(NULL),
+	currentSlaveTPtr_(NULL),
+	localSlaveTPtr_(NULL),
+	*/
+	//*************** end append objects based on solid4General*****************
+	master_(ptf.master_),
     dict_(ptf.dict_),
     underRelaxation_(ptf.underRelaxation_),
     alpha_(ptf.alpha_),
@@ -275,6 +319,17 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 )
 :
     fixedGradientFvPatchScalarField(ptf, iF),
+	//*************** append objects based on solid4General*****************
+	/*
+	fixedGradientFvPatchScalarField(p, iF),
+	firstPatchTPtr_(NULL),
+    firstPatchIndexInListTPtr_(NULL),
+	currentMasterTPtr_(NULL),
+    currentMasterIndexTPtr_(NULL),
+	currentSlaveTPtr_(NULL),
+	localSlaveTPtr_(NULL),
+	*/
+	//*************** end append objects based on solid4General*****************
     //master_(currentMasterPtr_),
 	master_(ptf.master_),
     dict_(ptf.dict_),

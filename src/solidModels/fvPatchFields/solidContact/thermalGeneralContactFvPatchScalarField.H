@@ -93,6 +93,30 @@ class thermalGeneralContactFvPatchScalarField
 
         //- Zone-to-zone interpolation
         // mutable PtrList<newGgiZoneInterpolation> zoneToZones_;
+		
+		//*************** append objects based on solid4General*****************
+		//- Is this the global master patch: the global master patches keeps a
+        // copy of mesh.allPoints() and updates them to the deformed position
+        // each time before the contact is corrected
+        mutable bool* firstPatchTPtr_;
+		
+		//- Patch index of global master patch
+        mutable label* firstPatchIndexInListTPtr_;
+		
+		//- Is this the current master patch
+        mutable bool* currentMasterTPtr_;
+		
+		//- Patch index of current master patch
+        mutable label* currentMasterIndexTPtr_;
+		
+		//- Is this the current slave patch
+        mutable bool* currentSlaveTPtr_;
+		
+		//- If the current patch is the local slave of the contact pair
+        // The local slave is the patch with the lower patch index
+        mutable boolList* localSlaveTPtr_;
+		
+		//*************** end append objects based on solid4General*****************
 
 
     // Private member functions
@@ -196,20 +220,23 @@ public:
         // Access
 
             //- Return if this patch is the master
-			/*
+			
             Switch master() const
             {
 				Info<<"In thermalGeneralContact.H::master() line:"<<__LINE__<<endl;
                 return master_;
             }
-			*/
+			
 			
 			//************** code to modify master slave definition************
+			 /*
 			 Switch master() const
             {
 				Info<<"In thermalGeneralContact.H::master() line:"<<__LINE__<<endl;
                 return solid4GeneralContactPatch().currentMaster();
             }
+			*/
+			//************ end code to modify master slave definition **********
 			
 			//*******************begin new solid4GeneralContact functions*************
 			//- Return local slaves
