@@ -239,7 +239,9 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
     curTimeIndex_(-1)
 {
 	Info<<"In thermalGeneralContact c3(p,iF,dict) line:"<<__LINE__<<endl;
-    Info<<"master() in thermalGeneralContact c3(p,iF,dict): "<<master()<<endl;
+    Info<<"patch().name() in thermalGeneralContact c3(p,iF,dict) :"<<patch().name()<< endl;
+	Info<<"patch().index() in thermalGeneralContact c3(p,iF,dict) :"<<patch().index()<< endl;
+	Info<<"master() in thermalGeneralContact c3(p,iF,dict): "<<master()<<endl;
 	if (debug)
     {
         Info<< patch().name() << ": " << type() << endl;

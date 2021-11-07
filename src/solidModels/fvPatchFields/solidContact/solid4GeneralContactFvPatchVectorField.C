@@ -221,7 +221,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcCurrentMaster() const   /
     // The global master is the first solid4GeneralContact patch i.e. the one
     // with the lowest patch index
 	
-	const boolList& locSlave = localSlave();
+	//const boolList& locSlave = localSlave();
+	const boolList& locSlave = localTSlave();
 	
 	Info<< "In calcCurrentMaster() "<<__LINE__<<endl;
 	Info<< "patch().index() in calcCurrentMaster() "<<patch().index()<<endl;
