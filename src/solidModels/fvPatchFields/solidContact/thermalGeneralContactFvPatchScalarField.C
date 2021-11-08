@@ -55,7 +55,7 @@ Foam::thermalGeneralContactFvPatchScalarField::slavePatchField() const
 {
 	Info<<"In thermalGeneralContact::slavePatchField() line:"<<__LINE__<<endl;
     
-	/*Lets check this without size 
+	//Lets check this without size 
 	
 	if (slavePatchIndices().size() != 1)
     {
@@ -67,7 +67,6 @@ Foam::thermalGeneralContactFvPatchScalarField::slavePatchField() const
             << "patch; this patch has " << slavePatchIndices().size()
             << " slave patches!" << abort(FatalError);
     }
-	*/
 
     const volScalarField& field =
         db().lookupObject<volScalarField>(dimensionedInternalField().name());
@@ -582,6 +581,7 @@ Foam::thermalGeneralContactFvPatchScalarField::frictionFluxRateForThisPatch() co
 		//test currentMaster()
         if (solid4GeneralContactPatch().currentMaster())  //(master_)
         {
+			Info<<"In thermalGeneralContact::frictionFluxRateForThisPatch() line:"<<__LINE__<<endl;
             fricFlux = solid4GeneralContactPatch().frictionHeatRate();
         }
         else
@@ -845,7 +845,7 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
         scalarField shadowPatchTOnCurPatch;
         
 		//if (master())
-        if (localSlave()[shadI])
+        if(master()) //(localSlave()[shadI])
 		{
 			Info<<"MASTER in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
             // Note: solid4GeneralContactPatch().zone() always returns the master zone

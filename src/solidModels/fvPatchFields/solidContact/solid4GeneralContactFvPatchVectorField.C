@@ -1423,7 +1423,8 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels()
             (
                 this->dimensionedInternalField().name()
             );
-
+		
+		Info<<"slavePatchIndices()[0] in normalModels() :"<<slavePatchIndices()[0]<<endl;
         solid4GeneralContactFvPatchVectorField& slavePatchField =
             const_cast<solid4GeneralContactFvPatchVectorField&>
             (
@@ -2151,7 +2152,7 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionHeatRate() const
 {
     // Consider storing frictionHeatRate instead of recalculating multiple times
 
-    if (!firstPatchInList())
+    if (!currentMaster())//(!firstPatchInList())
     {
         FatalErrorIn
         (
