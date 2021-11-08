@@ -220,24 +220,26 @@ public:
     // Member functions
 
         // Access
-
-            //- Return if this patch is the master
 			
+			/* Comment this for the moment 
+            //- Return if this patch is the master
             Switch master() const
             {
 				Info<<"In thermalGeneralContact.H::master() line:"<<__LINE__<<endl;
-                return master_;
+                				
+				return master_;
             }
+			*/
 			
 			
 			//************** code to modify master slave definition************
-			 /*
+			 
 			 Switch master() const
             {
 				Info<<"In thermalGeneralContact.H::master() line:"<<__LINE__<<endl;
                 return solid4GeneralContactPatch().currentMaster();
             }
-			*/
+			
 			//************ end code to modify master slave definition **********
 			
 			//*******************begin new solid4GeneralContact functions*************
