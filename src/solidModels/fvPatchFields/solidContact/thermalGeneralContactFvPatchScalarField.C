@@ -53,9 +53,9 @@ void Foam::thermalGeneralContactFvPatchScalarField::checkConsistentMaster() cons
 const Foam::thermalGeneralContactFvPatchScalarField&
 Foam::thermalGeneralContactFvPatchScalarField::slavePatchField() const
 {
-    const labelList& shadowPatchIndices =
+	const labelList& shadowPatchIndices =
         solid4GeneralContactPatch().slavePatchIndices();
-
+	
     if (shadowPatchIndices.size() != 1)
     {
         FatalErrorIn

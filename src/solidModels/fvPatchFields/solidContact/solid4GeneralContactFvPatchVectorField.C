@@ -2268,6 +2268,15 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
         return;
     }
 	
+		if(
+	    !localSlavePtr_
+		&& dimensionedInternalField().name() == "U_0"
+		)
+		{
+//	  	Info<<"Here I am in first U_0 check in write()"<<__LINE__<<endl;
+		return;
+		} 
+	
     solidTractionFvPatchVectorField::write(os);
 	Info<<"In solid4GeneralContact::write function "<<__LINE__<<endl;
 	/* os.writeKeyword("master")
@@ -2323,7 +2332,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
     const label slaveI = 0;
 	
 	Info<<"In solid4GeneralContact::write function "<<__LINE__<<endl;
-
+	
+	Info<< "The current field in solid4GeneralContact::write function is "<< dimensionedInternalField().name()<< endl;
+	Info<< "The current patch in solid4GeneralContact::write function is "<< patch().name()<< endl;	
+	
+	//Info<<"*localSlavePtr_ in solid4GeneralContact::write function "<<*localSlavePtr_<<endl;
 	
     if(!localSlavePtr_) //remove this check later, since localSlave should re-compute the local slave
         FatalError  << "solid4GeneralContactFvPatchVectorField::write: localSlavePtr_ NOT defined:" 
