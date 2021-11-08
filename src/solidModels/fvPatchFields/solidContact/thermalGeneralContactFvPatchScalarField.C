@@ -53,6 +53,37 @@ void Foam::thermalGeneralContactFvPatchScalarField::checkConsistentMaster() cons
 const Foam::thermalGeneralContactFvPatchScalarField&
 Foam::thermalGeneralContactFvPatchScalarField::slavePatchField() const
 {
+	Info<<"In thermalGeneralContact::slavePatchField() line:"<<__LINE__<<endl;
+    
+	/*Lets check this without size 
+	
+	if (slavePatchIndices().size() != 1)
+    {
+        FatalErrorIn
+        (
+            "const Foam::thermalGeneralContactFvPatchScalarField&\n"
+            "Foam::thermalGeneralContactFvPatchScalarField::slavePatchField() const"
+        )   << "This function can only be called for a patch with 1 slave "
+            << "patch; this patch has " << slavePatchIndices().size()
+            << " slave patches!" << abort(FatalError);
+    }
+	*/
+
+    const volScalarField& field =
+        db().lookupObject<volScalarField>(dimensionedInternalField().name());
+
+    return
+        refCast<const thermalGeneralContactFvPatchScalarField>
+        (
+            field.boundaryField()[slavePatchIndices()[0]]
+        );
+}
+
+/*Comment this for the moment 
+
+const Foam::thermalGeneralContactFvPatchScalarField&
+Foam::thermalGeneralContactFvPatchScalarField::slavePatchField() const
+{
 	const labelList& shadowPatchIndices =
         solid4GeneralContactPatch().slavePatchIndices();
 	
@@ -69,7 +100,7 @@ Foam::thermalGeneralContactFvPatchScalarField::slavePatchField() const
 
     return shadowPatchField(0);
 }
-
+*/
 
 const Foam::thermalGeneralContactFvPatchScalarField&
 Foam::thermalGeneralContactFvPatchScalarField::shadowPatchField
