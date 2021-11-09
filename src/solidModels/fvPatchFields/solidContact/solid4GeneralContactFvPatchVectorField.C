@@ -2146,10 +2146,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
     solidTractionFvPatchVectorField::updateCoeffs();
 }
 
-
+/*
 Foam::tmp<Foam::scalarField>
 Foam::solid4GeneralContactFvPatchVectorField::frictionHeatRate() const
 {
+	Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
     // Consider storing frictionHeatRate instead of recalculating multiple times
 
     if (!currentMaster())//(!firstPatchInList())
@@ -2161,33 +2162,46 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionHeatRate() const
         )   << "Only master can call frictionHeatRate function!"
             << abort(FatalError);
     }
+	
+	Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
 
     // For now, we assume traction is constant over time-step
     // Todo: we should use trapezoidal rule
     vectorField curTraction(patch().size(), vector::zero);
+	
+	Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
 
     tmp<scalarField> tfrictionHeatRate
     (
         new scalarField(curTraction.size(), 0.0)
     );
     scalarField& frictionHeatRate = tfrictionHeatRate();
+	
+	Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
 
     forAll(slavePatchNames(), shadPatchI)
     {
+		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
         // Calculate slip
 
         const vectorField slavePatchSlip = frictionModels()[shadPatchI].slip();
-
+		
+		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
+		
         const vectorField slaveZoneSlip =
             slaveZones()[shadPatchI].patchFaceToGlobal
             (
                 slavePatchSlip
             );
+			
+		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
 
         // Interpolate from slave to master
 
         const vectorField masterZoneSlip =
             zoneToZones()[shadPatchI].slaveToMaster(slaveZoneSlip);
+			
+		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
 
         const vectorField masterPatchSlip =
             zone().globalFaceToPatch
@@ -2206,10 +2220,120 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionHeatRate() const
         // positive
         frictionHeatRate += mag(traction() & (masterPatchSlip/deltaT));
     }
+	Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
 
     return tfrictionHeatRate;
 }
+*/
 
+// ***************** Based on solidGeneral *******************
+Foam::tmp<Foam::scalarField>
+Foam::solid4GeneralContactFvPatchVectorField::frictionHeatRate() const
+{
+	Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
+    // Consider storing frictionHeatRate instead of recalculating multiple times
+
+    if (!currentMaster())//(!firstPatchInList())
+    {
+        FatalErrorIn
+        (
+            "Foam::tmp<Foam::scalarField> Foam::"
+            "solid4GeneralContactFvPatchVectorField::frictionHeatRate() const"
+        )   << "Only master can call frictionHeatRate function!"
+            << abort(FatalError);
+    }
+	
+	Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
+
+    // For now, we assume traction is constant over time-step
+    // Todo: we should use trapezoidal rule
+    vectorField curTraction(patch().size(), vector::zero);
+	
+	Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
+
+    tmp<scalarField> tfrictionHeatRate
+    (
+        new scalarField(curTraction.size(), 0.0)
+    );
+    scalarField& frictionHeatRate = tfrictionHeatRate();
+	
+	const scalar deltaT =
+            patch().boundaryMesh().mesh().time().deltaTValue();
+	
+	Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
+	
+	const boolList& locSlave = localTSlave();
+
+    forAll(locSlave, shadPatchI) //forAll(slavePatchNames(), shadPatchI)
+    {
+		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
+       
+		//**************** based on solidGeneral *****************
+		vectorField curPatchSlip(patch().size(), vector::zero);
+		
+		// Calculate slip
+		if (locSlave[shadPatchI])
+        {
+		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
+			const vectorField slavePatchSlip = frictionModels()[shadPatchI].slip();
+			
+		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
+		
+		Info<<"patch().index() in frictionHeatRate(): "<<patch().index()<<endl;
+		Info<<"patch().name() in frictionHeatRate(): "<<patch().name()<<endl;
+		
+        const vectorField slaveZoneSlip =
+            slaveZones()[shadPatchI].patchFaceToGlobal
+            (
+                slavePatchSlip
+            );
+			
+			
+		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
+
+        // Interpolate from slave to master
+
+        const vectorField masterZoneSlip =
+            zoneToZones()[shadPatchI].slaveToMaster(slaveZoneSlip);
+			
+		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
+
+        //const vectorField masterPatchSlip =
+            curPatchSlip =
+			zone().globalFaceToPatch
+            (
+                masterZoneSlip
+            );
+		
+		/*const scalar deltaT =
+            patch().boundaryMesh().mesh().time().deltaTValue();
+			*/
+		
+		}
+		else 
+		{
+		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
+			curPatchSlip = frictionModels()[shadPatchI].slip();
+		//const vectorField slavePatchSlip = frictionModels()[shadPatchI].slip();
+		}
+		
+        // Accumulate frictionHeatRate for each slave patch
+
+        // Rate of dissipated frictional energy for this timestep
+        // The dot product of the traction vectors and the slip vectors gives
+        // the dissipated frictional energy per unit area; which is always
+        // positive
+		frictionHeatRate += mag(traction() & (curPatchSlip/deltaT));
+        //frictionHeatRate += mag(traction() & (masterPatchSlip/deltaT));
+		//**************** End based on solidGeneral *****************
+    
+	}	
+	
+	Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
+
+    return tfrictionHeatRate;
+}
+// ***************** End Based on solidGeneral *****************
 
 Foam::PtrList<Foam::scalarField>&
 Foam::solid4GeneralContactFvPatchVectorField::contactPerSlave()
