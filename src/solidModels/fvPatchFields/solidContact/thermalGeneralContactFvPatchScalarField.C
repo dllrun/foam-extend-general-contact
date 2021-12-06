@@ -57,6 +57,7 @@ Foam::thermalGeneralContactFvPatchScalarField::slavePatchField() const
     
 	//Lets check this without size 
 	
+	/*
 	if (slavePatchIndices().size() != 1)
     {
         FatalErrorIn
@@ -67,10 +68,14 @@ Foam::thermalGeneralContactFvPatchScalarField::slavePatchField() const
             << "patch; this patch has " << slavePatchIndices().size()
             << " slave patches!" << abort(FatalError);
     }
+	*/
+	
+	Info<<"In thermalGeneralContact::slavePatchField() line:"<<__LINE__<<endl;
 
     const volScalarField& field =
         db().lookupObject<volScalarField>(dimensionedInternalField().name());
-
+	
+	Info<<"In thermalGeneralContact::slavePatchField() line:"<<__LINE__<<endl;
     return
         refCast<const thermalGeneralContactFvPatchScalarField>
         (
@@ -107,6 +112,7 @@ Foam::thermalGeneralContactFvPatchScalarField::shadowPatchField
     const label shadI
 ) const
 {
+	Info<<"In thermalGeneralContact::shadowPatchField() line:"<<__LINE__<<endl;
     if (shadI < 0)
     {
         FatalErrorIn
@@ -120,7 +126,9 @@ Foam::thermalGeneralContactFvPatchScalarField::shadowPatchField
 
     const labelList& shadowPatchIndices =
         solid4GeneralContactPatch().slavePatchIndices();
-
+	
+	Info<<"In thermalGeneralContact::shadowPatchField() line:"<<__LINE__<<endl;
+	
     if (shadI >= shadowPatchIndices.size())
     {
         FatalErrorIn
@@ -132,6 +140,8 @@ Foam::thermalGeneralContactFvPatchScalarField::shadowPatchField
             << shadowPatchIndices.size() << " shadow patches!"
             << abort(FatalError);
     }
+	
+	Info<<"In thermalGeneralContact::shadowPatchField() line:"<<__LINE__<<endl;
 
     const volScalarField& field =
         db().lookupObject<volScalarField>(dimensionedInternalField().name());
@@ -141,6 +151,13 @@ Foam::thermalGeneralContactFvPatchScalarField::shadowPatchField
         (
             field.boundaryField()[shadowPatchIndices[shadI]]
         );
+		
+	/*return
+        refCast<const thermalGeneralContactFvPatchScalarField>
+        (
+            field.boundaryField()[slavePatchIndices()[0]]
+        );
+		*/
 }
 
 
@@ -276,10 +293,11 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
     {
         Info<< patch().name() << ": " << type() << endl;
     }
-
+	
     // Read only on master
-    if (master())
-    {
+	// Lets comment and read for all patches 
+    //if (master())
+    //{
         underRelaxation_ = readScalar(dict.lookup("underRelaxation"));
 
         Rc_ = readScalar(dict.lookup("Rc"));
@@ -296,7 +314,9 @@ Foam::thermalGeneralContactFvPatchScalarField::thermalGeneralContactFvPatchScala
 
             Rc_ = SMALL;
         }
-    }
+    //}
+	
+	Info<<"In thermalGeneralContact c3(p,iF,dict) line:"<<__LINE__<<endl;	
 
     if (dict.found("gradient"))
     {
@@ -414,6 +434,7 @@ Foam::thermalGeneralContactFvPatchScalarField::slavePatchNames() const
 const Foam::labelList&
 Foam::thermalGeneralContactFvPatchScalarField::slavePatchIndices() const
 {
+	Info<<"In thermalGeneralContact::slavePatchIndices() line:"<<__LINE__<<endl;
     return solid4GeneralContactPatch().slavePatchIndices();
 }
 
@@ -436,12 +457,15 @@ const Foam::scalarField& Foam::thermalGeneralContactFvPatchScalarField::contact(
 
 Foam::scalar Foam::thermalGeneralContactFvPatchScalarField::underRelaxation() const
 {
-    if (master())
-    {
+	//const boolList& locSlave = localSlave();
+    //if(locSlave[shadI])
+	if (master())
+	{
         return underRelaxation_;
     }
     else
     {
+		Info<<"In thermalGeneralContact::underRelaxation() line:"<<__LINE__<<endl;
         return slavePatchField().underRelaxation();
     }
 }
@@ -449,12 +473,15 @@ Foam::scalar Foam::thermalGeneralContactFvPatchScalarField::underRelaxation() co
 
 Foam::scalar Foam::thermalGeneralContactFvPatchScalarField::Rc() const
 {
-    if (master())
-    {
+    //const boolList& locSlave = localSlave();
+    //if(locSlave[shadI])
+	if (master())
+	{
         return Rc_;
     }
     else
     {
+		Info<<"In thermalGeneralContact::Rc() line:"<<__LINE__<<endl;
         return slavePatchField().Rc();
     }
 }
@@ -462,12 +489,15 @@ Foam::scalar Foam::thermalGeneralContactFvPatchScalarField::Rc() const
 
 Foam::scalar Foam::thermalGeneralContactFvPatchScalarField::beta() const
 {
-    if (master())
-    {
+    //const boolList& locSlave = localSlave();
+    //if(locSlave[shadI])
+	if (master())
+	{
         return beta_;
     }
     else
     {
+		Info<<"In thermalGeneralContact::beta() line:"<<__LINE__<<endl;
         return slavePatchField().beta();
     }
 }
@@ -476,12 +506,16 @@ Foam::scalar Foam::thermalGeneralContactFvPatchScalarField::beta() const
 Foam::scalar Foam::thermalGeneralContactFvPatchScalarField::UTS() const
 {
 	Info<<"In thermalGeneralContact::UTS() line:"<<__LINE__<<endl;
-    if (master())
-    {
+    //const boolList& locSlave = localSlave();
+    //if(locSlave[shadI])
+	if (master())
+	{
+		//UTS_ = dict.lookupOrDefault<scalar>("UTS", 2e9);
         return UTS_;
     }
     else
     {
+		Info<<"In thermalGeneralContact::UTS() line:"<<__LINE__<<endl;
         return slavePatchField().UTS();
     }
 }
@@ -794,7 +828,11 @@ void Foam::thermalGeneralContactFvPatchScalarField::rmap
 void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
 {
 	Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
-    if (updated())
+    Info<< "patch().name() in thermalGeneralContact::updateCoeffs() "<<patch().name()<<endl;
+	Info<< "patch().index() in thermalGeneralContact::updateCoeffs() "<<patch().index()<<endl;
+	Info<< "slavePatchNames() in thermalGeneralContact::updateCoeffs() "<<slavePatchNames()<<endl;
+			
+	if (updated())
     {
 		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         return;
@@ -843,12 +881,16 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
 		Info<<"forAll loop in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         // Create the shadow zone temperature field
         scalarField shadowPatchTOnCurPatch;
-        
+		
+        Info<<"mMASTER or sSLAVE check in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
+		
 		//if (master())
-        if(master()) //(localSlave()[shadI])
+        if(localSlave()[shadI])
 		{
 			Info<<"MASTER in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
-            // Note: solid4GeneralContactPatch().zone() always returns the master zone
+            Info<< "In MASTER - patch().name() in thermalGeneralContact::updateCoeffs() "<<patch().name()<<endl;
+			Info<< "In MASTER - patch().index() in thermalGeneralContact::updateCoeffs() "<<patch().index()<<endl;
+			// Note: solid4GeneralContactPatch().zone() always returns the master zone
             // and solid4GeneralContactPatch().slaveZones() always returns the slave
             // zones
             const scalarField shadowZoneT =
@@ -875,14 +917,33 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
         else
         {
 			Info<<"SLAVE in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
-            // Note: zone() is the master global patch
+            Info<< "In SLAVE - patch().name() in thermalGeneralContact::updateCoeffs() "<<patch().name()<<endl;
+			Info<< "In SLAVE - patch().index() in thermalGeneralContact::updateCoeffs() "<<patch().index()<<endl;
+			
+			
+			// Note: zone() is the master global patch
             // Note 2: the slave always has only one master i.e.
             // one shadowPatchField
             const scalarField shadowZoneT =
                 solid4GeneralContactPatch().zone().patchFaceToGlobal
                 (
                     slavePatchField()
+					//shadowPatchField(shadI)
                 );
+			
+			
+			/*Comment this for now
+			//************* Begin testing ************
+			const scalarField shadowZoneT =
+                solid4GeneralContactPatch().slaveZones()[shadI].patchFaceToGlobal
+                (
+                    //slavePatchField()
+					shadowPatchField(shadI)
+                );
+			//************* End testing ************	
+			*/
+			
+			Info<<"SLAVE in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
 
             // Interpolate shadow temperature field to the current zone
             const scalarField shadowZoneTOnCurPatch =
@@ -890,14 +951,26 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
                 (
                     shadowZoneT
                 );
-
+						
+			
             // Create the temperature field for this patch
             shadowPatchTOnCurPatch =
                 solid4GeneralContactPatch().slaveZones()[shadI].globalFaceToPatch
                 (
                     shadowZoneTOnCurPatch
                 );
-				
+			
+			/*	
+			// ********** Testing based on solid4General's CalcContact.C*****************
+			// Create the temperature field for this patch
+            shadowPatchTOnCurPatch =
+                solid4GeneralContactPatch().slaveZones()[shadI].globalFaceToPatch
+                (
+                    shadowZoneTOnCurPatch
+                );
+			*/
+
+			// ******** End Testing based on solid4General's CalcContact.C*****************
 			Info<<"End SLAVE in thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
         }
 		
@@ -906,7 +979,9 @@ void Foam::thermalGeneralContactFvPatchScalarField::updateCoeffs()
         const scalarField curPatchH = Hc();
 		
 		Info<<"In thermalGeneralContact::updateCoeffs() line:"<<__LINE__<<endl;
-
+		Info<< "patch().name() in thermalGeneralContact::updateCoeffs() "<<patch().name()<<endl;
+		Info<< "patch().index() in thermalGeneralContact::updateCoeffs() "<<patch().index()<<endl;
+	
         // Calculate the heat flux through the current patch (in the contact
         // area)
         const scalarField curPatchFluxInContactArea =

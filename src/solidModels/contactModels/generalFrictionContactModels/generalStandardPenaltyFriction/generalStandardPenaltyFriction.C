@@ -28,6 +28,8 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "constitutiveModel.H"
 
+#define standardPenaltyFrictionDEBUG false
+
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
@@ -74,8 +76,11 @@ void Foam::generalStandardPenaltyFriction::calcFrictionPenaltyFactor()
       rheology.mu()().boundaryField()[slavePatchIndex];
 	//************** END standardPenaltyFriction based on ORG foam-extend-4.0 ************	
 	
+	#if(standardPenaltyFrictionDEBUG)
 	Info<<"Step4A: Here I am in generalStandardPenaltyFriction::calcFrictionPenaltyFactor():"<<__LINE__<<endl;
-    //******************* Comment the section with object impK ***************
+    #endif
+	
+	//******************* Comment the section with object impK ***************
 	// Lookup implicit stiffness = 2*mu + lambda, approximately equal to the
     // bulk modulus
 	/*
@@ -191,8 +196,10 @@ void Foam::generalStandardPenaltyFriction::calcFrictionPenaltyFactor()
 
     Info<< "    friction penalty factor: " << frictionPenaltyFactor_
         << endl;
-	
+		
+	#if(standardPenaltyFrictionDEBUG)
 	Info<<"Step4B: Here I am in generalStandardPenaltyFriction::calcFrictionPenaltyFactor():"<<__LINE__<<endl;
+	#endif
 }
 
 
@@ -301,15 +308,22 @@ void Foam::generalStandardPenaltyFriction::correct
     const vectorField& masterDDInterpToSlave
 )
 {
+	#if(standardPenaltyFrictionDEBUG)
 	Info<<"Step4C: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
-    // Preliminaries
+    #endif
+	
+	// Preliminaries
     const fvMesh& mesh = mesh_;
     const label slavePatchIndex = slavePatchID();
 	
     // Calculate slave shear traction increments
     const scalarField magSlavePressure = mag(slavePressure);
+	
+	#if(standardPenaltyFrictionDEBUG)
 	Info<<"Step4D: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
-    label numSlipFaces = 0;
+    #endif
+	
+	label numSlipFaces = 0;
     label numStickFaces = 0;
     scalarField& stickSlip = stickSlipFaces();
     const scalarField oldStickSlip = stickSlip;

@@ -36,6 +36,13 @@ InClass
 #include "polyPatchID.H"
 #include "ZoneIDs.H"
 //#include "lookupSolidModel.H"
+//#define __LINE__ 0
+#define ISDEBUG false
+#define ActivePairDEBUG false
+#define currentMasterDEBUG false
+#define localSlaveDEBUG false
+#define normalModelDEBUG false
+
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -198,10 +205,13 @@ bool Foam::solid4GeneralContactFvPatchVectorField::currentMaster() const
     {
         calcCurrentMaster();
     }
+	#if(currentMasterDEBUG) 
 	Info<< "In currentMaster() "<<__LINE__<<endl;
 	Info<< "patch().index() in currentMaster() "<<patch().index()<<endl;
 	Info<< "patch().name() in currentMaster() "<<patch().name()<<endl;
 	Info<< "*currentMasterPtr_ in currentMaster() "<<*currentMasterPtr_<<endl;
+	#endif
+	
 	return *currentMasterPtr_;
 }
 
@@ -223,10 +233,12 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcCurrentMaster() const   /
 	
 	//const boolList& locSlave = localSlave();
 	const boolList& locSlave = localTSlave();
-	
+	#if(currentMasterDEBUG) 
 	Info<< "In calcCurrentMaster() "<<__LINE__<<endl;
 	Info<< "patch().index() in calcCurrentMaster() "<<patch().index()<<endl;
-    forAll(locSlave, slaveI)
+    #endif
+	
+	forAll(locSlave, slaveI)
     {
         if (locSlave[slaveI])
         {
@@ -303,11 +315,15 @@ Foam::solid4GeneralContactFvPatchVectorField::localSlave() const
     {
         calcLocalSlave();
     }
+	
+	#if(localSlaveDEBUG)
 	Info<< "The current field in localSlave() is "<< dimensionedInternalField().name()<< endl;
 	Info<< "The current patch in localSlave() is "<< patch().name()<< endl;			
 	Info<< "The size of current patch in localSlave() is "<< patch().size()<< endl;
 	Info<< "*localSlavePtr_ in localSlave() is "<<*localSlavePtr_<< endl;
-    return *localSlavePtr_;
+    #endif
+	
+	return *localSlavePtr_;
 }
 
 void Foam::solid4GeneralContactFvPatchVectorField::calcLocalSlave() const
@@ -554,11 +570,17 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeNormalModels
     const dictionary& dict
 ) const
 {
+	#if(normalModelDEBUG)
 	Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
-    normalModels_.setSize(slavePatchNames().size());
+    #endif
 	
+	normalModels_.setSize(slavePatchNames().size());
+	
+	#if(normalModelDEBUG)
 	Info<<"normalModels_.size() in makeNormalModels(..): "<<normalModels_.size()<<endl;
-    const boolList& locSlave = localSlave();
+    #endif
+	
+	const boolList& locSlave = localSlave();
 	
 	forAll (normalModels_, shadPatchI)
     {
@@ -595,20 +617,32 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeNormalModels
         const dictionary& contactDict = *contactDictPtr;
 		Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
 		*/
+		#if(normalModelDEBUG)
 		Info<<"locSlave[shadPatchI] in makeNormalModels(): "<<locSlave[shadPatchI]<<endl;
+		#endif
+		
 		// Only the local slave creates the contact model
         if (locSlave[shadPatchI])
         {
 			const dictionary* contactDictPtr = NULL;
+			#if(normalModelDEBUG)
 			Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
-            if (dict.found("generalNormalContactModel") )
+            #endif
+			
+			if (dict.found("generalNormalContactModel") )
             {				
                 contactDictPtr = &dict;
+				#if(normalModelDEBUG)
 				Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
-            }
+				#endif
+				
+			}
 			
 			const dictionary& contactDict = *contactDictPtr;
+			
+			#if(normalModelDEBUG)
 			Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+			#endif
 			
 			// Create contact model
 			normalModels_.set
@@ -626,8 +660,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeNormalModels
 				).ptr()
 			);
 		}
+		
+		#if(normalModelDEBUG)
 		Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
-    }
+		#endif
+	}
 
     // Initialise penalty scales to -1
     Info<< "    Initialising stored previous normalPenaltyFactors" << endl;
@@ -1380,7 +1417,8 @@ const Foam::solid4GeneralContactFvPatchVectorField&
 Foam::solid4GeneralContactFvPatchVectorField::slavePatchField() const
 {
 	Info<<"In slavePatchField() line:"<<__LINE__<<endl;
-    if (slavePatchIndices().size() != 1)
+    /*
+	if (slavePatchIndices().size() != 1)
     {
         FatalErrorIn
         (
@@ -1390,6 +1428,7 @@ Foam::solid4GeneralContactFvPatchVectorField::slavePatchField() const
             << "patch; this patch has " << slavePatchIndices().size()
             << " slave patches!" << abort(FatalError);
     }
+	*/
 
     const volVectorField& field =
         db().lookupObject<volVectorField>(dimensionedInternalField().name());
@@ -1407,9 +1446,10 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels()
 {
     if (firstPatchInList())
     {
-//		Info<<"In normalModels() line:"<<__LINE__<<endl;
+		Info<<"In normalModels() line:"<<__LINE__<<endl;
         if (normalModels_.size() == 0)
         {
+			Info<<"In normalModels() line:"<<__LINE__<<endl;
             makeNormalModels(dict_);
         }
 
@@ -1672,18 +1712,23 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 		Info<<"if (updated()) check in solid4GeneralContact's updateCoeffs()"<<__LINE__<<endl;
         return;
     }
+	#if(ISDEBUG)
 	Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;	
 	Info<< "slavePatchNames().size() in updateCoeffs() "<<slavePatchNames().size()<<endl;	
+	
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;	
+	#endif
 	//*************** based on solidGeneral*****************
 	boolList activeContactPairs(slavePatchNames().size(), false);
 	//*************** END based on solidGeneral**************
+	#if(ISDEBUG)
 	Info<<"activeContactPairs in updateCoeffs() "<<activeContactPairs<<endl;
 	
 	Info<< "this->db().time().timeIndex() "<<this->db().time().timeIndex()<<endl;
 	Info<< "curTimeIndex_ "<<curTimeIndex_<<endl;
-    if (curTimeIndex_ != this->db().time().timeIndex())
+    #endif
+	if (curTimeIndex_ != this->db().time().timeIndex())
     {
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;		
         // Update old quantities at the start of a new time-step
@@ -1691,12 +1736,15 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 		
 
         if (firstPatchInList())
-        {			
+        {
+			
 			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Let the contact models know that it is a new time-step, in case
             // they need to update anything
+			#if(ISDEBUG)
 			Info<<"Is it activeContactPairs? in updateCoeffs() "<<activeContactPairs<<endl;
-            forAll(activeContactPairs, shadPatchI)
+            #endif
+			forAll(activeContactPairs, shadPatchI)
             {
 				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
                 normalModels()[shadPatchI].newTimeStep();
@@ -1708,17 +1756,20 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         }
 		
     }
+	#if(ISDEBUG)
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-    // Move the master and slave zone to the deformed configuration
+    #endif
+	// Move the master and slave zone to the deformed configuration
     if (currentMaster())   //(firstPatchInList())
     {
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	moveZonesToDeformedConfiguration();
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	}
+	#if(ISDEBUG)
 	Info<<"zone().patch().localPoints() in updateCoeffs():"<<zone().patch().localPoints()<<endl;
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-	
+	#endif
 	// Only the local masters calculates the contact force and the local
         // master interpolates this force
         const boolList& locSlave = localSlave();
@@ -1741,27 +1792,34 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	
 	// Create master bounding box used for quick check
         boundBox masterBb(zone().patch().localPoints(), false);
+		#if(ISDEBUG)
 		Info<<"zone().patch().localPoints() in updateCoeffs(): "<<zone().patch().localPoints()<<endl;
 		Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 		Info<< "zone().patch().name() in updateCoeffs() "<<zone().patch().name()<<endl;
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;		
 		Info<<"masterBb in updateCoeffs(): "<<masterBb<<endl;
+		#endif
 		
 		// The BB may have zero thickness in one of the directions e.g. for a
         // flat patch, so we will check for this and, if found, create an offset
         const scalar bbOff = bbOffset();
+		#if(ISDEBUG)
 		Info<<"masterBb.minDim() in updateCoeffs(): "<<masterBb.minDim()<<endl;
 		Info<<"What is bbOff? in updateCoeffs():"<<bbOff<<endl;
+		#endif
 		if (masterBb.minDim() < bbOff)
         {
             const vector bbDiag = masterBb.max() - masterBb.min();
 			Info<<"bbDiag in updateCoeffs():"<<bbDiag<<endl;
             if (bbDiag.x() < bbOff)
             {
+				#if(ISDEBUG)
 				Info<<"Does it enter this check? in updateCoeffs():"<<__LINE__<<endl;
 				Info<<"masterBb.min() in updateCoeffs():"<<masterBb.min()<<endl;
 				Info<<"masterBb.max() in updateCoeffs():"<<masterBb.max()<<endl;
-                vector offset(bbOff, 0, 0);
+                #endif
+				
+				vector offset(bbOff, 0, 0);
                 masterBb.min() -= offset;
                 masterBb.max() += offset;
 				Info<<"What is offset? in updateCoeffs():"<<offset<<endl;				
@@ -1782,9 +1840,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                 masterBb.min() -= offset;
                 masterBb.max() += offset;
             }
+			#if(ISDEBUG)
 			Info<<"masterBb.min() in updateCoeffs():"<<masterBb.min()<<endl;
 			Info<<"masterBb.max() in updateCoeffs():"<<masterBb.max()<<endl;
-        }
+			#endif
+		}
 		
 	// Accumulated traction for the current patch
         vectorField curPatchTraction(patch().size(), vector::zero);
@@ -1798,9 +1858,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 			
 	forAll(activeContactPairs,shadPatchI)	
 	{
+		#if(ActivePairDEBUG) 
 		Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 		Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
 		Info<< "slavePatchNames()[shadPatchI] in updateCoeffs() "<<slavePatchNames()[shadPatchI]<<endl;
+		#endif
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 		//Info<<"activeContactPairs[shadPatchI] in updateCoeffs():"<<activeContactPairs[shadPatchI]<<endl;
 			// Create slave bounding box
@@ -1816,10 +1878,13 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 
                 if (bbDiag.x() < bbOff)
                 {
+					#if(ActivePairDEBUG)
 				Info<<"Does it enter this check? in updateCoeffs():"<<__LINE__<<endl;
 				Info<<"slaveBb.min() in updateCoeffs():"<<slaveBb.min()<<endl;
 				Info<<"slaveBb.max() in updateCoeffs():"<<slaveBb.max()<<endl;
-                    vector offset(bbOff, 0, 0);
+                    #endif
+					
+					vector offset(bbOff, 0, 0);
                     slaveBb.min() -= offset;
                     slaveBb.max() += offset;
                 }
@@ -1839,19 +1904,27 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                     slaveBb.min() -= offset;
                     slaveBb.max() += offset;
                 }
+				
+				#if(ActivePairDEBUG)
 				Info<<"slaveBb.min() in updateCoeffs():"<<slaveBb.min()<<endl;
 				Info<<"slaveBb.max() in updateCoeffs():"<<slaveBb.max()<<endl;
 				Info<<"bbDiag in updateCoeffs():"<<bbDiag<<endl;
 				Info<<"bbDiag.x() updateCoeffs():"<<bbDiag.x()<<endl;
 				Info<<"bbDiag.y() updateCoeffs():"<<bbDiag.y()<<endl;
 				Info<<"bbDiag.z() updateCoeffs():"<<bbDiag.z()<<endl;
-            }
+				#endif
+				
+			}
+			
+			#if(ActivePairDEBUG)
 			Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 			Info<< "slavePatchNames()[shadPatchI] in updateCoeffs() "<<slavePatchNames()[shadPatchI]<<endl;			
 			Info<<"In updateCoeffs():"<<__LINE__<<endl;
 			Info<<"masterBb in updateCoeffs():"<<masterBb<<endl;
 			Info<<"slaveBb in updateCoeffs():"<<slaveBb<<endl;
 			Info<<"masterBb.overlaps(slaveBb) in updateCoeffs():"<<masterBb.overlaps(slaveBb)<<endl;
+			#endif
+			
 			if (masterBb.overlaps(slaveBb))
             {
 				Info<<"In updateCoeffs():"<<__LINE__<<endl;

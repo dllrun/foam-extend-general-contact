@@ -33,6 +33,7 @@ InClass
 #include "addToRunTimeSelectionTable.H"
 #include "primitivePatchInterpolation.H"
 #include "constitutiveModel.H"
+#define standardPenaltyDEBUG false
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -311,8 +312,11 @@ void generalStandardPenalty::correct
     scalarField& areaInContact = this->areaInContact();
     forAll(slavePatchLocalFaces, faceI)
     {
+		#if(standardPenaltyDEBUG)
 	Info<<"Step2: Here I am in generalStandardPenalty::correct(..):"<<__LINE__<<endl;
     Info<<"Slave vertices are checked to find the vertex penetrations face: "<<faceI<<endl;
+		#endif
+		
 		areaInContact[faceI] =
             slavePatchLocalFaces[faceI].areaInContact
             (
@@ -339,7 +343,10 @@ void generalStandardPenalty::correct
 
         slavePatchLocalFaceAreas[faceI] =
             mag(slavePatchLocalFaces[faceI].normal(slavePatchLocalPoints));
+			
+			#if(standardPenaltyDEBUG)
     Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
+			#endif
 	}
 
     // Calculate the point pressures
@@ -360,9 +367,12 @@ void generalStandardPenalty::correct
 
         // Note: penetration is negative for points in contact
         {
+			#if(standardPenaltyDEBUG)
 			Info<<"Step3: Here I am in generalStandardPenalty::correct(..):"<<__LINE__<<endl;
 			Info<<"Corrective contact forces added to penetrating slave vertices"<<__LINE__<<endl;
-            // The force is linearly proportional the penetration, like a spring
+            #endif
+			
+			// The force is linearly proportional the penetration, like a spring
             if (d < epsilon0_)
             {
                 totalSlavePointPressure[pointI] =
@@ -404,10 +414,13 @@ void generalStandardPenalty::correct
     (
         mesh.boundaryMesh()[slavePatchIndex]
     );
-
+	
+	#if(standardPenaltyDEBUG)
 	Info<<"Step4: Here I am in generalStandardPenalty::correct(..):"<<__LINE__<<endl;
 	Info<<"These slave point tractions are interpolated to slave face centers"<<__LINE__<<endl;
-    // Interpolate point pressures to the face centres and apply in the negative
+    #endif
+	
+	// Interpolate point pressures to the face centres and apply in the negative
     // normal direction
     vectorField newSlaveTraction =
         localSlaveInterpolator.pointToFaceInterpolate<scalar>
@@ -415,7 +428,9 @@ void generalStandardPenalty::correct
             totalSlavePointPressure
         )*(-slavePatchFaceNormals);
 		
+		#if(standardPenaltyDEBUG)
 	Info<<"In generalStandardPenalty::correct(..):"<<__LINE__<<endl;
+		#endif
 
     // Under-relax pressure/traction
     // Note: slavePressure_ is really a traction vector
