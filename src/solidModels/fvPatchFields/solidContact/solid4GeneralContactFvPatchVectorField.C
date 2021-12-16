@@ -573,6 +573,116 @@ void Foam::solid4GeneralContactFvPatchVectorField::makeSlavePatchNames()const
 	//******************** END based on solid General*************			
 }
 
+//****************** Start Test for shadPatchI dependent function **************
+void Foam::solid4GeneralContactFvPatchVectorField::calcNormalContactModels
+(
+    const dictionary& dict
+) const
+{
+	#if(normalModelDEBUG)
+	Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+    #endif
+	
+	normalModels_.setSize(slavePatchNames().size());
+	
+	#if(normalModelDEBUG)
+	Info<<"normalModels_.size() in makeNormalModels(..): "<<normalModels_.size()<<endl;
+    #endif
+	
+	const boolList& locSlave = localSlave();
+	
+	forAll (normalModels_, shadPatchI)
+    {
+		/*
+        // Check if only one slave patch is defined
+        const dictionary* contactDictPtr = NULL;
+        if (normalModels_.size() == 1)
+        {
+			Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+            if (dict.found("generalNormalContactModel") )
+            {				
+                contactDictPtr = &dict;
+				Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+            }
+            else
+            {
+                contactDictPtr =
+                    &dict.subDict
+                    (
+                        patch().name() + "_to_"
+                      + slavePatchNames()[shadPatchI] + "_dict"
+                    );
+            }
+        }
+        else
+        {
+            contactDictPtr =
+                &dict.subDict
+                (
+                    patch().name() + "_to_"
+                  + slavePatchNames()[shadPatchI] + "_dict"
+                );
+        }
+        const dictionary& contactDict = *contactDictPtr;
+		Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+		*/
+		#if(normalModelDEBUG)
+		Info<<"locSlave[shadPatchI] in makeNormalModels(): "<<locSlave[shadPatchI]<<endl;
+		#endif
+		
+		// Only the local slave creates the contact model
+        if (locSlave[shadPatchI])
+        {
+			const dictionary* contactDictPtr = NULL;
+			#if(normalModelDEBUG)
+			Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+            #endif
+			
+			if (dict.found("generalNormalContactModel") )
+            {				
+                contactDictPtr = &dict;
+				#if(normalModelDEBUG)
+				Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+				#endif
+				
+			}
+			
+			const dictionary& contactDict = *contactDictPtr;
+			
+			#if(normalModelDEBUG)
+			Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+			#endif
+			
+			// Create contact model
+			normalModels_.set
+			(
+				shadPatchI,
+				generalNormalContactModel::New
+				(
+					word(contactDict.lookup("generalNormalContactModel")),
+					patch().boundaryMesh()[slavePatchIndices()[shadPatchI]],
+					contactDict,
+					patch().index(),                  // master
+					slavePatchIndices()[shadPatchI], // slave
+					zone().globalPatch(),
+					slaveZones()[shadPatchI].globalPatch()
+				)
+			);
+		}
+		
+		#if(normalModelDEBUG)
+		Info<<"In makeNormalModels(..) line:"<<__LINE__<<endl;
+		#endif
+	}
+
+    // Initialise penalty scales to -1
+    Info<< "    Initialising stored previous normalPenaltyFactors" << endl;
+    normalPenaltyFactors_.setSize(normalModels_.size(), -1);
+}
+
+
+//****************** End Test for shadPatchI dependent function **************
+
 
 void Foam::solid4GeneralContactFvPatchVectorField::makeNormalModels
 (
@@ -1450,6 +1560,51 @@ Foam::solid4GeneralContactFvPatchVectorField::slavePatchField() const
 }
 
 
+//*******************Start a shadI dependent function *******************
+//Foam::PtrList<Foam::generalNormalContactModel>&
+Foam::generalNormalContactModel&
+Foam::solid4GeneralContactFvPatchVectorField::normalContactModel(const label shadowI)
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("normalModel(const label shadowI)")
+            << "Only the local slave can call the contact model"
+            << abort(FatalError);
+    }
+
+    if (normalModels_.empty())
+    {
+        calcNormalContactModels(dict_);
+    }
+
+    return normalModels_[shadowI];
+}
+
+//const Foam::PtrList<Foam::generalNormalContactModel>&
+const Foam::generalNormalContactModel&
+Foam::solid4GeneralContactFvPatchVectorField::normalContactModel
+(
+    const label shadowI
+) const
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("normalModel(const label shadowI)")
+            << "Only the local slave can call the contact model"
+            << abort(FatalError);
+    }
+
+    if (normalModels_.empty())
+    {
+        calcNormalContactModels(dict_);
+    }
+
+    return normalModels_[shadowI];
+}
+
+//*******************End shadI dependent function **********************
+
+
 Foam::PtrList<Foam::generalNormalContactModel>&
 Foam::solid4GeneralContactFvPatchVectorField::normalModels()
 {
@@ -2224,7 +2379,15 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 			
 			const label masterShadowI =
                         localMasterField.findSlaveID(patch().index());
-        // Set the traction on the slave patch
+        
+		//****************** Start Test with shadPatchI dependent function **************
+		
+		//curSlaveTractions(shadPatchI)= localMasterField.normalContactModel(masterShadowI).slavePressure();
+			
+		
+		//****************** End test with shadPatchI dependent function **************
+		
+		// Set the traction on the slave patch
         // The master stores the friction and normal models, so we need to find
         // which models correspond to the current slave
         //traction() =

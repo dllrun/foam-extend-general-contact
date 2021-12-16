@@ -233,6 +233,15 @@ class solid4GeneralContactFvPatchVectorField
 
         //- Calculate the slave patch indices
         void calcSlavePatchIndices() const;
+		
+		
+		//****************** Start Test with shadPatchI dependent function **************
+		
+		void calcNormalContactModels(const dictionary& dict) const;
+		
+		
+		//**************End Test with shadPatchI dependent function **************
+		
 
         //- Make normal contact models
         void makeNormalModels(const dictionary& dict) const;
@@ -451,6 +460,10 @@ public:
 			//- Return the current patch traction for slaveI
             const vectorField& curPatchTractions(const label slaveI) const;
 			
+			//*******************Start a shadI dependent function *******************
+			const vectorField& curSlaveTractions(const label slaveI) const;
+			//*******************End a shadI dependent function *******************
+			
 			//- Return the current patch traction for slaveI
             vectorField& curPatchTractions(const label slaveI);
 			//*************** END based on solidGeneral*****************
@@ -476,7 +489,21 @@ public:
             //  This function is not allowed if slavePatchIndices.size() > 1
             const solid4GeneralContactFvPatchVectorField& slavePatchField() const;
 
-            //- Return reference to the normal contact models
+
+			//*******************Start a shadI dependent function *******************
+
+            //- Return reference to the normal contact model
+            //PtrList<generalNormalContactModel>& 
+			generalNormalContactModel& normalContactModel(const label shadowI);
+
+            //- Return const reference to the normal contact model
+            //PtrList<generalNormalContactModel>& 
+			const generalNormalContactModel& normalContactModel(const label shadowI) const;
+			
+			//*******************End shadI dependent function **********************
+			
+			
+			//- Return reference to the normal contact models
             PtrList<generalNormalContactModel>& normalModels();
 
             //- Return const reference to the normal contact models
