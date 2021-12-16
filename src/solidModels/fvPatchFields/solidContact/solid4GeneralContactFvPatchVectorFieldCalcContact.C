@@ -34,6 +34,7 @@ InClass
 #define moveZonesDEBUG false
 #define zoneDEBUG false
 #define zoneToZoneDEBUG false
+#define curPatchTractionDEBUG false
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -641,7 +642,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcContactPerSlave() const
 const Foam::globalPolyPatch&
 Foam::solid4GeneralContactFvPatchVectorField::zone() const
 {
+	#if(zoneToZoneDEBUG)
 	Info<<"IN -- zone() line:"<<__LINE__<<endl;
+	#endif
 	
 	//findSlaveID(patch().index())
     if (currentMaster())  //if (globalMaster())
@@ -984,8 +987,11 @@ Foam::solid4GeneralContactFvPatchVectorField::curPatchTractions
     const label slaveI
 )
 {
+	#if(curPatchTractionDEBUG)
 	Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
-    if (!curPatchTractionPtr_)
+    #endif
+	
+	if (!curPatchTractionPtr_)
     {
 		Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
         makeCurPatchTractions();

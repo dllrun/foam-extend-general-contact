@@ -1292,6 +1292,7 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
             }
         }
 		Info<<"End of SLAVE computation in updateCoeffs() line:"<<__LINE__<<endl;
+		Info<<""<<endl;
     }
 
     // Accumulate the contact indicator field
