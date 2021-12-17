@@ -512,10 +512,35 @@ public:
             //- Return const reference to the normal contact model
             //PtrList<generalNormalContactModel>& 
 			const generalNormalContactModel& normalContactModel(const label shadowI) const;
-			
+
 			//*******************End shadI dependent function **********************
 			
 			
+			
+			//************** Changed normalModel & frictionModel ***************
+			//- Return reference to the normal contact models
+            PtrList<generalNormalContactModel>& normalModels(const label shadowI);
+
+            //- Return const reference to the normal contact models
+            const PtrList<generalNormalContactModel>& normalModels(const label shadowI) const;
+
+            //- Return reference to the friction contact models
+            PtrList<generalFrictionContactModel>& frictionModels(const label shadowI);
+
+            //- Return const reference to the friction contact models
+            const PtrList<generalFrictionContactModel>& frictionModels(const label shadowI) const;
+
+            //- Return normal contact model for the slave patch calling this
+            //  function
+            generalNormalContactModel& normalModelForThisSlave(const label shadowI);
+
+            //- Return friction contact model for the slave patch calling this
+            //  function
+            generalFrictionContactModel& frictionModelForThisSlave(const label shadowI);
+			
+			//************** End Changed normalModel & frictionModel ***************
+			
+			/*
 			//- Return reference to the normal contact models
             PtrList<generalNormalContactModel>& normalModels();
 
@@ -535,7 +560,8 @@ public:
             //- Return friction contact model for the slave patch calling this
             //  function
             generalFrictionContactModel& frictionModelForThisSlave();
-
+			*/
+			
             //- Return const reference to deformed zone
             const globalPolyPatch& zone() const;
 

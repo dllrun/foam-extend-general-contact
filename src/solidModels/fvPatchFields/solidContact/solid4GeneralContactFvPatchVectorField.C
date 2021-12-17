@@ -1453,8 +1453,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::autoMap
         // REPLACE This Check If needed
 		if (!firstPatchInList())  // if (!localSlave()) 
         {
-            normalModelForThisSlave().autoMap(m);
-            frictionModelForThisSlave().autoMap(m);
+          //  normalModelForThisSlave(shadI).autoMap(m);
+          //  frictionModelForThisSlave(shadI).autoMap(m);
         }
     }
 
@@ -1683,7 +1683,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalContactModel
 
 
 Foam::PtrList<Foam::generalNormalContactModel>&
-Foam::solid4GeneralContactFvPatchVectorField::normalModels()
+Foam::solid4GeneralContactFvPatchVectorField::normalModels(const label shadowI)
 {
     if (firstPatchInList())
     {
@@ -1697,7 +1697,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels()
             makeNormalModels(dict_);
         }
 
-        return normalModels_;
+        return normalModels_; //[shadowI];
     }
     else
     {
@@ -1721,13 +1721,16 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels()
                 )
             );
 
-        return slavePatchField.normalModels();
+        return slavePatchField.normalModels(shadowI);
     }
 }
 
 
 const Foam::PtrList<Foam::generalNormalContactModel>&
-Foam::solid4GeneralContactFvPatchVectorField::normalModels() const
+Foam::solid4GeneralContactFvPatchVectorField::normalModels
+(
+    const label shadowI
+) const
 {
     if (firstPatchInList())
     {
@@ -1736,7 +1739,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels() const
             makeNormalModels(dict_);
         }
 
-        return normalModels_;
+        return normalModels_[shadowI];
     }
     else
     {
@@ -1756,13 +1759,13 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels() const
                 field.boundaryField()[slavePatchIndices()[0]]
             );
 
-        return slavePatchField.normalModels();
+        return slavePatchField.normalModels(shadowI);
     }
 }
 
 
 Foam::PtrList<Foam::generalFrictionContactModel>&
-Foam::solid4GeneralContactFvPatchVectorField::frictionModels()
+Foam::solid4GeneralContactFvPatchVectorField::frictionModels(const label shadowI)
 {
     if (firstPatchInList())
     {
@@ -1771,7 +1774,7 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionModels()
             makeFrictionModels(dict_);
         }
 
-        return frictionModels_;
+        return frictionModels_[shadowI];
     }
     else
     {
@@ -1790,13 +1793,16 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionModels()
                 )
             );
 
-        return slavePatchField.frictionModels();
+        return slavePatchField.frictionModels(shadowI);
     }
 }
 
 
 const Foam::PtrList<Foam::generalFrictionContactModel>&
-Foam::solid4GeneralContactFvPatchVectorField::frictionModels() const
+Foam::solid4GeneralContactFvPatchVectorField::frictionModels
+(
+    const label shadowI
+) const
 {
     if (firstPatchInList())
     {
@@ -1805,7 +1811,7 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionModels() const
             makeFrictionModels(dict_);
         }
 
-        return frictionModels_;
+        return frictionModels_[shadowI];
     }
     else
     {
@@ -1824,13 +1830,13 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionModels() const
                 )
             );
 
-        return slavePatchField.frictionModels();
+        return slavePatchField.frictionModels(shadowI);
     }
 }
 
 
 Foam::generalNormalContactModel&
-Foam::solid4GeneralContactFvPatchVectorField::normalModelForThisSlave()
+Foam::solid4GeneralContactFvPatchVectorField::normalModelForThisSlave(const label shadowI)
 {	
 	Info<<"In normalModelForThisSlave() line: "<<__LINE__<<endl;
 	#if(normalModelDEBUG)
@@ -1902,12 +1908,12 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModelForThisSlave()
             << abort(FatalError);
     }
 
-    return normalModels()[masterSlaveID];
+    return normalModels(shadowI)[masterSlaveID];
 }
 
 
 Foam::generalFrictionContactModel&
-Foam::solid4GeneralContactFvPatchVectorField::frictionModelForThisSlave()
+Foam::solid4GeneralContactFvPatchVectorField::frictionModelForThisSlave(const label shadowI)
 {
     if (firstPatchInList())
     {
@@ -1955,7 +1961,7 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionModelForThisSlave()
             << abort(FatalError);
     }
 
-    return frictionModels()[masterSlaveID];
+    return frictionModels(shadowI)[masterSlaveID];
 }
 
 
