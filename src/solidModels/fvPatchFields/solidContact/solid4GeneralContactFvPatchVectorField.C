@@ -1908,7 +1908,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModelForThisSlave(const labe
             << abort(FatalError);
     }
 
-    return normalModels(shadowI)[masterSlaveID];
+    return normalModels(masterSlaveID);    //[masterSlaveID];
 }
 
 
@@ -1961,7 +1961,7 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionModelForThisSlave(const la
             << abort(FatalError);
     }
 
-    return frictionModels(shadowI)[masterSlaveID];
+    return frictionModels(masterSlaveID);   //[masterSlaveID];
 }
 
 
@@ -2343,7 +2343,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
             // patchDDInterpToSlavePatch is the master patch DU interpolated to
             // the slave; and the difference between these two is the slip (and
             // also the normal component of DU)
-            normalModels(shadPatchI)[shadPatchI].correct
+            normalModels(shadPatchI).correct
             (
                 slavePatchFaceNormals,
                 slaveZones()[shadPatchI].globalPointToPatch
@@ -2356,7 +2356,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
             );
 
             // Calculate friction contact forces
-            frictionModels(shadPatchI)[shadPatchI].correct
+            frictionModels(shadPatchI).correct
             (
                 normalModels(shadPatchI).slavePressure(),
                 slavePatchFaceNormals,
@@ -2377,8 +2377,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 				{
 				// Interpolate slave traction to the master
                 const vectorField slavePatchTraction =
-                   - frictionModels()[shadPatchI].slaveTractionForMaster()
-                   - normalModels()[shadPatchI].slavePressure();
+                   - frictionModels(shadPatchI).slaveTractionForMaster()
+                   - normalModels(shadPatchI).slavePressure();
 
                 const vectorField slaveZoneTraction =
                     slaveZones()[shadPatchI].patchFaceToGlobal
@@ -2475,8 +2475,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         // which models correspond to the current slave
         //traction() =
 		curPatchTractions(shadPatchI) =
-            frictionModelForThisSlave().slaveTraction()
-          + normalModelForThisSlave().slavePressure();
+            frictionModelForThisSlave(shadPatchI).slaveTraction()
+          + normalModelForThisSlave(shadPatchI).slavePressure();
 		
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 		
@@ -2714,7 +2714,7 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionHeatRate() const
 		if (locSlave[shadPatchI])
         {
 		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
-			const vectorField slavePatchSlip = frictionModels()[shadPatchI].slip();
+			const vectorField slavePatchSlip = frictionModels(shadPatchI).slip();
 			
 		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
 		
@@ -2752,7 +2752,7 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionHeatRate() const
 		else 
 		{
 		Info<<"In frictionHeatRate() line:"<<__LINE__<<endl;
-			curPatchSlip = frictionModels()[shadPatchI].slip();
+			curPatchSlip = frictionModels(shadPatchI).slip();
 		//const vectorField slavePatchSlip = frictionModels()[shadPatchI].slip();
 		}
 		
@@ -2911,12 +2911,12 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
     if (localSlave()[slaveI])
     {
         os.writeKeyword("generalNormalContactModel")
-            << normalModels()[slaveI].type() << token::END_STATEMENT << nl;
-        normalModels()[slaveI].writeDict(os);
+            << normalModels(slaveI).type() << token::END_STATEMENT << nl;
+        normalModels(slaveI).writeDict(os);
 
         os.writeKeyword("generalFrictionContactModel")
-            << frictionModels()[slaveI].type() << token::END_STATEMENT << nl;
-        frictionModels()[slaveI].writeDict(os);
+            << frictionModels(slaveI).type() << token::END_STATEMENT << nl;
+        frictionModels(slaveI).writeDict(os);
     }
     else
     {
@@ -2962,14 +2962,14 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
             localSlaveField.findSlaveID(patch().index());
 
         os.writeKeyword("generalNormalContactModel")
-            << localSlaveField.normalModels()[localSlaveID].type()
+            << localSlaveField.normalModels(localSlaveID).type()
             << token::END_STATEMENT << nl;
-        localSlaveField.normalModels()[localSlaveID].writeDict(os);
+        localSlaveField.normalModels(localSlaveID).writeDict(os);
 
         os.writeKeyword("generalFrictionContactModel")
-            << localSlaveField.frictionModels()[localSlaveID].type()
+            << localSlaveField.frictionModels(localSlaveID).type()
             << token::END_STATEMENT << nl;
-        localSlaveField.frictionModels()[localSlaveID].writeDict(os);
+        localSlaveField.frictionModels(localSlaveID).writeDict(os);
     }
 		
         /*
@@ -3087,6 +3087,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
     // Write out point distance fields for master and slave
     if (writePointDistanceFields_ && master())
     {
+		
+		//**************Remove this check for now*************
+		/*
         if (normalModels().size() != 1)
         {
             FatalErrorIn
@@ -3097,6 +3100,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::write(Ostream& os) const
                 << "implemented for one-to-one contact"
                 << abort(FatalError);
         }
+		*/
+		//**************End remove this check for now*************
 
         // Take a reference to the mesh for convenience
         const polyMesh& mesh = patch().patch().boundaryMesh().mesh();
