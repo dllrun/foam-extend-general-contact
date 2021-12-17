@@ -1682,7 +1682,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalContactModel
 //*******************End shadI dependent function **********************
 
 
-Foam::PtrList<Foam::generalNormalContactModel>&
+Foam::generalNormalContactModel&
 Foam::solid4GeneralContactFvPatchVectorField::normalModels(const label shadowI)
 {
     if (firstPatchInList())
@@ -1697,7 +1697,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels(const label shadowI)
             makeNormalModels(dict_);
         }
 
-        return normalModels_; //[shadowI];
+        return normalModels_[shadowI];
     }
     else
     {
@@ -1726,7 +1726,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels(const label shadowI)
 }
 
 
-const Foam::PtrList<Foam::generalNormalContactModel>&
+const Foam::generalNormalContactModel&
 Foam::solid4GeneralContactFvPatchVectorField::normalModels
 (
     const label shadowI
@@ -1764,7 +1764,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels
 }
 
 
-Foam::PtrList<Foam::generalFrictionContactModel>&
+Foam::generalFrictionContactModel&
 Foam::solid4GeneralContactFvPatchVectorField::frictionModels(const label shadowI)
 {
     if (firstPatchInList())
@@ -1798,7 +1798,7 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionModels(const label shadowI
 }
 
 
-const Foam::PtrList<Foam::generalFrictionContactModel>&
+const Foam::generalFrictionContactModel&
 Foam::solid4GeneralContactFvPatchVectorField::frictionModels
 (
     const label shadowI
@@ -2015,8 +2015,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 				if (locSlave[shadPatchI])
 				{	
 				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-                normalModels()[shadPatchI].newTimeStep();
-                frictionModels()[shadPatchI].newTimeStep();
+                normalModels(shadPatchI).newTimeStep();  //[shadPatchI].newTimeStep();
+                frictionModels(shadPatchI).newTimeStep();  //[shadPatchI].newTimeStep();
 
                 // Force N^2 contact search at least once per time-step
                 zoneToZones()[shadPatchI].clearPrevCandidateMasterNeighbors();
@@ -2343,7 +2343,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
             // patchDDInterpToSlavePatch is the master patch DU interpolated to
             // the slave; and the difference between these two is the slip (and
             // also the normal component of DU)
-            normalModels()[shadPatchI].correct
+            normalModels(shadPatchI)[shadPatchI].correct
             (
                 slavePatchFaceNormals,
                 slaveZones()[shadPatchI].globalPointToPatch
@@ -2356,11 +2356,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
             );
 
             // Calculate friction contact forces
-            frictionModels()[shadPatchI].correct
+            frictionModels(shadPatchI)[shadPatchI].correct
             (
-                normalModels()[shadPatchI].slavePressure(),
+                normalModels(shadPatchI).slavePressure(),
                 slavePatchFaceNormals,
-                normalModels()[shadPatchI].areaInContact(),
+                normalModels(shadPatchI).areaInContact(),
                 slavePatchDD,
                 patchDDInterpToSlavePatch
             );

@@ -519,16 +519,16 @@ public:
 			
 			//************** Changed normalModel & frictionModel ***************
 			//- Return reference to the normal contact models
-            PtrList<generalNormalContactModel>& normalModels(const label shadowI);
+            generalNormalContactModel& normalModels(const label shadowI);
 
             //- Return const reference to the normal contact models
-            const PtrList<generalNormalContactModel>& normalModels(const label shadowI) const;
+            const generalNormalContactModel& normalModels(const label shadowI) const;
 
             //- Return reference to the friction contact models
-            PtrList<generalFrictionContactModel>& frictionModels(const label shadowI);
+            generalFrictionContactModel& frictionModels(const label shadowI);
 
             //- Return const reference to the friction contact models
-            const PtrList<generalFrictionContactModel>& frictionModels(const label shadowI) const;
+            const generalFrictionContactModel& frictionModels(const label shadowI) const;
 
             //- Return normal contact model for the slave patch calling this
             //  function
