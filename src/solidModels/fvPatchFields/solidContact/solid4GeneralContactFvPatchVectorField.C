@@ -1565,6 +1565,49 @@ Foam::solid4GeneralContactFvPatchVectorField::slavePatchField() const
 Foam::generalNormalContactModel&
 Foam::solid4GeneralContactFvPatchVectorField::normalContactModel(const label shadowI)
 {
+	if (firstPatchInList())
+    {
+		#if(!normalModelDEBUG)
+		Info<<"In normalContactModels() line:"<<__LINE__<<endl;
+        #endif
+		
+		if (normalModels_.size() == 0)
+        {
+			Info<<"In normalModels() line:"<<__LINE__<<endl;
+            makeNormalModels(dict_);
+        }
+
+        return normalModels_[shadowI];
+    }
+    else
+    {
+		#if(!normalModelDEBUG)
+		Info<<"ELSE in normalContactModels() line:"<<__LINE__<<endl;
+        #endif
+		
+		const volVectorField& field =
+            db().lookupObject<volVectorField>
+            (
+                this->dimensionedInternalField().name()
+            );
+		
+		Info<<"slavePatchIndices()[0] in normalModels() :"<<slavePatchIndices()[0]<<endl;
+        solid4GeneralContactFvPatchVectorField& slavePatchField =
+            const_cast<solid4GeneralContactFvPatchVectorField&>
+            (
+                refCast<const solid4GeneralContactFvPatchVectorField>
+                (
+                    field.boundaryField()[slavePatchIndices()[0]]
+                )
+            );
+
+        return slavePatchField.normalContactModel(shadowI);
+    }
+	
+	//**********************END
+	
+	
+	/*
     if (!localSlave()[shadowI])
     {
         FatalErrorIn("normalModel(const label shadowI)")
@@ -1578,6 +1621,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalContactModel(const label sha
     }
 
     return normalModels_[shadowI];
+	*/
 }
 
 //const Foam::PtrList<Foam::generalNormalContactModel>&
@@ -1587,6 +1631,38 @@ Foam::solid4GeneralContactFvPatchVectorField::normalContactModel
     const label shadowI
 ) const
 {
+	
+	if (firstPatchInList())
+    {
+        if (normalModels_.size() == 0)
+        {
+            makeNormalModels(dict_);
+        }
+
+        return normalModels_[shadowI];
+    }
+    else
+    {
+		#if(normalModelDEBUG)
+		Info<<"ELSE in normalModels() line:"<<__LINE__<<endl;
+        #endif
+		
+		const volVectorField& field =
+            db().lookupObject<volVectorField>
+            (
+                this->dimensionedInternalField().name()
+            );
+
+        const solid4GeneralContactFvPatchVectorField& slavePatchField =
+            refCast<const solid4GeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[slavePatchIndices()[0]]
+            );
+
+        return slavePatchField.normalContactModel(shadowI);
+    }
+	
+	/*
     if (!localSlave()[shadowI])
     {
         FatalErrorIn("normalModel(const label shadowI)")
@@ -1600,6 +1676,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalContactModel
     }
 
     return normalModels_[shadowI];
+	*/
 }
 
 //*******************End shadI dependent function **********************
