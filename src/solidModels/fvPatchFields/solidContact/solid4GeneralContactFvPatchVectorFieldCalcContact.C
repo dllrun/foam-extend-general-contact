@@ -963,6 +963,48 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneForThisSlave() const
     return slaveZones()[masterSlaveID];
 }
 
+//****************** Start Test with shadPatchI dependent function **************
+//curSlaveTractions
+
+const Foam::vectorField&
+Foam::solid4GeneralContactFvPatchVectorField::curSlaveTractions
+(
+    const label slaveI
+) const
+{
+	Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
+    if (!curPatchTractionPtr_)
+    {
+        makeCurPatchTractions();
+    }
+
+    return (*curPatchTractionPtr_)[slaveI];
+}
+
+
+Foam::vectorField&
+Foam::solid4GeneralContactFvPatchVectorField::curSlaveTractions
+(
+    const label slaveI
+)
+{
+	#if(curPatchTractionDEBUG)
+	Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
+    #endif
+	
+	if (!curPatchTractionPtr_)
+    {
+		Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
+        makeCurPatchTractions();
+    }
+	
+	
+	return (*curPatchTractionPtr_)[slaveI];
+}
+
+//****************** End Test with shadPatchI dependent function **************
+
+
 
 //*************** based on solidGeneral*****************
 const Foam::vectorField&

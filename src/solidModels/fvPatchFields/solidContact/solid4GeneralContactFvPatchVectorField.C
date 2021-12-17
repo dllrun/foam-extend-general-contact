@@ -2382,7 +2382,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         
 		//****************** Start Test with shadPatchI dependent function **************
 		
-		//curSlaveTractions(shadPatchI)= localMasterField.normalContactModel(masterShadowI).slavePressure();
+		curSlaveTractions(shadPatchI)= localMasterField.normalContactModel(masterShadowI).slavePressure();
 			
 		
 		//****************** End test with shadPatchI dependent function **************

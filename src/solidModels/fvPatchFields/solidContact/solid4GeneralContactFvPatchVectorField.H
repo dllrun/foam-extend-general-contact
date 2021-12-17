@@ -208,6 +208,12 @@ class solid4GeneralContactFvPatchVectorField
         //- Current time index
         label curTimeIndex_;
 		
+		//****************** Start Test with shadPatchI dependent function **************
+		//- The current patch tractions for each contatc pair
+        mutable List<vectorField>* curSlaveTractionPtr_;
+		
+		//****************** End Test with shadPatchI dependent function **************
+		
 		//*************** based on solidGeneral*****************
 		//- The current patch tractions for each contatc pair
         mutable List<vectorField>* curPatchTractionPtr_;
@@ -298,6 +304,7 @@ class solid4GeneralContactFvPatchVectorField
 		//- Make the current patch traction list
         void makeCurPatchTractions() const;
 		//*************** END based on solidGeneral*****************
+		
 
         // //- Interpolate zone face values to points
         // template<class Type>
@@ -460,13 +467,19 @@ public:
 			//- Return the current patch traction for slaveI
             const vectorField& curPatchTractions(const label slaveI) const;
 			
-			//*******************Start a shadI dependent function *******************
+			//- Return the current patch traction for slaveI
+            vectorField& curPatchTractions(const label slaveI);
+			//*************** END based on solidGeneral*****************
+			
+			
+			//*******************Start a shadPatchI dependent function *******************
 			const vectorField& curSlaveTractions(const label slaveI) const;
 			//*******************End a shadI dependent function *******************
 			
 			//- Return the current patch traction for slaveI
-            vectorField& curPatchTractions(const label slaveI);
-			//*************** END based on solidGeneral*****************
+            vectorField& curSlaveTractions(const label slaveI);
+			//****************** End shadPatchI dependent function **************
+			
 			
             //- Return if this patch is the slave
             Switch master() const
