@@ -1873,11 +1873,15 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModelForThisSlave(const labe
 	const solid4GeneralContactFvPatchVectorField& masterPatchField =
         refCast<const solid4GeneralContactFvPatchVectorField>
         (
-            field.boundaryField()[slavePatchIndices()[0]]
+            field.boundaryField()[slavePatchIndices()[shadowI]]
         );
 		
 	Info<<"patch().name() in normalModelForThisSlave(): "<<patch().name()<<endl;
 	
+	
+	const label masterShadowI =
+                        masterPatchField.findSlaveID(patch().index());
+						
     // The master may have multiple slaves so we need to find which model
     // corresponds to the current slave patch
     const wordList& shadPatchNames = masterPatchField.slavePatchNames();
@@ -1896,6 +1900,8 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModelForThisSlave(const labe
 	Info<<"In normalModelForThisSlave() line: "<<__LINE__<<endl;
 	Info<< "patch().name() in normalModelForThisSlave() "<<patch().name()<<endl;
 	Info<< "patch().index() in normalModelForThisSlave() "<<patch().index()<<endl;
+	Info<< "masterSlaveID in normalModelForThisSlave() "<<masterSlaveID<<endl;
+	Info<< "masterShadowI in normalModelForThisSlave() "<<masterShadowI<<endl;
 	
 
     if (masterSlaveID == -1)
@@ -1935,7 +1941,7 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionModelForThisSlave(const la
     const solid4GeneralContactFvPatchVectorField& masterPatchField =
         refCast<const solid4GeneralContactFvPatchVectorField>
         (
-            field.boundaryField()[slavePatchIndices()[0]]
+            field.boundaryField()[slavePatchIndices()[shadowI]]
         );
 
     // The master may have multiple slaves so we need to find which model
@@ -2441,50 +2447,16 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 			else
 			{
 			
-			Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
-			
-			const volVectorField& field =
-                        db().lookupObject<volVectorField>
-                        (
-                            dimensionedInternalField().name()
-                        );
-						
-			const solid4GeneralContactFvPatchVectorField&
-                        localMasterField =
-                        refCast<const solid4GeneralContactFvPatchVectorField>
-                        (
-                            field.boundaryField()
-                            [
-                                slavePatchIndices()[shadPatchI]
-                            ]
-                        );
-						
-			
-			const label masterShadowI =
-                        localMasterField.findSlaveID(patch().index());
-        
-		//****************** Start Test with shadPatchI dependent function **************
-		
-		//curSlaveTractions(shadPatchI)= localMasterField.normalContactModel(masterShadowI).slavePressure();
-			
-		
-		//****************** End test with shadPatchI dependent function **************
-		
 		// Set the traction on the slave patch
         // The master stores the friction and normal models, so we need to find
         // which models correspond to the current slave
         //traction() =
-		/*
+		
 		curPatchTractions(shadPatchI) =
             frictionModelForThisSlave(shadPatchI).slaveTraction()
           + normalModelForThisSlave(shadPatchI).slavePressure();
-		*/
-		//*********** Testing with master label ***************
-		curPatchTractions(shadPatchI) =
-            localMasterField.frictionModelForThisSlave(masterShadowI).slaveTraction()
-          + localMasterField.normalModelForThisSlave(masterShadowI).slavePressure();
 		
-		//*********** End testing with master label *************
+		
 		
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 		
