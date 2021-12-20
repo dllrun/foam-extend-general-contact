@@ -2465,7 +2465,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         
 		//****************** Start Test with shadPatchI dependent function **************
 		
-		curSlaveTractions(shadPatchI)= localMasterField.normalContactModel(masterShadowI).slavePressure();
+		//curSlaveTractions(shadPatchI)= localMasterField.normalContactModel(masterShadowI).slavePressure();
 			
 		
 		//****************** End test with shadPatchI dependent function **************
@@ -2474,9 +2474,17 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         // The master stores the friction and normal models, so we need to find
         // which models correspond to the current slave
         //traction() =
+		/*
 		curPatchTractions(shadPatchI) =
             frictionModelForThisSlave(shadPatchI).slaveTraction()
           + normalModelForThisSlave(shadPatchI).slavePressure();
+		*/
+		//*********** Testing with master label ***************
+		curPatchTractions(shadPatchI) =
+            localMasterField.frictionModelForThisSlave(masterShadowI).slaveTraction()
+          + localMasterField.normalModelForThisSlave(masterShadowI).slavePressure();
+		
+		//*********** End testing with master label *************
 		
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 		
