@@ -163,21 +163,21 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcFirstPatchIndexInList() c
 
     forAll(field.boundaryField(), patchI)
     {
-		Info<<"In calcGlobalMaster line: "<<__LINE__<<endl;
+		Info<<"In calcFirstPatchIndexInList() line: "<<__LINE__<<endl;
         if
         (
             field.boundaryField()[patchI].type()
             == solid4GeneralContactFvPatchVectorField::typeName
         )
         {
-			Info<<"In calcGlobalMaster line: "<<__LINE__<<endl;
+			Info<<"In calcFirstPatchIndexInList() line: "<<__LINE__<<endl;
             gMasterID = patchI;
 
             break;
         }		
     }
-	Info<<"In calcGlobalMaster line: "<<__LINE__<<endl;
-		Info<<"gMasterID in calcGlobalMaster: "<<gMasterID<<endl;
+	Info<<"In calcFirstPatchIndexInList() line: "<<__LINE__<<endl;
+		Info<<"gMasterID in calcFirstPatchIndexInList(): "<<gMasterID<<endl;
 
     // Check there is only one global master
 
@@ -1685,7 +1685,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalContactModel
 Foam::generalNormalContactModel&
 Foam::solid4GeneralContactFvPatchVectorField::normalModels(const label shadowI)
 {
-    if (firstPatchInList())
+    if (localSlave()[shadowI]) //if (firstPatchInList())
     {
 		#if(!normalModelDEBUG)
 		Info<<"In normalModels() line:"<<__LINE__<<endl;
@@ -1717,7 +1717,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels(const label shadowI)
             (
                 refCast<const solid4GeneralContactFvPatchVectorField>
                 (
-                    field.boundaryField()[slavePatchIndices()[0]]
+                    field.boundaryField()[slavePatchIndices()[shadowI]]
                 )
             );
 
@@ -1732,7 +1732,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels
     const label shadowI
 ) const
 {
-    if (firstPatchInList())
+    if (localSlave()[shadowI])  //if (firstPatchInList())
     {
         if (normalModels_.size() == 0)
         {
@@ -1756,7 +1756,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels
         const solid4GeneralContactFvPatchVectorField& slavePatchField =
             refCast<const solid4GeneralContactFvPatchVectorField>
             (
-                field.boundaryField()[slavePatchIndices()[0]]
+                field.boundaryField()[slavePatchIndices()[shadowI]]
             );
 
         return slavePatchField.normalModels(shadowI);
@@ -1767,7 +1767,7 @@ Foam::solid4GeneralContactFvPatchVectorField::normalModels
 Foam::generalFrictionContactModel&
 Foam::solid4GeneralContactFvPatchVectorField::frictionModels(const label shadowI)
 {
-    if (firstPatchInList())
+    if (localSlave()[shadowI])  //if (firstPatchInList())
     {
         if (frictionModels_.size() == 0)
         {
@@ -1789,7 +1789,7 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionModels(const label shadowI
             (
                 refCast<const solid4GeneralContactFvPatchVectorField>
                 (
-                    field.boundaryField()[slavePatchIndices()[0]]
+                    field.boundaryField()[slavePatchIndices()[shadowI]]
                 )
             );
 
@@ -1804,7 +1804,7 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionModels
     const label shadowI
 ) const
 {
-    if (firstPatchInList())
+    if (localSlave()[shadowI])   //if (firstPatchInList())
     {
         if (frictionModels_.size() == 0)
         {
@@ -1826,7 +1826,7 @@ Foam::solid4GeneralContactFvPatchVectorField::frictionModels
             (
                 refCast<const solid4GeneralContactFvPatchVectorField>
                 (
-                    field.boundaryField()[slavePatchIndices()[0]]
+                    field.boundaryField()[slavePatchIndices()[shadowI]]
                 )
             );
 
@@ -1999,6 +1999,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         // master interpolates this force
         const boolList& locSlave = localSlave();
 		
+		
 	if (curTimeIndex_ != this->db().time().timeIndex())
     {
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;		
@@ -2031,13 +2032,15 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         //}
 		
     }
-	#if(ISDEBUG)
+	#if(!ISDEBUG)
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-    #endif
+	Info<<"currentMaster() in updateCoeffs(): "<<currentMaster()<<endl;
+    Info<<"locSlave in updateCoeffs(): "<<locSlave<<endl;
+	#endif
 	// Move the master and slave zone to the deformed configuration
     if (currentMaster())   //(firstPatchInList())
     {
-	#if(ISDEBUG)
+	#if(!ISDEBUG)
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	#endif
 	moveZonesToDeformedConfiguration();
@@ -2446,6 +2449,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 			}
 			else
 			{
+			
+			Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
 			
 		// Set the traction on the slave patch
         // The master stores the friction and normal models, so we need to find

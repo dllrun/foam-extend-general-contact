@@ -123,7 +123,12 @@ Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
     // movePoints function only clears weights
     // Also, be careful to move the points as opposed to the localPoints
     const_cast<pointField&>(zone().globalPatch().points()) = zoneNewPoints;
-
+	
+	
+	#if(!moveZonesDEBUG)
+	Info<<"IN -- moveZonesToDeformedConfiguration() line:"<<__LINE__<<endl;
+    #endif
+	
     // Secondly we will move the slave zones
 
     forAll(slavePatchNames(), shadPatchI)
@@ -728,9 +733,10 @@ Foam::solid4GeneralContactFvPatchVectorField::slaveZones() const
 	//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
     if (currentMaster())
     {
+		//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
         if (slaveZones_.empty())
         {
-			//Info<<"IN -- if (slaveZones_.empty()) of slaveZones() line:"<<__LINE__<<endl;
+			Info<<"Master IN -- if (slaveZones_.empty()) of slaveZones() line:"<<__LINE__<<endl;
             calcSlaveZones();
         }
 
@@ -738,6 +744,7 @@ Foam::solid4GeneralContactFvPatchVectorField::slaveZones() const
     }
     else
     {
+		Info<<"Slave IN -- slaveZones() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -761,7 +768,7 @@ Foam::solid4GeneralContactFvPatchVectorField::slaveZones()
 	//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
     if (currentMaster())
     {
-		//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+		Info<<"Master IN -- slaveZones() line:"<<__LINE__<<endl;
         if (slaveZones_.empty())
         {
             calcSlaveZones();
@@ -772,7 +779,7 @@ Foam::solid4GeneralContactFvPatchVectorField::slaveZones()
     }
     else
     {
-		//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+		Info<<"Slave IN -- slaveZones() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
