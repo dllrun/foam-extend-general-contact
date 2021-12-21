@@ -42,9 +42,10 @@ InClass
 void
 Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
 {
-	#if(moveZonesDEBUG)
+	#if(!moveZonesDEBUG)
 	Info<<"IN -- moveZonesToDeformedConfiguration() line:"<<__LINE__<<endl;
-    #endif
+    
+	#endif
 	
 	// Only the master moves the zones
     if (!currentMaster())   //(!firstPatchInList())
@@ -647,23 +648,29 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcContactPerSlave() const
 const Foam::globalPolyPatch&
 Foam::solid4GeneralContactFvPatchVectorField::zone() const
 {
-	#if(zoneToZoneDEBUG)
+	#if(!zoneToZoneDEBUG)
 	Info<<"IN -- zone() line:"<<__LINE__<<endl;
 	#endif
 	
 	//findSlaveID(patch().index())
     if (currentMaster())  //if (globalMaster())
     {
+		#if(!zoneToZoneDEBUG)
+		Info<<"IN -- zone() line:"<<__LINE__<<endl;
+		#endif
         if (!zonePtr_)
         {
 			Info<<"IN -- if (!zonePtr_) of zone() line:"<<__LINE__<<endl;
             calcZone();
         }
-
+		
         return *zonePtr_;
     }
     else
     {
+		#if(!zoneDEBUG)
+		Info<<"IN -- zone() line:"<<__LINE__<<endl;
+		#endif
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -689,7 +696,7 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 	
     if (currentMaster())   //if (globalMaster())
     {
-		#if(zoneDEBUG)
+		#if(!zoneDEBUG)
 		Info<<"IN -- zone() line:"<<__LINE__<<endl;
 		#endif
 	
@@ -698,12 +705,13 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 			Info<<"IN -- if (!zonePtr_) of zone() line:"<<__LINE__<<endl;
             calcZone();
         }
-
+		
+		
         return *zonePtr_;
     }
     else
     {
-		#if(zoneDEBUG)
+		#if(!zoneDEBUG)
 		Info<<"IN -- zone() line:"<<__LINE__<<endl;
 		#endif
 		
@@ -804,7 +812,7 @@ Foam::solid4GeneralContactFvPatchVectorField::slaveZones()
 const Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
 Foam::solid4GeneralContactFvPatchVectorField::zoneToZones() const
 {
-	#if(zoneToZoneDEBUG)
+	#if(!zoneToZoneDEBUG)
 	Info<<"IN -- zoneToZones() line:"<<__LINE__<<endl;
 	#endif
 	

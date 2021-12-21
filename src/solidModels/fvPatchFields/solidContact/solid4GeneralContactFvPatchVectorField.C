@@ -219,6 +219,7 @@ bool Foam::solid4GeneralContactFvPatchVectorField::currentMaster() const
 
 void Foam::solid4GeneralContactFvPatchVectorField::calcCurrentMaster() const   //// CHECK method to calculate global master
 {
+	Info<< "In calcCurrentMaster() "<<__LINE__<<endl;
 	
     if (currentMasterPtr_)
     {
@@ -312,6 +313,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcCurrentSlave() const   //
 const Foam::boolList&
 Foam::solid4GeneralContactFvPatchVectorField::localSlave() const
 {
+	//Info<< "In localSlave() "<<__LINE__<<endl;
     if (!localSlavePtr_)
     {
         calcLocalSlave();
@@ -1526,7 +1528,7 @@ Foam::solid4GeneralContactFvPatchVectorField::slavePatchIndices() const
     {
         makeSlavePatchNames(); //calcSlavePatchIndices();
     }
-	//Info<<"*slavePatchIndicesPtr_ in slavePatchIndices(): "<<*slavePatchIndicesPtr_<<endl;
+	Info<<"*slavePatchIndicesPtr_ in slavePatchIndices(): "<<*slavePatchIndicesPtr_<<endl;
 
     return *slavePatchIndicesPtr_;
 }
@@ -1986,7 +1988,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;	
 	#endif
 	//*************** based on solidGeneral*****************
-	boolList activeContactPairs(slavePatchNames().size(), false);  // false);
+	boolList activeContactPairs(slavePatchNames().size(), true);  // false);
 	//*************** END based on solidGeneral**************
 	#if(ISDEBUG)
 	Info<<"activeContactPairs in updateCoeffs() "<<activeContactPairs<<endl;
@@ -2046,20 +2048,23 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	moveZonesToDeformedConfiguration();
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	}
+	
+	
 	#if(ISDEBUG)
 	Info<<"zone().patch().localPoints() in updateCoeffs():"<<zone().patch().localPoints()<<endl;
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	#endif
 	
 		
-	#if(ISDEBUG)
+	#if(!ISDEBUG)
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
     #endif
 	// Delete the zone-to-zone interpolator weights as the zones have moved
     // const wordList& shadPatchNames = slavePatchNames();
     forAll(activeContactPairs, shadPatchI)
     {
-		if (locSlave[shadPatchI])//if (localSlave()[shadPatchI])
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+		if (currentMaster())  //(locSlave[shadPatchI])//if (localSlave()[shadPatchI])
 		{
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         zoneToZones()[shadPatchI].movePoints
@@ -2068,6 +2073,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         );
 		}
     }
+	
+	
+	//***************** Start boundBox comment ************
+	#if(ISDEBUG)
 	
 	// Create master bounding box used for quick check
         boundBox masterBb(zone().patch().localPoints(), false);
@@ -2086,6 +2095,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 		Info<<"masterBb.minDim() in updateCoeffs(): "<<masterBb.minDim()<<endl;
 		Info<<"What is bbOff? in updateCoeffs():"<<bbOff<<endl;
 		#endif
+		
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 		if (masterBb.minDim() < bbOff)
         {
             const vector bbDiag = masterBb.max() - masterBb.min();
@@ -2134,6 +2145,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 			#endif
 		}
 		
+	//***************** Start boundBox comment ************
+	#endif
+	
+		
 	// Accumulated traction for the current patch
         vectorField curPatchTraction(patch().size(), vector::zero);
 	//	Info<<"What is curPatchTraction? "<<curPatchTraction<<endl;
@@ -2153,6 +2168,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 		#endif
 		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 		//Info<<"activeContactPairs[shadPatchI] in updateCoeffs():"<<activeContactPairs[shadPatchI]<<endl;
+			
+			
+			//***************** Start boundBox comment ************
+			#if(ISDEBUG)		
 			// Create slave bounding box
             boundBox slaveBb(slaveZones()[shadPatchI].patch().localPoints(), false);
 			#if(ISDEBUG)
@@ -2213,6 +2232,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 				
 			}
 			
+			
 			#if(ISDEBUG)
 			Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 			Info<< "slavePatchNames()[shadPatchI] in updateCoeffs() "<<slavePatchNames()[shadPatchI]<<endl;			
@@ -2222,14 +2242,19 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 			Info<<"masterBb.overlaps(slaveBb) in updateCoeffs():"<<masterBb.overlaps(slaveBb)<<endl;
 			#endif
 			
+			
 			if (masterBb.overlaps(slaveBb))
             {
 				Info<<"In updateCoeffs():"<<__LINE__<<endl;
                 activeContactPairs[shadPatchI] = true;
             }
 			
+				
 			#if(ISDEBUG)
 			Info<<"activeContactPairs[shadPatchI] in updateCoeffs():"<<activeContactPairs[shadPatchI]<<endl;
+			#endif
+			
+			//***************** End boundBox comment ************
 			#endif
 			
 		if (activeContactPairs[shadPatchI])
