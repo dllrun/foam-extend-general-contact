@@ -163,7 +163,7 @@ class solid4GeneralContactFvPatchVectorField
         mutable scalarField normalPenaltyFactors_;
 
         //- Master face zone kept in deformed configuration
-        mutable globalPolyPatch* zonePtr_;
+        mutable globalPolyPatch* myGlobalPolyPatchZonePtr_;
 
         //- Slave face zones kept in deformed configuration
         //  Stored by the master patch

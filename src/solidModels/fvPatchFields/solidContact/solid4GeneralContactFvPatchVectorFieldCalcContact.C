@@ -272,7 +272,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const
         )   << "Trying to create zone on a slave" << abort(FatalError);
     }
 
-    if (zonePtr_)
+    if (myGlobalPolyPatchZonePtr_)
     {
         FatalErrorIn
         (
@@ -282,7 +282,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const
 
     // Note: the main mesh will either be in the initial configuration or the
     // updated configuration
-    zonePtr_ = new globalPolyPatch
+    myGlobalPolyPatchZonePtr_ = new globalPolyPatch
     (
         patch().name(),
         patch().boundaryMesh().mesh()
@@ -714,13 +714,13 @@ Foam::solid4GeneralContactFvPatchVectorField::zone() const
 		#if(!zoneToZoneDEBUG)
 		Info<<"IN -- zone() line:"<<__LINE__<<endl;
 		#endif
-        if (!zonePtr_)
+        if (!myGlobalPolyPatchZonePtr_)
         {
-			Info<<"IN -- if (!zonePtr_) of zone() line:"<<__LINE__<<endl;
+			Info<<"IN -- if (!myGlobalPolyPatchZonePtr_) of zone() line:"<<__LINE__<<endl;
             calcZone();
         }
-		//Info<<"*zonePtr_ IN -- zone():"<<*zonePtr_<<endl;
-        return *zonePtr_;
+		
+        return *myGlobalPolyPatchZonePtr_;
     }
     else
     {
@@ -756,14 +756,14 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 		Info<<"IN -- zone() line:"<<__LINE__<<endl;
 		#endif
 	
-        if (!zonePtr_)
+        if (!myGlobalPolyPatchZonePtr_)
         {
-			Info<<"IN -- if (!zonePtr_) of zone() line:"<<__LINE__<<endl;
+			Info<<"IN -- if (!myGlobalPolyPatchZonePtr_) of zone() line:"<<__LINE__<<endl;
             calcZone();
         }
 		
-		//Info<<"*zonePtr_ IN -- zone():"<<*zonePtr_->patchName()<<endl;
-        return *zonePtr_;
+		Info<<"myGlobalPolyPatchZonePtr_->patchName() IN -- zone():"<<myGlobalPolyPatchZonePtr_->patchName()<<endl;
+        return *myGlobalPolyPatchZonePtr_;
     }
     else
     {

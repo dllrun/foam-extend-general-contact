@@ -883,7 +883,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::clearOut()
 	//************ END based on solid General*************
     
 	deleteDemandDrivenData(slavePatchIndicesPtr_);
-    deleteDemandDrivenData(zonePtr_);
+    deleteDemandDrivenData(myGlobalPolyPatchZonePtr_);
     slaveZones_.clear();
     zoneToZones_.clear();
     scaleTractionFieldPtr_.clear();
@@ -979,7 +979,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     normalModels_(),
     frictionModels_(),
     normalPenaltyFactors_(),
-    zonePtr_(NULL),
+    myGlobalPolyPatchZonePtr_(NULL),
     slaveZones_(),
     zoneToZones_(),
     quickReject_(Foam::newGgiInterpolation::AABB),
@@ -1029,7 +1029,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     normalModels_(),
     frictionModels_(),
     normalPenaltyFactors_(),
-    zonePtr_(NULL),
+    myGlobalPolyPatchZonePtr_(NULL),
     slaveZones_(),
     zoneToZones_(),
     quickReject_
@@ -1183,7 +1183,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     normalModels_(ptf.normalModels_),
     frictionModels_(ptf.frictionModels_),
     normalPenaltyFactors_(ptf.normalPenaltyFactors_.size(), -1),
-    zonePtr_(NULL),
+    myGlobalPolyPatchZonePtr_(NULL),
     slaveZones_(),
     zoneToZones_(),
     quickReject_(ptf.quickReject_),
@@ -1267,7 +1267,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     normalModels_(ptf.normalModels_),
     frictionModels_(ptf.frictionModels_),
     normalPenaltyFactors_(ptf.normalPenaltyFactors_.size(), -1),
-    zonePtr_(NULL),
+    myGlobalPolyPatchZonePtr_(NULL),
     slaveZones_(),
     zoneToZones_(),
     quickReject_(ptf.quickReject_),
@@ -1352,7 +1352,7 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     normalModels_(ptf.normalModels_),
     frictionModels_(ptf.frictionModels_),
     normalPenaltyFactors_(ptf.normalPenaltyFactors_.size(), -1),
-    zonePtr_(NULL),
+    myGlobalPolyPatchZonePtr_(NULL),
     slaveZones_(),
     zoneToZones_(),
     quickReject_(ptf.quickReject_),
@@ -2046,6 +2046,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	#endif
 	moveZonesToDeformedConfiguration();
+	//display globalPolyPatch patch information
+	Info<<myGlobalPolyPatchZonePtr_->patch()<<endl;
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 	}
 	
