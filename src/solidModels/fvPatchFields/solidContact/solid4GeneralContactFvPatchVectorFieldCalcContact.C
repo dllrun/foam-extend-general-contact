@@ -214,6 +214,48 @@ Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
 }
 
 
+//*******************Start a shadPatchI dependent function *******************
+void Foam::solid4GeneralContactFvPatchVectorField::calcZoneIndex() const
+{
+	
+    if (zoneIndex_ != -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex()"
+            "const"
+        )   << "zoneIndex_ already set" << abort(FatalError);
+    }
+
+    const fvMesh& mesh = patch().boundaryMesh().mesh();
+
+    word zoneName = patch().name() + "FaceZone";
+
+    faceZoneID zone(zoneName, mesh.faceZones());
+	
+	//**********delete it********
+	// Think about how to use patchPointToGlobal(..) instead of mesh.faceZones()
+	//**********delete it********
+
+    if (!zone.active())
+    {
+        FatalErrorIn
+        (
+            "void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex()"
+            "const"
+        )   << "Face zone name " << zoneName
+            << " not found.  Please check your zone definition." << nl
+            << "Current faceZones are:" << mesh.faceZones().names()
+            << abort(FatalError);
+    }
+
+    zoneIndex_ = zone.index();
+	
+}
+
+//*******************End a shadPatchI dependent function *******************
+
+
 void Foam::solid4GeneralContactFvPatchVectorField::calcZone() const
 {
     if (debug)
@@ -644,6 +686,20 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcContactPerSlave() const
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+//*******************Start a shadPatchI dependent function *******************
+Foam::label Foam::solid4GeneralContactFvPatchVectorField::zoneIndex() const
+{
+    if (zoneIndex_ == -1)
+    {
+        calcZoneIndex();
+    }
+
+    return zoneIndex_;
+}
+
+//*******************End a shadPatchI dependent function *******************
+
 
 const Foam::globalPolyPatch&
 Foam::solid4GeneralContactFvPatchVectorField::zone() const

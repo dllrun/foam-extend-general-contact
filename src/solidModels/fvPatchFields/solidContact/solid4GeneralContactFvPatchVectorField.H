@@ -223,7 +223,13 @@ class solid4GeneralContactFvPatchVectorField
 		
 		mutable scalarField slaveBbOffsetList_;
 		//*************** END based on solidGeneral*****************
-
+		
+		
+		//*******************Start a shadPatchI dependent function *******************
+		// CHECK inherited from solidTractionFvPatchVectorField 
+		mutable label zoneIndex_;
+		//*******************End a shadI dependent function *******************			
+			
 
     // Private Member Functions
 
@@ -257,6 +263,11 @@ class solid4GeneralContactFvPatchVectorField
 
         //- Clear out demand driven data
         //virtual void clearOut();
+		
+		//*******************Start a shadPatchI dependent function *******************
+		//- Calculate zone index
+        void calcZoneIndex() const;
+		//*******************End a shadI dependent function *******************
 
         //- Create the zone
         void calcZone() const;
@@ -447,6 +458,11 @@ public:
 
             //Step3 - Return the list of slaveG patch indices
             const List<label>& slaveGPatchIndices() const;
+			
+			//*******************Start a shadPatchI dependent function *******************
+			//- Return index of the zone
+            label zoneIndex() const;
+			//*******************End a shadI dependent function *******************
         
             //- Return the list of slaveG zone names
             const List<word>& slaveGZoneNames() const;
