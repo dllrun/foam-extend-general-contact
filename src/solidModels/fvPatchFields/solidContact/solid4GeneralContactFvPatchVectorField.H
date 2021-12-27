@@ -567,6 +567,17 @@ public:
 
             //- Return reference to deformed zone
             globalPolyPatch& zone();
+			
+			
+			//*******************Start a shadPatchI dependent function *******************
+			//- Return const reference to deformed master zone
+            const globalPolyPatch& slaveZone(const label shadowI) const;
+
+            //- Return reference to deformed master zone 
+            globalPolyPatch& slaveZone(const label shadowI);
+			//*******************End a shadI dependent function *******************			
+			
+			
 
             //- Return const reference to deformed slave zones
             const PtrList<globalPolyPatch>& slaveZones() const;

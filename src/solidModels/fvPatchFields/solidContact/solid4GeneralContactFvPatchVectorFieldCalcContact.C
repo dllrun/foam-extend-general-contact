@@ -663,7 +663,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zone() const
 			Info<<"IN -- if (!zonePtr_) of zone() line:"<<__LINE__<<endl;
             calcZone();
         }
-		
+		//Info<<"*zonePtr_ IN -- zone():"<<*zonePtr_<<endl;
         return *zonePtr_;
     }
     else
@@ -706,7 +706,7 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
             calcZone();
         }
 		
-		
+		//Info<<"*zonePtr_ IN -- zone():"<<*zonePtr_->patchName()<<endl;
         return *zonePtr_;
     }
     else
@@ -735,24 +735,80 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 }
 
 
+//*******************Start a shadPatchI dependent function *******************
+//- Return const reference to deformed master zone
+const Foam::globalPolyPatch& 
+Foam::solid4GeneralContactFvPatchVectorField::slaveZone
+(
+	const label shadowI
+) const
+{
+	//Info<<"Slave IN -- slaveZone(..) line:"<<__LINE__<<endl;
+        const volVectorField& field =
+            db().lookupObject<volVectorField>
+            (
+                this->dimensionedInternalField().name()
+            );
+
+        const solid4GeneralContactFvPatchVectorField& slavePatchField =
+            refCast<const solid4GeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[slavePatchIndices()[shadowI]]
+            );
+
+        return slavePatchField.zone();
+}
+
+//- Return reference to deformed master zone 
+Foam::globalPolyPatch& 
+Foam::solid4GeneralContactFvPatchVectorField::slaveZone
+(
+const label shadowI
+)
+{
+	//Info<<"Slave IN -- slaveZones() line:"<<__LINE__<<endl;
+        const volVectorField& field =
+            db().lookupObject<volVectorField>
+            (
+                this->dimensionedInternalField().name()
+            );
+
+        solid4GeneralContactFvPatchVectorField& slavePatchField =
+            const_cast<solid4GeneralContactFvPatchVectorField&>
+            (
+                refCast<const solid4GeneralContactFvPatchVectorField>
+                (
+                    field.boundaryField()[slavePatchIndices()[shadowI]]
+                )
+            );
+		
+		//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+        return slavePatchField.zone();
+	
+}
+//*******************End a shadI dependent function *******************			
+			
+
+
 const Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solid4GeneralContactFvPatchVectorField::slaveZones() const
 {
-	//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+	Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
     if (currentMaster())
     {
 		//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
         if (slaveZones_.empty())
         {
-			Info<<"Master IN -- if (slaveZones_.empty()) of slaveZones() line:"<<__LINE__<<endl;
+			//Info<<"Master IN -- if (slaveZones_.empty()) of slaveZones() line:"<<__LINE__<<endl;
             calcSlaveZones();
         }
-
+		
+		//Info<<"slaveZones_ IN -- slaveZones():"<<slaveZones_<<endl;
         return slaveZones_;
     }
     else
     {
-		Info<<"Slave IN -- slaveZones() line:"<<__LINE__<<endl;
+		//Info<<"Slave IN -- slaveZones() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -776,18 +832,18 @@ Foam::solid4GeneralContactFvPatchVectorField::slaveZones()
 	//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
     if (currentMaster())
     {
-		Info<<"Master IN -- slaveZones() line:"<<__LINE__<<endl;
+		//Info<<"Master IN -- slaveZones() line:"<<__LINE__<<endl;
         if (slaveZones_.empty())
         {
             calcSlaveZones();
         }
 		
-		//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+		//Info<<"slaveZones_ IN -- slaveZones():"<<slaveZones_<<endl;
         return slaveZones_;
     }
     else
     {
-		Info<<"Slave IN -- slaveZones() line:"<<__LINE__<<endl;
+		//Info<<"Slave IN -- slaveZones() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (

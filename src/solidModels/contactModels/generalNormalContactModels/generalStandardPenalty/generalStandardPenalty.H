@@ -171,6 +171,7 @@ public:
         //- Return slave pressure
         virtual vectorField& slavePressure()
         {
+			//Info<<"In -- generalStandardPenalty::slavePressure() line:"<<__LINE__<<endl;
             return slavePressureVolField_.boundaryField()[slavePatchID()];
         }
 

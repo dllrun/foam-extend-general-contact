@@ -1262,6 +1262,8 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
         traction() =
             frictionModelForThisSlave().slaveTraction()
           + normalModelForThisSlave().slavePressure();
+		  
+		Info<<"SLAVE traction() in updateCoeffs() :"<<traction()<<endl;
 
         // TESTING - START
         // Scale traction vectors on faces, which share an edge with the

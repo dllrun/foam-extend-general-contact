@@ -1528,7 +1528,7 @@ Foam::solid4GeneralContactFvPatchVectorField::slavePatchIndices() const
     {
         makeSlavePatchNames(); //calcSlavePatchIndices();
     }
-	Info<<"*slavePatchIndicesPtr_ in slavePatchIndices(): "<<*slavePatchIndicesPtr_<<endl;
+	//Info<<"*slavePatchIndicesPtr_ in slavePatchIndices(): "<<*slavePatchIndicesPtr_<<endl;
 
     return *slavePatchIndicesPtr_;
 }
@@ -2040,7 +2040,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
     Info<<"locSlave in updateCoeffs(): "<<locSlave<<endl;
 	#endif
 	// Move the master and slave zone to the deformed configuration
-    if (currentMaster())   //(firstPatchInList())
+    if(firstPatchInList())  //(currentMaster())   //(firstPatchInList()) //
     {
 	#if(!ISDEBUG)
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
@@ -2520,7 +2520,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
         scalarField& contactForThisSlave = contactPerSlave()[0];
 				forAll(contactForThisSlave, faceI)
 				{
-					Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+					//Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 					if (magTraction[faceI] > tol)
 					{
 					contactForThisSlave[faceI] = 1.0;
