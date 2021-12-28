@@ -31,10 +31,10 @@ InClass
 #include "pointFields.H"
 #include "polyPatchID.H"
 #include "ZoneIDs.H"
-#define moveZonesDEBUG false
-#define zoneDEBUG false
-#define zoneToZoneDEBUG false
-#define curPatchTractionDEBUG false
+#define moveZonesDEBUG true
+#define zoneDEBUG true
+#define zoneToZoneDEBUG true 
+#define curPatchTractionDEBUG true
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -42,7 +42,7 @@ InClass
 void
 Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
 {
-	#if(!moveZonesDEBUG)
+	#if(moveZonesDEBUG)
 	Info<<"IN -- moveZonesToDeformedConfiguration() line:"<<__LINE__<<endl;
     
 	#endif
@@ -97,7 +97,7 @@ Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
         const vectorField& patchD =
             D.boundaryField()[patch().index()];
 		
-		#if(moveZonesDEBUG)
+		#if(!moveZonesDEBUG)
 		Info<<"patchD IN -- moveZonesToDeformedConfiguration(): "<<patchD<<endl;
 		#endif
 		
@@ -126,7 +126,7 @@ Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
     const_cast<pointField&>(zone().globalPatch().points()) = zoneNewPoints;
 	
 	
-	#if(!moveZonesDEBUG)
+	#if(moveZonesDEBUG)
 	Info<<"IN -- moveZonesToDeformedConfiguration() line:"<<__LINE__<<endl;
     #endif
 	
@@ -208,7 +208,7 @@ Foam::solid4GeneralContactFvPatchVectorField::moveZonesToDeformedConfiguration()
         ) = slaveZoneNewPoints;
     }
 	
-	#if(moveZonesDEBUG)
+	#if(!moveZonesDEBUG)
 	Info<<"IN -- moveZonesToDeformedConfiguration() line:"<<__LINE__<<endl;
 	#endif
 }
@@ -400,7 +400,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
 
         if (currentMaster())
         {
-			#if(zoneToZoneDEBUG)
+			#if(!zoneToZoneDEBUG)
 			Info<<"IN -- CalcZoneToZones() line:"<<__LINE__<<endl;
             #endif
 			
@@ -704,14 +704,14 @@ Foam::label Foam::solid4GeneralContactFvPatchVectorField::zoneIndex() const
 const Foam::globalPolyPatch&
 Foam::solid4GeneralContactFvPatchVectorField::zone() const
 {
-	#if(!zoneToZoneDEBUG)
+	#if(!zoneDEBUG)
 	Info<<"IN -- zone() line:"<<__LINE__<<endl;
 	#endif
 	
 	//findSlaveID(patch().index())
     if (currentMaster())  //if (globalMaster())
     {
-		#if(!zoneToZoneDEBUG)
+		#if(zoneDEBUG)
 		Info<<"IN -- zone() line:"<<__LINE__<<endl;
 		#endif
         if (!myGlobalPolyPatchZonePtr_)
@@ -724,7 +724,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zone() const
     }
     else
     {
-		#if(!zoneDEBUG)
+		#if(zoneDEBUG)
 		Info<<"IN -- zone() line:"<<__LINE__<<endl;
 		#endif
         const volVectorField& field =
@@ -746,13 +746,13 @@ Foam::solid4GeneralContactFvPatchVectorField::zone() const
 
 Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
 {
-	#if(zoneDEBUG)
+	#if(!zoneDEBUG)
 	Info<<"IN -- zone() line:"<<__LINE__<<endl;
 	#endif
 	
     if (currentMaster())   //if (globalMaster())
     {
-		#if(!zoneDEBUG)
+		#if(zoneDEBUG)
 		Info<<"IN -- zone() line:"<<__LINE__<<endl;
 		#endif
 	
@@ -767,7 +767,7 @@ Foam::globalPolyPatch& Foam::solid4GeneralContactFvPatchVectorField::zone()
     }
     else
     {
-		#if(!zoneDEBUG)
+		#if(zoneDEBUG)
 		Info<<"IN -- zone() line:"<<__LINE__<<endl;
 		#endif
 		
@@ -849,22 +849,22 @@ const label shadowI
 const Foam::PtrList<Foam::globalPolyPatch>&
 Foam::solid4GeneralContactFvPatchVectorField::slaveZones() const
 {
-	Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+	//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
     if (currentMaster())
     {
-		//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
+		Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
         if (slaveZones_.empty())
         {
 			//Info<<"Master IN -- if (slaveZones_.empty()) of slaveZones() line:"<<__LINE__<<endl;
             calcSlaveZones();
         }
 		
-		//Info<<"slaveZones_ IN -- slaveZones():"<<slaveZones_<<endl;
+	//	Info<<"slaveZones_->patch() IN -- slaveZones():"<<slaveZones_->patch()<<endl;
         return slaveZones_;
     }
     else
     {
-		//Info<<"Slave IN -- slaveZones() line:"<<__LINE__<<endl;
+		Info<<"Slave IN -- slaveZones() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -888,18 +888,26 @@ Foam::solid4GeneralContactFvPatchVectorField::slaveZones()
 	//Info<<"IN -- slaveZones() line:"<<__LINE__<<endl;
     if (currentMaster())
     {
-		//Info<<"Master IN -- slaveZones() line:"<<__LINE__<<endl;
+		Info<<"Master IN -- slaveZones() line:"<<__LINE__<<endl;
         if (slaveZones_.empty())
         {
             calcSlaveZones();
         }
 		
-		//Info<<"slaveZones_ IN -- slaveZones():"<<slaveZones_<<endl;
-        return slaveZones_;
+	//	Info<<"slaveZones_[0]->patch() IN -- slaveZones():"<<slaveZones_[0]->patch()<<endl;
+		Info<<"slaveZones_.size() IN -- slaveZones():"<<slaveZones_.size()<<endl;
+        for (int i = 0; i < slaveZones_.size(); i++) 
+		{			
+        cout << i << " ";
+		Info<<"slaveZones_[i]->patch() IN -- slaveZones():"<<slaveZones_[i].patch()<<endl;	
+		}
+		
+		
+		return slaveZones_;
     }
     else
     {
-		//Info<<"Slave IN -- slaveZones() line:"<<__LINE__<<endl;
+		Info<<"Slave IN -- slaveZones() line:"<<__LINE__<<endl;
         const volVectorField& field =
             db().lookupObject<volVectorField>
             (
@@ -934,7 +942,15 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones() const
         {
             calcZoneToZones();
         }
+		
 	
+			
+		for (int i = 0; i < zoneToZones_.size(); i++) 
+		{			
+        cout << i << " ";
+		Info<<"zoneToZones_[i].masterPatch() IN -- zoneToZones() "<<zoneToZones_[i].masterPatch()<<endl;	
+		}
+		
         return zoneToZones_;
     }
     else
@@ -959,7 +975,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones() const
 Foam::PtrList<Foam::newGgiStandAlonePatchInterpolation>&
 Foam::solid4GeneralContactFvPatchVectorField::zoneToZones()
 {
-	#if(zoneToZoneDEBUG)
+	#if(!zoneToZoneDEBUG)
 	Info<<"IN -- zoneToZones() line:"<<__LINE__<<endl;
 	#endif
 	
@@ -970,9 +986,15 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones()
             calcZoneToZones();
         }
 	
-	#if(zoneToZoneDEBUG)
+	#if(!zoneToZoneDEBUG)
 	Info<<"IN -- zoneToZones() line:"<<__LINE__<<endl;
 	#endif
+	
+	for (int i = 0; i < zoneToZones_.size(); i++) 
+		{			
+        cout << i << " ";
+		Info<<"zoneToZones_[i].masterPatch() IN -- zoneToZones() "<<zoneToZones_[i].masterPatch()<<endl;	
+		}
 	
         return zoneToZones_;
     }
@@ -995,7 +1017,7 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones()
                 )
             );
 		
-		#if(zoneToZoneDEBUG)
+		#if(!zoneToZoneDEBUG)
 		Info<<"IN -- zoneToZones() line:"<<__LINE__<<endl;
 		#endif
 		
@@ -1115,7 +1137,7 @@ Foam::solid4GeneralContactFvPatchVectorField::curSlaveTractions
     const label slaveI
 )
 {
-	#if(curPatchTractionDEBUG)
+	#if(!curPatchTractionDEBUG)
 	Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
     #endif
 	
@@ -1156,7 +1178,7 @@ Foam::solid4GeneralContactFvPatchVectorField::curPatchTractions
     const label slaveI
 )
 {
-	#if(curPatchTractionDEBUG)
+	#if(!curPatchTractionDEBUG)
 	Info<<"In curPatchTractions(..) line: "<<__LINE__<<endl;
     #endif
 	
