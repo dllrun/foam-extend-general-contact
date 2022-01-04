@@ -290,6 +290,9 @@ class solid4GeneralContactFvPatchVectorField
 
         //- Create the zone-to-zone interpolators
         void calcZoneToZones() const;
+		
+		//- Create the zone-to-zone interpolators
+        void makeZoneToZone() const;
 
         //- Move the master and slave zones to the deformed configuration
         void moveZonesToDeformedConfiguration();
@@ -610,6 +613,18 @@ public:
 
             //- Return reference to deformed master zone 
             globalPolyPatch& slaveZone(const label shadowI);
+			
+			//- Return const reference to patch-to-patch interpolation
+            const newGgiStandAlonePatchInterpolation& zoneToZone
+            (
+                const label shadowI
+            ) const;
+
+            //- Return reference to patch-to-patch interpolation
+            newGgiStandAlonePatchInterpolation& zoneToZone
+            (
+                const label shadowI
+            );
 			//*******************End a shadI dependent function *******************			
 			
 			

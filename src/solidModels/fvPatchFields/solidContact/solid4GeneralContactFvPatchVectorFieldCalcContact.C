@@ -382,6 +382,134 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcSlaveZones() const
     }
 }
 
+//**************************** Start makeZoneToZone ****************
+
+void Foam::solid4GeneralContactFvPatchVectorField::makeZoneToZone() const
+{
+    // Create zone-to-zone interpolation
+    if (!zoneToZones_.empty())
+    {
+        FatalErrorIn
+        (
+            "void solid4GeneralContactFvPatchScalarField::calcZoneToZones() const"
+        )   << "Zone to zone interpolation already calculated"
+            << abort(FatalError);
+    }
+
+    // Check master and slave patch
+    const volVectorField& field =
+        db().lookupObject<volVectorField>
+        (
+            this->dimensionedInternalField().name()
+        );
+
+    zoneToZones_.setSize(slavePatchNames().size());
+	
+	const boolList& locSlave = localSlave();
+
+    forAll (zoneToZones_, shadPatchI)
+    {
+        const solid4GeneralContactFvPatchVectorField& slavePatchField =
+            refCast<const solid4GeneralContactFvPatchVectorField>
+            (
+                field.boundaryField()[slavePatchIndices()[shadPatchI]]
+            );
+
+        
+        if (locSlave[shadPatchI])
+        {
+			#if(!zoneToZoneDEBUG)
+			Info<<"IN -- CalcZoneToZones() line:"<<__LINE__<<endl;
+            #endif
+			
+			// Create interpolation for patches
+            zoneToZones_.set
+            (
+                shadPatchI,
+                new newGgiStandAlonePatchInterpolation
+                (
+                    zone().globalPatch(),
+                    slaveZones()[shadPatchI].globalPatch(),
+                    tensorField(0),
+                    tensorField(0),
+                    vectorField(0), // Slave-to-master separation. Bug fix
+                    true,           // global data
+                    0,              // Master non-overlapping face tolerances
+                    0,              // Slave non-overlapping face tolerances
+                    // Do not rescale weighting factors, as it is wrong on
+                    // partially covered faces
+                    false,
+                    quickReject_,
+                    regionOfInterest_
+                )
+            );
+
+            // Check which point distance calculation method to use
+            const Switch useNewPointDistanceMethod =
+                dict_.lookupOrDefault<Switch>
+                (
+                    "useNewPointDistanceMethod", false
+                );
+
+            Info<< "    " << type() << ": " << patch().name() << nl
+                << "        useNewPointDistanceMethod: "
+                << useNewPointDistanceMethod
+                << endl;
+
+            zoneToZones_[shadPatchI].useNewPointDistanceMethod() =
+                useNewPointDistanceMethod;
+
+            // Check if the projectPointsToPatchBoundary switch is set
+            const Switch projectPointsToPatchBoundary =
+                dict_.lookupOrDefault<Switch>
+                (
+                    "projectPointsToPatchBoundary",
+                    false
+                );
+
+            Info<< "        projectPointsToPatchBoundary: "
+                << projectPointsToPatchBoundary
+                << endl;
+
+            zoneToZones_[shadPatchI].projectPointsToPatchBoundary() =
+                projectPointsToPatchBoundary;
+
+            if (dict_.found("checkPointDistanceOrientations"))
+            {
+                const Switch checkPointDistanceOrientations =
+                    Switch(dict_.lookup("checkPointDistanceOrientations"));
+
+                Info<< "        checkPointDistanceOrientations: "
+                    << checkPointDistanceOrientations
+                    << endl;
+
+                zoneToZones_[shadPatchI].checkPointDistanceOrientations() =
+                    checkPointDistanceOrientations;
+            }
+
+            // Check if the usePrevCandidateMasterNeighbors switch is set
+            const Switch usePrevCandidateMasterNeighbors =
+                dict_.lookupOrDefault<Switch>
+                (
+                    "usePrevCandidateMasterNeighbors",
+                    false
+                );
+
+            Info<< "        usePrevCandidateMasterNeighbors: "
+                << usePrevCandidateMasterNeighbors
+                << endl;
+
+            zoneToZones_[shadPatchI].usePrevCandidateMasterNeighbors() =
+                usePrevCandidateMasterNeighbors;
+        }
+        
+    }
+}
+
+//**************************** END makeZoneToZone ****************
+
+
+
 void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
 {
     if (debug)
@@ -410,6 +538,8 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
         );
 
     zoneToZones_.setSize(slavePatchNames().size());
+	
+	//const boolList& locSlave = localSlave();
 
     forAll (zoneToZones_, shadPatchI)
     {
@@ -419,7 +549,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
                 field.boundaryField()[slavePatchIndices()[shadPatchI]]
             );
 
-        if (currentMaster())
+        if  (currentMaster()) //(locSlave[shadPatchI])  //
         {
             if (slavePatchField.master() == true)
             {
@@ -442,7 +572,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneToZones() const
             }
         }
 
-        if (currentMaster())
+        if  (currentMaster())  //(locSlave[shadPatchI])
         {
 			#if(!zoneToZoneDEBUG)
 			Info<<"IN -- CalcZoneToZones() line:"<<__LINE__<<endl;
@@ -886,6 +1016,68 @@ const label shadowI
         return slavePatchField.zone();
 	
 }
+
+
+const Foam::newGgiStandAlonePatchInterpolation&
+Foam::solid4GeneralContactFvPatchVectorField::zoneToZone
+(
+    const label shadowI
+) const
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("zoneToZone(const label shadowI)")
+            << "Only the local slave can call the zoneToZone interpolator"
+            << abort(FatalError);
+    }
+
+    if (zoneToZones_.empty())
+    {
+        word zoneName =
+            patch().boundaryMesh().mesh().faceZones()[zoneIndex()].name();
+
+        if (debug)
+        {
+            Info<< "Initializing the GGI interpolators for " << zoneName
+                << endl;
+        }
+
+        makeZoneToZone();
+    }
+
+    return zoneToZones_[shadowI];
+}
+
+
+Foam::newGgiStandAlonePatchInterpolation&
+Foam::solid4GeneralContactFvPatchVectorField::zoneToZone(const label shadowI)
+{
+    if (!localSlave()[shadowI])
+    {
+        FatalErrorIn("zoneToZone(const label shadowI)")
+            << "Only the local slave can call the zoneToZone interpolator"
+            << abort(FatalError);
+    }
+
+    if (zoneToZones_.empty())
+    {
+        word zoneName =
+            patch().boundaryMesh().mesh().faceZones()[zoneIndex()].name();
+
+        if (debug)
+        {
+            Info<< "Initializing the GGI interpolators for " << zoneName
+                << endl;
+        }
+
+        makeZoneToZone();
+    }
+
+    return zoneToZones_[shadowI];
+}
+
+
+
 //*******************End a shadI dependent function *******************			
 			
 
