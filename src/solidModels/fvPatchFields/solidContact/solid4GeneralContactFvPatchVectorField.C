@@ -881,10 +881,16 @@ void Foam::solid4GeneralContactFvPatchVectorField::clearOut()
     deleteDemandDrivenData(localSlavePtr_);
 	deleteDemandDrivenData(curPatchTractionPtr_);
 	//************ END based on solid General*************
-    
+	
+    deleteDemandDrivenData(slavePatchNames_);
 	deleteDemandDrivenData(slavePatchIndicesPtr_);
+	deleteDemandDrivenData(slaveZoneNamesPtr_);
+    deleteDemandDrivenData(slaveZoneIndicesPtr_);
     deleteDemandDrivenData(myGlobalPolyPatchZonePtr_);
-    slaveZones_.clear();
+	normalModels_.clear();
+    frictionModels_.clear();
+
+    slaveZones_.clear();	
     zoneToZones_.clear();
     scaleTractionFieldPtr_.clear();
 }
@@ -975,6 +981,11 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     writePointDistanceFields_(false),
     slavePatchNames_(),
     slavePatchIndicesPtr_(NULL),
+	//***************** shadI dependent ************
+	zoneIndex_(-1),
+    slaveZoneNamesPtr_(NULL),
+    slaveZoneIndicesPtr_(NULL),
+	//***************** END shadI dependent **********
     rigidMaster_(false),
     normalModels_(),
     frictionModels_(),
@@ -1025,6 +1036,11 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     ),
     slavePatchNames_(),
     slavePatchIndicesPtr_(NULL),
+	//***************** shadI dependent ************
+	zoneIndex_(-1),
+    slaveZoneNamesPtr_(NULL),
+    slaveZoneIndicesPtr_(NULL),
+	//***************** END shadI dependent **********
     rigidMaster_(false),
     normalModels_(),
     frictionModels_(),
@@ -1179,6 +1195,11 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     writePointDistanceFields_(ptf.writePointDistanceFields_),
     slavePatchNames_(ptf.slavePatchNames_),
     slavePatchIndicesPtr_(NULL),
+	//***************** shadI dependent ************
+	zoneIndex_(ptf.zoneIndex_),
+    slaveZoneNamesPtr_(NULL),
+    slaveZoneIndicesPtr_(NULL),
+	//***************** END shadI dependent **********
     rigidMaster_(ptf.rigidMaster_),
     normalModels_(ptf.normalModels_),
     frictionModels_(ptf.frictionModels_),
@@ -1263,6 +1284,11 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     writePointDistanceFields_(ptf.writePointDistanceFields_),
     slavePatchNames_(ptf.slavePatchNames_),
     slavePatchIndicesPtr_(NULL),
+	//***************** shadI dependent ************
+	zoneIndex_(ptf.zoneIndex_),
+    slaveZoneNamesPtr_(NULL),
+    slaveZoneIndicesPtr_(NULL),
+	//***************** END shadI dependent **********
     rigidMaster_(ptf.rigidMaster_),
     normalModels_(ptf.normalModels_),
     frictionModels_(ptf.frictionModels_),
@@ -1348,6 +1374,11 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     writePointDistanceFields_(ptf.writePointDistanceFields_),
     slavePatchNames_(ptf.slavePatchNames_),
     slavePatchIndicesPtr_(NULL),
+	//***************** shadI dependent ************
+	zoneIndex_(ptf.zoneIndex_),
+    slaveZoneNamesPtr_(NULL),
+    slaveZoneIndicesPtr_(NULL),
+	//***************** END shadI dependent **********
     rigidMaster_(ptf.rigidMaster_),
     normalModels_(ptf.normalModels_),
     frictionModels_(ptf.frictionModels_),
@@ -1397,6 +1428,21 @@ Foam::solid4GeneralContactFvPatchVectorField::solid4GeneralContactFvPatchVectorF
     {
         curPatchTractionPtr_ =
             new List<vectorField>(*ptf.curPatchTractionPtr_);
+    }
+	
+	if (ptf.slaveZoneNamesPtr_)
+    {
+        slaveZoneNamesPtr_ = new wordList(*ptf.slaveZoneNamesPtr_);
+    }
+
+    if (ptf.slaveZoneIndicesPtr_)
+    {
+        slaveZoneIndicesPtr_ = new labelList(*ptf.slaveZoneIndicesPtr_);
+    }
+
+    if (ptf.zonePtr_)
+    {
+        zonePtr_ = new standAlonePatch(*ptf.zonePtr_);
     }
 	*/
 	//******************* END based on solid General******************

@@ -253,6 +253,50 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcZoneIndex() const
 	
 }
 
+
+void Foam::solid4GeneralContactFvPatchVectorField::calcSlaveZoneNames() const
+{
+    if (slaveZoneNamesPtr_ || slaveZoneIndicesPtr_)
+    {
+        FatalErrorIn
+        (
+            "label Foam::solid4GeneralContactFvPatchVectorField::"
+            "calcSlaveZoneNames() const"
+        )   << "slaveZoneNames_ or slaveZoneIndices_ already set"
+            << abort(FatalError);
+    }
+
+    const wordList& shadNames = slavePatchNames();
+
+    slaveZoneNamesPtr_ = new wordList(shadNames.size());
+    wordList& slaveZoneNames = *slaveZoneNamesPtr_;
+
+    slaveZoneIndicesPtr_ = new labelList(shadNames.size());
+    labelList& slaveZoneIndices = *slaveZoneIndicesPtr_;
+
+    const fvMesh& mesh = patch().boundaryMesh().mesh();
+
+    forAll(shadNames, slaveI)
+    {
+        word zoneName = shadNames[slaveI] + "FaceZone";
+
+        faceZoneID zone(zoneName, mesh.faceZones());
+
+        if (!zone.active())
+        {
+            FatalErrorIn("solid4GeneralContactFvPatchVectorField")
+                << "Face zone name " << zoneName
+                << " not found.  Please check your zone definition."
+                << abort(FatalError);
+        }
+
+        slaveZoneNames[slaveI] = zoneName;
+
+        slaveZoneIndices[slaveI] = zone.index();
+    }
+}
+
+
 //*******************End a shadPatchI dependent function *******************
 
 
@@ -900,6 +944,7 @@ Foam::solid4GeneralContactFvPatchVectorField::slaveZones()
 		{			
         cout << i << " ";
 		Info<<"slaveZones_[i]->patch() IN -- slaveZones():"<<slaveZones_[i].patch()<<endl;	
+		Info<<"slaveZones_[i]->globalPatch() IN -- slaveZones():"<<slaveZones_[i].globalPatch()<<endl;	
 		}
 		
 		
@@ -944,12 +989,13 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones() const
         }
 		
 	
-			
+		/*	
 		for (int i = 0; i < zoneToZones_.size(); i++) 
 		{			
         cout << i << " ";
-		Info<<"zoneToZones_[i].masterPatch() IN -- zoneToZones() "<<zoneToZones_[i].masterPatch()<<endl;	
+		Info<<"zoneToZones_[i].slavePatch() IN -- zoneToZones() "<<zoneToZones_[i].slavePatch()<<endl;	
 		}
+		*/
 		
         return zoneToZones_;
     }
@@ -989,12 +1035,14 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneToZones()
 	#if(!zoneToZoneDEBUG)
 	Info<<"IN -- zoneToZones() line:"<<__LINE__<<endl;
 	#endif
-	
-	for (int i = 0; i < zoneToZones_.size(); i++) 
+		
+		/*
+		for (int i = 0; i < zoneToZones_.size(); i++) 
 		{			
         cout << i << " ";
-		Info<<"zoneToZones_[i].masterPatch() IN -- zoneToZones() "<<zoneToZones_[i].masterPatch()<<endl;	
+		Info<<"zoneToZones_[i].slavePatch() IN -- zoneToZones() "<<zoneToZones_[i].slavePatch()<<endl;	
 		}
+		*/
 	
         return zoneToZones_;
     }
@@ -1111,6 +1159,36 @@ Foam::solid4GeneralContactFvPatchVectorField::zoneForThisSlave() const
     // Return the zoneToZone between the master and the current patch
     return slaveZones()[masterSlaveID];
 }
+
+
+//*******************Start a shadPatchI dependent function *******************
+
+const Foam::List<Foam::word>&
+Foam::solid4GeneralContactFvPatchVectorField::slaveZoneNames() const
+{
+    if (!slaveZoneNamesPtr_)
+    {
+        calcSlaveZoneNames();
+    }
+
+    return *slaveZoneNamesPtr_;
+}
+
+
+const Foam::List<Foam::label>&
+Foam::solid4GeneralContactFvPatchVectorField::slaveZoneIndices() const
+{
+    if (!slaveZoneIndicesPtr_)
+    {
+        calcSlaveZoneNames();
+    }
+
+    return *slaveZoneIndicesPtr_;
+}
+
+//*******************End a shadPatchI dependent function *******************
+
+
 
 //****************** Start Test with shadPatchI dependent function **************
 //curSlaveTractions

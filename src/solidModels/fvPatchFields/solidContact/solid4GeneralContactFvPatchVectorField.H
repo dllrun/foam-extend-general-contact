@@ -226,8 +226,15 @@ class solid4GeneralContactFvPatchVectorField
 		
 		
 		//*******************Start a shadPatchI dependent function *******************
-		// CHECK inherited from solidTractionFvPatchVectorField 
+		// //- Zone index i.e. index of global face zone corresponding to the
+        // current patch 
 		mutable label zoneIndex_;
+		
+		//- List of slave zone names
+        mutable List<word>* slaveZoneNamesPtr_;
+
+        //- List of slave zone indices
+        mutable List<label>* slaveZoneIndicesPtr_;
 		//*******************End a shadI dependent function *******************			
 			
 
@@ -265,6 +272,12 @@ class solid4GeneralContactFvPatchVectorField
         //virtual void clearOut();
 		
 		//*******************Start a shadPatchI dependent function *******************
+		//- Calculate slave patch names
+        void calcSlavePatchNames() const;
+
+        //- Calculate slave zone names
+        void calcSlaveZoneNames() const;
+		
 		//- Calculate zone index
         void calcZoneIndex() const;
 		//*******************End a shadI dependent function *******************
@@ -462,6 +475,12 @@ public:
 			//*******************Start a shadPatchI dependent function *******************
 			//- Return index of the zone
             label zoneIndex() const;
+			
+			//- Return the list of slave zone names
+            const List<word>& slaveZoneNames() const;
+
+            //- Return the list of slave zone indices
+            const List<label>& slaveZoneIndices() const;
 			//*******************End a shadI dependent function *******************
         
             //- Return the list of slaveG zone names
