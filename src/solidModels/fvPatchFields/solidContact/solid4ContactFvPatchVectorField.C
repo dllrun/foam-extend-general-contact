@@ -1156,7 +1156,12 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
                 );
 				
 			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-            // Calculate normal contact forces
+			
+			Info<<"normalModels()[shadPatchI].slavePressure() in updateCoeffs()"<< normalModels()[shadPatchI].slavePressure()<<endl;
+            
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+			
+			// Calculate normal contact forces
             // shadowPatchDD is the DU on the shadow patch, whereas
             // patchDDInterpToShadowPatch is the master patch DU interpolated to
             // the shadow; and the difference between these two is the slip (and
@@ -1193,6 +1198,13 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
             }
             else
             {
+				
+				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+			
+				Info<<"normalModels()[shadPatchI].slavePressure() in updateCoeffs()"<<normalModels()[shadPatchI].slavePressure()<<endl;
+			 
+				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+			
                 // Interpolate slave traction to the master
                 const vectorField slavePatchTraction =
                    - frictionModels()[shadPatchI].slaveTractionForMaster()
@@ -1256,6 +1268,12 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
 		Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
         Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
 		Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
+		
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+			
+		Info<<"normalModelForThisSlave().slavePressure() in updateCoeffs()"<<normalModelForThisSlave().slavePressure()<<endl;
+			 
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 		// Set the traction on the slave patch
         // The master stores the friction and normal models, so we need to find
         // which models correspond to the current shadow

@@ -95,7 +95,7 @@ moveFaceZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration
         // Assemble the zone face displacement field to move the zones
         vectorField zoneD(zone().size(), vector::zero);
         vectorField shadowZoneD(shadowZone(shadowI).size(), vector::zero);
-
+		
         // For a non-moving mesh, we will move the zones by the total
         // displacement, whereas for a moving mesh (updated Lagrangian), we will
         // move the zones by the displacement increment
@@ -187,6 +187,9 @@ moveFaceZonesToDeformedConfiguration()   // CHECK ONLY in Deformed Configuration
         }
         const_cast<pointField&>(shadowZone(shadowI).points()) =
             shadowZoneNewPoints;
+		
+		Info<<"zone() in moveFaceZonesToDeformedConfiguration():"<<zone()<<endl;
+		Info<<"shadowZone(shadowI) in moveFaceZonesToDeformedConfiguration():"<<shadowZone(shadowI)<<endl;
     }
 }
 
@@ -1861,6 +1864,7 @@ void solidGeneralContactFvPatchVectorField::updateCoeffs()
                     }
 					
 		Info<<"SLAVE of LOCAL pair in updateCoeffs()"<<__LINE__<<endl;
+		Info<<"zoneIndex() in updateCoeffs()"<<zoneIndex()<<endl;
 			// Master zone DD
                     const vectorField zoneDD =
                         zoneField
