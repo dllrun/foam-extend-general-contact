@@ -95,10 +95,10 @@ class solid4GeneralContactFvPatchVectorField
 		//- Is this the global master patch: the global master patches keeps a
         // copy of mesh.allPoints() and updates them to the deformed position
         // each time before the contact is corrected
-        mutable bool* firstPatchPtr_;
+        mutable bool* firstPatchInListPtr_;
 		
 		//- Patch index of global master patch
-        mutable label* firstPatchIndexInListPtr_;
+        mutable label* firstPatchInListIndexPtr_;
 		
 		//- Is this the current master patch
         mutable bool* currentMasterPtr_;
@@ -141,14 +141,14 @@ class solid4GeneralContactFvPatchVectorField
         const Switch writePointDistanceFields_;
 
         //- Slave patch names
-    //    mutable wordList slavePatchNames_;
+    //    mutable wordList targetPatchNamesPtr_;
 		
-		//************ based on solidGeneralContact****************
-		mutable List<word>* slavePatchNames_;
-		//************ END based on solidGeneralContact****************
+		//************ based on solid4GeneralContact****************
+		mutable List<word>* targetPatchNamesPtr_;
+		//************ END based on solid4GeneralContact****************
 
         //- Slave patch indices
-        mutable labelList* slavePatchIndicesPtr_;
+        mutable labelList* targetPatchIndicesPtr_;
 
         //- Is the contact boundary active
         Switch rigidMaster_;
@@ -163,14 +163,22 @@ class solid4GeneralContactFvPatchVectorField
         mutable scalarField normalPenaltyFactors_;
 
         //- Master face zone kept in deformed configuration
-        mutable globalPolyPatch* myGlobalPolyPatchZonePtr_;
+        mutable globalPolyPatch* globalPolyPatchFaceZonePtr_;
 
         //- Slave face zones kept in deformed configuration
         //  Stored by the master patch
-        mutable PtrList<globalPolyPatch> slaveZones_;
+        mutable PtrList<globalPolyPatch> targetGlobalPolyPatchFaceZones_;
 
         //- Zone-to-zone interpolations
         mutable PtrList<newGgiStandAlonePatchInterpolation> zoneToZones_;
+		
+		//*************** based on solidGeneral*****************
+		//- Patch to patch algorithm
+        const intersection::algorithm alg_;
+		
+		//- Patch to patch direction
+        const intersection::direction dir_;
+		//*************** end based on solidGeneral*****************
 
         //- GGI quick reject algorithm
         newGgiInterpolation::quickReject quickReject_;
@@ -208,15 +216,21 @@ class solid4GeneralContactFvPatchVectorField
         //- Current time index
         label curTimeIndex_;
 		
-		//****************** Start Test with shadPatchI dependent function **************
+		//****************** Start Test with activePatchI dependent function **************
 		//- The current patch tractions for each contatc pair
         mutable List<vectorField>* curSlaveTractionPtr_;
 		
-		//****************** End Test with shadPatchI dependent function **************
+		//****************** End Test with activePatchI dependent function **************
 		
 		//*************** based on solidGeneral*****************
 		//- The current patch tractions for each contatc pair
         mutable List<vectorField>* curPatchTractionPtr_;
+		
+		// Rate of friction energy dissipation
+        mutable scalarField* QcPtr_;
+		
+		// Rate of friction energy dissipation for each contact pair
+        mutable List<scalarField>* QcsPtr_;
 		
 		//- Offset used if bounding box of patch has a zero dimension
         mutable scalar bbOffset_;
@@ -225,16 +239,16 @@ class solid4GeneralContactFvPatchVectorField
 		//*************** END based on solidGeneral*****************
 		
 		
-		//*******************Start a shadPatchI dependent function *******************
+		//*******************Start a activePatchI dependent function *******************
 		// //- Zone index i.e. index of global face zone corresponding to the
         // current patch 
 		mutable label zoneIndex_;
 		
 		//- List of slave zone names
-        mutable List<word>* slaveZoneNamesPtr_;
+        mutable List<word>* targetGlobalPolyPatchFaceZoneNamesPtr_;
 
         //- List of slave zone indices
-        mutable List<label>* slaveZoneIndicesPtr_;
+        mutable List<label>* targetGlobalPolyPatchFaceZoneIndicesPtr_;
 		//*******************End a shadI dependent function *******************			
 			
 
@@ -244,52 +258,52 @@ class solid4GeneralContactFvPatchVectorField
         bool movingMesh() const;
 
         //- Make the slave patch names
-        //void makeSlavePatchNames(const dictionary& dict) const;
+        //void maketargetPatchNames(const dictionary& dict) const;
 		
 		// ************ based on solidGeneral ****New declaration ***
 		//- Make the slave patch names
-        void makeSlavePatchNames() const;
+        void maketargetPatchNames() const;
 
         //- Calculate the slave patch indices
-        void calcSlavePatchIndices() const;
+        void calcTargetPatchIndices() const;
 		
 		
-		//****************** Start Test with shadPatchI dependent function **************
+		//****************** Start Test with activePatchI dependent function **************
 		
 		void calcNormalContactModels(const dictionary& dict) const;
 		
 		
-		//**************End Test with shadPatchI dependent function **************
+		//**************End Test with activePatchI dependent function **************
 		
 
         //- Make normal contact models
-        void makeNormalModels(const dictionary& dict) const;
+        void calcNormalModels(const dictionary& dict) const;
 
         //- Make friction contact models
-        void makeFrictionModels(const dictionary& dict) const;
+        void calcFrictionModels(const dictionary& dict) const;
 
         //- Clear out demand driven data
         //virtual void clearOut();
 		
-		//*******************Start a shadPatchI dependent function *******************
+		//*******************Start a activePatchI dependent function *******************
 		//- Calculate slave patch names
-        void calcSlavePatchNames() const;
+        void calctargetPatchNames() const;
 
         //- Calculate slave zone names
-        void calcSlaveZoneNames() const;
+        void calcTargetGlobalPolyPatchFaceZoneNames() const;
 		
 		//- Calculate zone index
-        void calcZoneIndex() const;
+        void calcGlobalPolyPatchFaceZoneIndex() const;
 		//*******************End a shadI dependent function *******************
 
         //- Create the zone
-        void calcZone() const;
+        void calcGlobalPolyPatchFaceZone() const;
 
         //- Create the slave zones
-        void calcSlaveZones() const;
+        void calcTargetGlobalPolyPatchFaceZones() const;
 
         //- Create the zone-to-zone interpolators
-        void calcZoneToZones() const;
+        void calcGlobalPolyPatchFaceZoneToZones() const;
 		
 		//- Create the zone-to-zone interpolators
         void makeZoneToZone() const;
@@ -305,7 +319,7 @@ class solid4GeneralContactFvPatchVectorField
         void calcFirstPatchInList() const;
 
         //- Check global master patch index
-        void calcFirstPatchIndexInList() const;
+        void calcFirstPatchInListIndex()const;
 		
 		//- Check current master patch
         void calcCurrentMaster() const;
@@ -330,6 +344,13 @@ class solid4GeneralContactFvPatchVectorField
 		
 		//- Make the current patch traction list
         void makeCurPatchTractions() const;
+		
+		//- Calculate rate of dissipated friction energy
+        void calcQc() const;
+		
+		//- Calculate rate of dissipated friction energy for each contact
+        //  pair
+        void calcQcs() const;
 		//*************** END based on solidGeneral*****************
 		
 
@@ -365,6 +386,45 @@ class solid4GeneralContactFvPatchVectorField
         scalar bbOffset() const;
 		
 		scalarField slaveBbOffset() const;
+		
+		
+		//- Get zone field from patch field
+        template<class Type>
+        tmp<Field<Type> > zoneField
+        (
+            const label zoneIndex,
+            const label patchIndex,
+            const Field<Type>& patchField
+        ) const;
+		
+		
+		//- Get patch field from zone field
+        template<class Type>
+        tmp<Field<Type> > patchField
+        (
+            const label patchIndex,
+            const label zoneIndex,
+            const Field<Type>& zoneField
+        ) const;
+		
+		//- Interpolate zone face values to points
+        template<class Type>
+        tmp<Field<Type> > zoneFaceToPointInterpolate
+        (
+            const label zoneIndex,
+            const Field<Type>& zoneField,
+            const label targetI
+        ) const;
+
+        //- Interpolate zone point values to faces
+        template<class Type>
+        tmp<Field<Type> > zonePointToFaceInterpolate
+        (
+            const label zoneIndex,
+            const Field<Type>& zonePointField,
+            const label targetI
+        ) const;
+		
 		//*************** END based on solidGeneral*****************
 
 
@@ -458,7 +518,7 @@ public:
             bool firstPatchInList() const;
 
             //- Return index of global master patch
-            label firstPatchIndexInList() const;
+            label firstPatchInListIndex() const;
 			
 			//- Return true if this patch is the current master
             bool currentMaster() const;
@@ -475,15 +535,15 @@ public:
             //Step3 - Return the list of slaveG patch indices
             const List<label>& slaveGPatchIndices() const;
 			
-			//*******************Start a shadPatchI dependent function *******************
+			//*******************Start a activePatchI dependent function *******************
 			//- Return index of the zone
-            label zoneIndex() const;
+            label globalPolyPatchFaceZoneIndex() const;
 			
 			//- Return the list of slave zone names
-            const List<word>& slaveZoneNames() const;
+            const List<word>& targetGlobalPolyPatchFaceZoneNames() const;
 
             //- Return the list of slave zone indices
-            const List<label>& slaveZoneIndices() const;
+            const List<label>& targetGlobalPolyPatchFaceZoneIndices() const;
 			//*******************End a shadI dependent function *******************
         
             //- Return the list of slaveG zone names
@@ -510,13 +570,13 @@ public:
 			//*************** END based on solidGeneral*****************
 			
 			
-			//*******************Start a shadPatchI dependent function *******************
+			//*******************Start a activePatchI dependent function *******************
 			const vectorField& curSlaveTractions(const label slaveI) const;
 			//*******************End a shadI dependent function *******************
 			
 			//- Return the current patch traction for slaveI
             vectorField& curSlaveTractions(const label slaveI);
-			//****************** End shadPatchI dependent function **************
+			//****************** End activePatchI dependent function **************
 			
 			
             //- Return if this patch is the slave
@@ -526,30 +586,30 @@ public:
             }
 
             //- Return the slave patch names
-            //const wordList& slavePatchNames() const;
+            //const wordList& targetPatchNames() const;
 			
 			//*************** based on solidGeneral*****************
 			//- Return the list of slave patch names
-            const List<word>& slavePatchNames() const;
+            const List<word>& targetPatchNames() const;
 			//*************** END based on solidGeneral*****************
 
             //- Return the slave patch indices
-            const labelList& slavePatchIndices() const;
+            const labelList& targetPatchIndices() const;
 
             //- Return the slave patch
-            //  This function is not allowed if slavePatchIndices.size() > 1
-            const solid4GeneralContactFvPatchVectorField& slavePatchField() const;
+            //  This function is not allowed if targetPatchIndices.size() > 1
+            const solid4GeneralContactFvPatchVectorField& targetPatchField() const;
 
 
 			//*******************Start a shadI dependent function *******************
 
             //- Return reference to the normal contact model
             //PtrList<generalNormalContactModel>& 
-			generalNormalContactModel& normalContactModel(const label shadowI);
+			generalNormalContactModel& normalContactModel(const label targetI);
 
             //- Return const reference to the normal contact model
             //PtrList<generalNormalContactModel>& 
-			const generalNormalContactModel& normalContactModel(const label shadowI) const;
+			const generalNormalContactModel& normalContactModel(const label targetI) const;
 
 			//*******************End shadI dependent function **********************
 			
@@ -557,24 +617,24 @@ public:
 			
 			//************** Changed normalModel & frictionModel ***************
 			//- Return reference to the normal contact models
-            generalNormalContactModel& normalModels(const label shadowI);
+            generalNormalContactModel& normalModel(const label targetI);
 
             //- Return const reference to the normal contact models
-            const generalNormalContactModel& normalModels(const label shadowI) const;
+            const generalNormalContactModel& normalModel(const label targetI) const;
 
             //- Return reference to the friction contact models
-            generalFrictionContactModel& frictionModels(const label shadowI);
+            generalFrictionContactModel& frictionModel(const label targetI);
 
             //- Return const reference to the friction contact models
-            const generalFrictionContactModel& frictionModels(const label shadowI) const;
+            const generalFrictionContactModel& frictionModel(const label targetI) const;
 
             //- Return normal contact model for the slave patch calling this
             //  function
-            generalNormalContactModel& normalModelForThisSlave(const label shadowI);
+            generalNormalContactModel& normalModelForThisSlave(const label targetI);
 
             //- Return friction contact model for the slave patch calling this
             //  function
-            generalFrictionContactModel& frictionModelForThisSlave(const label shadowI);
+            generalFrictionContactModel& frictionModelForThisSlave(const label targetI);
 			
 			//************** End Changed normalModel & frictionModel ***************
 			
@@ -601,39 +661,39 @@ public:
 			*/
 			
             //- Return const reference to deformed zone
-            const globalPolyPatch& zone() const;
+            const globalPolyPatch& globalPolyPatchFaceZone() const;
 
             //- Return reference to deformed zone
-            globalPolyPatch& zone();
+            globalPolyPatch& globalPolyPatchFaceZone();
 			
 			
-			//*******************Start a shadPatchI dependent function *******************
+			//*******************Start a activePatchI dependent function *******************
 			//- Return const reference to deformed master zone
-            const globalPolyPatch& slaveZone(const label shadowI) const;
+            const globalPolyPatch& targetGlobalPolyPatchFaceZone(const label targetI) const;
 
             //- Return reference to deformed master zone 
-            globalPolyPatch& slaveZone(const label shadowI);
+            globalPolyPatch& targetGlobalPolyPatchFaceZone(const label targetI);
 			
 			//- Return const reference to patch-to-patch interpolation
             const newGgiStandAlonePatchInterpolation& zoneToZone
             (
-                const label shadowI
+                const label targetI
             ) const;
 
             //- Return reference to patch-to-patch interpolation
             newGgiStandAlonePatchInterpolation& zoneToZone
             (
-                const label shadowI
+                const label targetI
             );
 			//*******************End a shadI dependent function *******************			
 			
 			
 
             //- Return const reference to deformed slave zones
-            const PtrList<globalPolyPatch>& slaveZones() const;
+            const PtrList<globalPolyPatch>& targetGlobalPolyPatchFaceZones() const;
 
             //- Return reference to deformed slave zones
-            PtrList<globalPolyPatch>& slaveZones();
+            PtrList<globalPolyPatch>& targetGlobalPolyPatchFaceZones();
 
             //- Return const reference to patch-to-patch interpolation
             const PtrList<newGgiStandAlonePatchInterpolation>&
@@ -667,7 +727,7 @@ public:
 			//************** based on solidGeneral************
 			//- Given the patch index of a slave, return the position in the
             // slave list of the current patch
-            label findSlaveID(const label patchID) const;
+            label findTargetID(const label patchID) const;
 			//************** END based on solidGeneral**********
 
         // Mapping functions
@@ -693,13 +753,26 @@ public:
 
 
         // Member functions
+		
+			//- Dissipated energy due to friction
+            virtual const scalarField& Qc() const;
 
+            //- Dissipated energy due to friction from contact with targetI
+            virtual const scalarField& Qc(const label targetI) const;
+			
+			/*
+			// ********** instead of deletion as in Destructors **********
             //- Clear out demand driven data
             virtual void clearOut();
-
+			*/
+			
+			
+			/*
+			//******** this might be needed renamed for thermalContact BC*******
             //- Return the rate of dissipated energy due to friction for the
             //  master patch
             virtual tmp<scalarField> frictionHeatRate() const;
+			*/
 
             //- Write
             virtual void write(Ostream&) const;
