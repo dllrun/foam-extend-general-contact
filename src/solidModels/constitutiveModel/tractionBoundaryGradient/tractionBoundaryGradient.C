@@ -35,6 +35,7 @@ Author
 //#include "plasticityModel.H"
 #include "constitutiveModel.H"
 #include "thermalModel.H"
+#define snGradDEBUG false
 
 
 // * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * * * //
@@ -276,13 +277,18 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
     tmp<vectorField> tgradient(new vectorField(traction.size(), vector::zero));
     vectorField& gradient = tgradient();
 	
+	#if(snGradDEBUG)
 	Info<<"tgradient() in tractionBoundaryGradient's snGrad(..)"<<tgradient()<<endl;
-
+	#endif
+	
     // Orthotropic material
     if (orthotropic)
     {
+		#if(snGradDEBUG)
 		Info<<"Here I am in tractionBoundaryGradient's snGrad(..)"<<__LINE__<<endl;
-        // Get mechanical properties
+        #endif
+		
+		// Get mechanical properties
         const constitutiveModel& rheology =
             patch.boundaryMesh().mesh().objectRegistry::
             lookupObject<constitutiveModel>("rheologyProperties");
@@ -385,8 +391,11 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
     }
     else
     {
+		#if(snGradDEBUG)
 		Info<<"Here I am in tractionBoundaryGradient's snGrad(..)"<<__LINE__<<endl;
-        // Standard isotropic solvers
+        #endif
+		
+		// Standard isotropic solvers
 
         // Lookup material properties from the solver
         const fvPatchScalarField& mu =
@@ -528,9 +537,12 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
             Traction -= (n & DSigmaCorr);
         }
 		
+		#if(snGradDEBUG)
 		Info<<"Here I am in tractionBoundaryGradient's snGrad(..)"<<__LINE__<<endl;
 		Info<<"gradient in tractionBoundaryGradient's snGrad(..)"<<gradient<<endl;
-        // Calculate the normal gradient based on the traction
+        #endif
+		
+		// Calculate the normal gradient based on the traction
 
         gradient =
             Traction
@@ -626,8 +638,9 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
     }
 	
 	//Info<<"gradient in tractionBoundaryGradient's snGrad(..)"<<gradient<<endl;
-	
+	#if(snGradDEBUG)
 	Info<<"tgradient() in tractionBoundaryGradient's snGrad(..)"<<tgradient()<<endl;
+	#endif
 
     return tgradient;
 }

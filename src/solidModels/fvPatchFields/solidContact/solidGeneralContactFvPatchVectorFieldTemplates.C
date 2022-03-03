@@ -28,7 +28,7 @@ License
 #include "PrimitivePatchInterpolationTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
+/*
 template<class Type>
 Foam::tmp<Foam::Field<Type> > Foam::solidGeneralContactFvPatchVectorField::
 zoneField
@@ -79,7 +79,6 @@ patchField
     const Field<Type>& zoneField
 ) const
 {
-	Info<<"patchField(..) in solidGeneralContactFvPatchVectorFieldTemplates: "<<__LINE__<<endl;
     const fvMesh& mesh = patch().boundaryMesh().mesh();
 
     const faceZone& fZone = mesh.faceZones()[zoneIndex];
@@ -130,7 +129,7 @@ zoneFaceToPointInterpolate
 
         tmp<Field<Type> > tZonePointField
         (
-            new Field<Type>(zone().localPoints().size(), pTraits<Type>::zero)
+            new Field<Type>(zone().patch().localPoints().size(), pTraits<Type>::zero)
         );
         Field<Type>& zonePointField = tZonePointField();
 
@@ -149,7 +148,7 @@ zoneFaceToPointInterpolate
         (
             new Field<Type>
             (
-                shadowZone(shadowI).localPoints().size(), pTraits<Type>::zero
+                shadowZone(shadowI).patch().localPoints().size(), pTraits<Type>::zero
             )
         );
         Field<Type>& zonePointField = tZonePointField();
@@ -192,7 +191,7 @@ zonePointToFaceInterpolate
 
         tmp<Field<Type> > tZoneField
         (
-            new Field<Type>(zone().size(), pTraits<Type>::zero)
+            new Field<Type>(zone().patch().size(), pTraits<Type>::zero)
         );
         Field<Type>& zoneField = tZoneField();
 
@@ -209,7 +208,7 @@ zonePointToFaceInterpolate
 
         tmp<Field<Type> > tZoneField
         (
-            new Field<Type>(shadowZone(shadowI).size(), pTraits<Type>::zero)
+            new Field<Type>(shadowZone(shadowI).patch().size(), pTraits<Type>::zero)
         );
         Field<Type>& zoneField = tZoneField();
 
@@ -234,6 +233,6 @@ zonePointToFaceInterpolate
 
     return tmp<Field<Type> >();
 }
-
+*/
 
 // ************************************************************************* //

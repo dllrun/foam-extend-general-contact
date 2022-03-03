@@ -262,6 +262,8 @@ generalStandardPenalty::generalStandardPenalty
     contactIterNum_(0)
 {
 	Info<<"Step0: Constructor C1(5 arguments) in ::generalStandardPenalty:"<<__LINE__<<endl;
+	Info<<"masterPatchID in Constructor C1(5 arguments) in ::generalStandardPenalty:"<<masterPatchID<<endl;
+	Info<<"slavePatchID in Constructor C1(5 arguments) in ::generalStandardPenalty:"<<slavePatchID<<endl;
 }
 
 

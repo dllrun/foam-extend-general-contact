@@ -37,14 +37,14 @@ Class
 #include "polyPatchID.H"
 #include "ZoneIDs.H"
 
-#define ISDEBUG true
-#define ActivePairDEBUG true
-#define currentMasterDEBUG true
-#define localSlaveDEBUG true
-#define normalModelDEBUG true
-#define masterOfPairDEBUG true
-#define slaveOfPairDEBUG true
-#define bbOffDEBUG true
+#define ISDEBUG false
+#define ActivePairDEBUG false
+#define currentMasterDEBUG false
+#define localSlaveDEBUG false
+#define normalModelDEBUG false
+#define masterOfPairDEBUG false
+#define slaveOfPairDEBUG false
+#define bbOffDEBUG false
 
 
 
@@ -1654,535 +1654,362 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 {
     if (this->updated())
     {
-		Info<<"if (updated()) check in solid4GeneralContact's updateCoeffs()"<<__LINE__<<endl;
         return;
     }
+	
 	#if(ISDEBUG)
 	Info<< "Check 1: patch().name() in updateCoeffs() "<<patch().name()<<endl;
 	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;	
 	Info<< "targetPatchNames().size() in updateCoeffs() "<<targetPatchNames().size()<<endl;	
-	
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;	
 	#endif
-	//*************** based on solidGeneral*****************
-	boolList activeContactPairs(targetPatchNames().size(), true);  // false);
-	//*************** END based on solidGeneral**************
-	#if(!ISDEBUG)
-	Info<<"activeContactPairs in updateCoeffs() "<<activeContactPairs<<endl;
-	
-	Info<< "this->db().time().timeIndex() "<<this->db().time().timeIndex()<<endl;
-	Info<< "curTimeIndex_ "<<curTimeIndex_<<endl;
-    #endif
-	
-	// Only the local masters calculates the contact force and the local
-        // master interpolates this force
-        const boolList& locSlave = localSlave();
-		
-		
-	if (curTimeIndex_ != this->db().time().timeIndex())
+
+    boolList activeContactPairs(targetPatchNames().size(), true);
+
+    // if it is a new time step then reset iCorr
+    if (curTimeIndex_ != db().time().timeIndex())
     {
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;		
-        // Update old quantities at the start of a new time-step
-        curTimeIndex_ = this->db().time().timeIndex();
-		
+        curTimeIndex_ = db().time().timeIndex();
+
+        // Delete friction heat rate to force its recalculation when thermal
+        // boundaries ask for it
+        deleteDemandDrivenData(QcPtr_);
+        deleteDemandDrivenData(QcsPtr_);
 
         if (firstPatchInList())
         {
-			
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-            // Let the contact models know that it is a new time-step, in case
-            // they need to update anything
-			#if(!ISDEBUG)
-			Info<<"Is it activeContactPairs? in updateCoeffs() "<<activeContactPairs<<endl;
-            #endif
-			forAll(activeContactPairs, activePatchI)
+            forAll(activeContactPairs, activePatchI)
             {
-				
-				if (locSlave[activePatchI])
-				{	
-				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-                normalModel(activePatchI).newTimeStep();  //[activePatchI].newTimeStep();
-                frictionModel(activePatchI).newTimeStep();  //[activePatchI].newTimeStep();
-				
-				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-                // Force N^2 contact search at least once per time-step
-                zoneToZone(activePatchI).clearPrevCandidateMasterNeighbors();
-				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-				}
-			}
+                // Let the contact models know that it is a new time-step, in
+                // case they need to update anything
+                normalModel(activePatchI).newTimeStep();
+                frictionModel(activePatchI).newTimeStep();
+            }
         }
-		
     }
-	#if(ISDEBUG)
-	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-    Info<<"locSlave in updateCoeffs(): "<<locSlave<<endl;
-	#endif
-	// Move the master and slave zone to the deformed configuration
-    if(firstPatchInList())   //(firstPatchInList()) //
+
+    // Method
+    // Move all global face zones to the deformed configuration
+    // Clear interpolator weights
+    // Perform quick check to find potential contacting pairs
+    // Call normal and frction contact models for active contacting pairs
+    // Accumulate contact force contributions for all active contact pairs
+
+
+    if (rigidMaster_)
     {
-	#if(ISDEBUG)
-	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-	#endif
-	moveZonesToDeformedConfiguration();
-	//display globalPolyPatch patch information
-	Info<<"globalPolyPatchFaceZonePtr_->patch() in updateCoeffs() "<<globalPolyPatchFaceZonePtr_->patch()<<endl;
-	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-	}
-	
-	
-	#if(!ISDEBUG)
-	Info<<"globalPolyPatchFaceZone().patch().localPoints() in updateCoeffs():"<<globalPolyPatchFaceZone().patch().localPoints()<<endl;
-	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-	#endif
-	
-		
-	#if(ISDEBUG)
-	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-    #endif
-	// Delete the zone-to-zone interpolator weights as the zones have moved
-    // const wordList& shadPatchNames = targetPatchNames();
-    forAll(activeContactPairs, activePatchI)
-    {
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-		if (locSlave[activePatchI]) //(locSlave[activePatchI])//if (localSlave()[activePatchI])
-		{
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-        zoneToZone(activePatchI).movePoints
-        (
-            tensorField(0), tensorField(0), vectorField(0)
-        );
-		}
+        // Set to master to traction free to mimic a rigid patch
+        traction() = vector::zero;
     }
-	
-	
-	//***************** Start boundBox comment ************
-	#if(!ISDEBUG)
-	
-	// Create master bounding box used for quick check
+    else
+    {
+        // Move all global face zones to the deformed configuration
+        if (firstPatchInList())
+        {
+			#if(ISDEBUG)
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+			#endif
+           // Move the master and slave zone to the deformed configuration
+            moveZonesToDeformedConfiguration();
+        }
+
+
+        // Clear interpolator weights
+
+        forAll(activeContactPairs, slaveI)
+        {
+            if (localSlave()[slaveI])
+            {
+                zoneToZone(slaveI).movePoints
+                (
+                    tensorField(0), tensorField(0), vectorField(0)
+                );
+            }
+        }
+
+
+        // Accumulated traction for the current patch
+        vectorField curPatchTraction(patch().size(), vector::zero);
+
+        // Only the local masters calculates the contact force and the local
+        // master interpolates this force
+        const boolList& locSlave = localSlave();
+
+        // Create master bounding box used for quick check
         boundBox masterBb(globalPolyPatchFaceZone().patch().localPoints(), false);
-		#if(!ISDEBUG)
-		Info<<"globalPolyPatchFaceZone().patch().localPoints() in updateCoeffs(): "<<globalPolyPatchFaceZone().patch().localPoints()<<endl;
-		Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
-		Info<< "globalPolyPatchFaceZone().patch().name() in updateCoeffs() "<<globalPolyPatchFaceZone().patch().name()<<endl;
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;		
-		Info<<"masterBb in updateCoeffs(): "<<masterBb<<endl;
-		#endif
-		
-		// The BB may have zero thickness in one of the directions e.g. for a
+
+        // The BB may have zero thickness in one of the directions e.g. for a
         // flat patch, so we will check for this and, if found, create an offset
         const scalar bbOff = bbOffset();
-		#if(!ISDEBUG)
-		Info<<"masterBb.minDim() in updateCoeffs(): "<<masterBb.minDim()<<endl;
-		Info<<"What is bbOff? in updateCoeffs():"<<bbOff<<endl;
-		#endif
-		
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-		if (masterBb.minDim() < bbOff)
+        if (masterBb.minDim() < bbOff)
         {
             const vector bbDiag = masterBb.max() - masterBb.min();
-			
-			#if(!ISDEBUG)
-			Info<<"bbDiag in updateCoeffs():"<<bbDiag<<endl;
-            #endif
-			
-			if (bbDiag.x() < bbOff)
+
+            if (bbDiag.x() < bbOff)
             {
-				#if(!ISDEBUG)
-				Info<<"Does it enter this check? in updateCoeffs():"<<__LINE__<<endl;
-				Info<<"masterBb.min() in updateCoeffs():"<<masterBb.min()<<endl;
-				Info<<"masterBb.max() in updateCoeffs():"<<masterBb.max()<<endl;
-                #endif
-				
-				vector offset(bbOff, 0, 0);
+                vector offset(bbOff, 0, 0);
                 masterBb.min() -= offset;
                 masterBb.max() += offset;
-				#if(!ISDEBUG)
-				Info<<"What is offset? in updateCoeffs():"<<offset<<endl;				
-				#endif
-			}
-			//else if (bbDiag.y() < bbOff)
-            if (bbDiag.y() < bbOff)
-            {
-				#if(!ISDEBUG)
-				Info<<"Does it enter this check? in updateCoeffs():"<<__LINE__<<endl;
-                #endif
-				
-				vector offset(0, bbOff, 0);
-                masterBb.min() -= offset;
-                masterBb.max() += offset;
-				Info<<"What is Y offset? in updateCoeffs():"<<offset<<endl;
             }
-			//else if (bbDiag.z() < bbOff)
-            if (bbDiag.z() < bbOff)
+            //else 
+			if (bbDiag.y() < bbOff)
+            {
+                vector offset(0, bbOff, 0);
+                masterBb.min() -= offset;
+                masterBb.max() += offset;
+            }
+            //else 
+			if (bbDiag.z() < bbOff)
             {
                 vector offset(0, 0, bbOff);
                 masterBb.min() -= offset;
                 masterBb.max() += offset;
             }
-			#if(!ISDEBUG)
-			Info<<"masterBb.min() in updateCoeffs():"<<masterBb.min()<<endl;
-			Info<<"masterBb.max() in updateCoeffs():"<<masterBb.max()<<endl;
+        }
+
+        forAll(activeContactPairs, activePatchI)
+        {
+			#if(ISDEBUG)
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+			Info<<"activePatchI pair in updateCoeffs(): "<<activePatchI<<endl;
 			#endif
-		}
-		
-	//***************** Start boundBox comment ************
-	#endif
-	
-		
-	// Accumulated traction for the current patch
-        vectorField curPatchTraction(patch().size(), vector::zero);
-	//	Info<<"What is curPatchTraction? "<<curPatchTraction<<endl;
-	
-	// The BB may have zero thickness in one of the directions e.g. for a
-	// flat patch, so we will check for this and, if found, create an offset
-	//	const scalarField targetBbOff = targetBbOffset();
-	//	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-	//	Info<<"targetBbOff in updateCoeffs() :"<<targetBbOff<<endl;
 			
-	forAll(activeContactPairs,activePatchI)	
-	{
-		#if(!ISDEBUG)
-		Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
-		Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
-		Info<< "targetPatchNames()[activePatchI] in updateCoeffs() "<<targetPatchNames()[activePatchI]<<endl;
-		#endif
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-		//Info<<"activeContactPairs[activePatchI] in updateCoeffs():"<<activeContactPairs[activePatchI]<<endl;
-			
+            // Perform quick check to find potential contacting pairs
+            // The quick check is based on the bounding box (BB) of the contact
+            // pairs: if the BBs of pair intersect then we will designate the
+            // pair as active.
 			
 			//***************** Start boundBox comment ************
-			#if(!ISDEBUG)		
-			// Create target bounding box
-            boundBox targetBb(targetGlobalPolyPatchFaceZone(activePatchI).patch().localPoints(), false);
-			#if(!ISDEBUG)
-			Info<<"targetBb in updateCoeffs(): "<<targetBb<<endl;
-			Info<<"targetBb.minDim() in updateCoeffs(): "<<targetBb.minDim()<<endl;
-			#endif
-			
-			Info<<"bbOff in updateCoeffs(): "<<bbOff<<endl;
-			// Check for a zero dimension in the targetBb
-            if (targetBb.minDim() < bbOff)
+			#if(ISDEBUG)
+            // Create shadow bounding box
+            boundBox shadowBb(targetGlobalPolyPatchFaceZone(activePatchI).patch().localPoints(), false);
+
+            // Check for a zero dimension in the shadowBb
+            if (shadowBb.minDim() < bbOff)
             {
-				#if(!ISDEBUG)
-				Info<<"In updateCoeffs():"<<__LINE__<<endl;
-                #endif
-				
-				const vector bbDiag = targetBb.max() - targetBb.min();
+                const vector bbDiag = shadowBb.max() - shadowBb.min();
 
                 if (bbDiag.x() < bbOff)
                 {
-					#if(!ISDEBUG)
-				Info<<"Does it enter this check? in updateCoeffs():"<<__LINE__<<endl;
-				Info<<"targetBb.min() in updateCoeffs():"<<targetBb.min()<<endl;
-				Info<<"targetBb.max() in updateCoeffs():"<<targetBb.max()<<endl;
-                    #endif
-					
-					vector offset(bbOff, 0, 0);
-                    targetBb.min() -= offset;
-                    targetBb.max() += offset;
+                    vector offset(bbOff, 0, 0);
+                    shadowBb.min() -= offset;
+                    shadowBb.max() += offset;
                 }
-				//else if (bbDiag.y() < bbOff)
-                if (bbDiag.y() < bbOff)
+                //else 
+				if (bbDiag.y() < bbOff)
                 {
-					Info<<"In updateCoeffs():"<<__LINE__<<endl;
                     vector offset(0, bbOff, 0);
-                    targetBb.min() -= offset;
-                    targetBb.max() += offset;
+                    shadowBb.min() -= offset;
+                    shadowBb.max() += offset;
                 }
-				//else if (bbDiag.z() < bbOff)
-                if (bbDiag.z() < bbOff)
+                //else 
+				if (bbDiag.z() < bbOff)
                 {
-					#if(!ISDEBUG)
-					Info<<"In updateCoeffs():"<<__LINE__<<endl;
-                    #endif
-					
-					vector offset(0, 0, bbOff);
-                    targetBb.min() -= offset;
-                    targetBb.max() += offset;
+                    vector offset(0, 0, bbOff);
+                    shadowBb.min() -= offset;
+                    shadowBb.max() += offset;
                 }
-				
-				#if(!ISDEBUG)
-				Info<<"targetBb.min() in updateCoeffs():"<<targetBb.min()<<endl;
-				Info<<"targetBb.max() in updateCoeffs():"<<targetBb.max()<<endl;
-				Info<<"bbDiag in updateCoeffs():"<<bbDiag<<endl;
-				Info<<"bbDiag.x() updateCoeffs():"<<bbDiag.x()<<endl;
-				Info<<"bbDiag.y() updateCoeffs():"<<bbDiag.y()<<endl;
-				Info<<"bbDiag.z() updateCoeffs():"<<bbDiag.z()<<endl;
-				#endif
-				
-			}
-			
-			
-			#if(!ISDEBUG)
-			Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
-			Info<< "targetPatchNames()[activePatchI] in updateCoeffs() "<<targetPatchNames()[activePatchI]<<endl;			
-			Info<<"In updateCoeffs():"<<__LINE__<<endl;
-			Info<<"masterBb in updateCoeffs():"<<masterBb<<endl;
-			Info<<"targetBb in updateCoeffs():"<<targetBb<<endl;
-			Info<<"masterBb.overlaps(targetBb) in updateCoeffs():"<<masterBb.overlaps(targetBb)<<endl;
-			#endif
-			
-			
-			if (masterBb.overlaps(targetBb))
+            }
+
+            if (masterBb.overlaps(shadowBb))
             {
-				Info<<"In updateCoeffs():"<<__LINE__<<endl;
                 activeContactPairs[activePatchI] = true;
             }
 			
-				
-			#if(!ISDEBUG)
-			Info<<"activeContactPairs[activePatchI] in updateCoeffs():"<<activeContactPairs[activePatchI]<<endl;
-			#endif
-			
 			//***************** End boundBox comment ************
 			#endif
-			
-		if (activeContactPairs[activePatchI])
-        {
-			
-			Info<<" "<<endl;
-			#if(ActivePairDEBUG)
-			Info<< "patch INDEX in updateCoeffs() "<<patch().index()<<endl;
-			Info<<"Checking mMASTER or sSLAVE in updateCoeffs() line:"<<__LINE__<<endl;
-			Info<<"locSlave[activePatchI] in updateCoeffs(): "<<locSlave[activePatchI]<<endl;
-			Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
-			Info<<"targetPatchNames in updateCoeffs() "<<targetPatchNames()[activePatchI]<<endl;
-			#endif
-			Info<<"...................................... "<<endl;
-			
-			if (locSlave[activePatchI])  //MASTER starts
+
+            // Call normal and frction contact models for active contacting
+            // pairs
+            // Accumulate contact force contributions for all active contact
+            // pairs
+
+            if (activeContactPairs[activePatchI])
             {
-				Info<<"MASTER in updateCoeffs() line:"<<__LINE__<<endl;
-			// Reset the traction to zero as we will accumulate it over all the
-			// target patches
-			//traction() = vector::zero;
-			
-			#if(!masterOfPairDEBUG)
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-            #endif
-			
-			// Calculate the target patch face unit normals as they are used by
-            // both the normal and friction models
-            const vectorField targetPatchFaceNormals =
-                targetGlobalPolyPatchFaceZone(activePatchI).globalFaceToPatch
-                (
-                    targetGlobalPolyPatchFaceZone(activePatchI).globalPatch().faceNormals()
-                );
-			
-			#if(!masterOfPairDEBUG)
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-            #endif
-			
-			// Interpolate the master displacement increment to the target patch
-            // as it is required by specific normal and friction contact models
-
-            vectorField patchDD(patch().size(), vector::zero);
-            vectorField targetPatchDD
-            (
-                patch().boundaryMesh()[targetPatchIndices()[activePatchI]].size(),
-                vector::zero
-            );
-			
-			#if(!masterOfPairDEBUG)
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-			#endif
-			
-				if (movingMesh())
-				{
-                // Updated Lagrangian, we will directly lookup the displacement
-                // increment
-
-                const volVectorField& DD =
-                    db().lookupObject<volVectorField>("DU");
-			//		db().lookupObject<volVectorField>("DD");
-
-                patchDD = DD.boundaryField()[patch().index()];
-                targetPatchDD =
-                    DD.boundaryField()[targetPatchIndices()[activePatchI]];
-				}
-				else
-				{
-					Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-                // We will lookup the total displacement and old total
-                // displacement
-
-                const volVectorField& D =
-                    db().lookupObject<volVectorField>("U");
-				//	db().lookupObject<volVectorField>("D");
-				
-				#if(!masterOfPairDEBUG)
-				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-				Info<<"patch().index() in updateCoeffs(): "<<patch().index()<<endl;
-                #endif
-				
-				patchDD =
-                    D.boundaryField()[patch().index()]
-                  - D.oldTime().boundaryField()[patch().index()];
-                targetPatchDD =
-                    D.boundaryField()[targetPatchIndices()[activePatchI]]
-                  - D.oldTime().boundaryField()
-                    [
-                        targetPatchIndices()[activePatchI]
-                    ];
-				}
-			
-            // Master zone DD
-            const vectorField zoneDD = globalPolyPatchFaceZone().patchFaceToGlobal(patchDD);
-			
-			#if(!masterOfPairDEBUG)
-			Info<< "zoneDD in updateCoeffs() "<<zoneDD<< endl;
-			
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-            #endif
-			
-			// Master patch DD interpolated to the target patch
-            const vectorField patchDDInterpToTargetPatch =
-                targetGlobalPolyPatchFaceZone(activePatchI).globalFaceToPatch
-                (
-                    //zoneToZone(activePatchI).masterToSlave(zoneDD)()
-					zoneToZone(activePatchI).slaveToMaster(zoneDD)()
-                );
-			
-			#if(masterOfPairDEBUG)
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-            #endif
-			
-			Info<<"normalModel(activePatchI).slavePressure() in updateCoeffs()"<< normalModel(activePatchI).slavePressure()<<endl;
-			
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-			// Calculate normal contact forces
-            // targetPatchDD is the DU on the target patch, whereas
-            // patchDDInterpToTargetPatch is the master patch DU interpolated to
-            // the slave; and the difference between these two is the slip (and
-            // also the normal component of DU)
-            normalModel(activePatchI).correct
-            (
-                targetPatchFaceNormals,
-                targetGlobalPolyPatchFaceZone(activePatchI).globalPointToPatch
-                (
-                    zoneToZone(activePatchI).slavePointDistanceToIntersection()
-                ),
-                // zoneToZones()[activePatchI],
-                targetPatchDD,
-                patchDDInterpToTargetPatch
-            );
-			
-			#if(masterOfPairDEBUG)
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-            #endif
-
-            // Calculate friction contact forces
-            frictionModel(activePatchI).correct
-            (
-                normalModel(activePatchI).slavePressure(),
-                targetPatchFaceNormals,
-                normalModel(activePatchI).areaInContact(),
-                targetPatchDD,
-                patchDDInterpToTargetPatch
-            );
-
-				if (rigidMaster_)
-				{
-                // Set to master to traction free to mimic a rigid contact
-                traction() = vector::zero;
-
-                // Set contact indicator field
-                contactPerSlave()[activePatchI] = 0.0;
-				}
-				else
-				{
-				
-				Info<<"activePatchI - MASTER in updateCoeffs(): "<<activePatchI<<endl;
-				
-				// Interpolate slave traction to the master
-				
-				/*
-				const vectorField targetPatchTraction =
-						frictionModelForThisSlave(activePatchI).slaveTraction()
-						+ normalModelForThisSlave(activePatchI).slavePressure();
-				*/
-				
-			#if(masterOfPairDEBUG)
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-            #endif
-			
-			Info<<"normalModel(activePatchI).slavePressure() in updateCoeffs()"<< normalModel(activePatchI).slavePressure()<<endl;
-			
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-				
-				//******************** Start ORG ********************
-				
-                const vectorField targetPatchTraction =
-                   - frictionModel(activePatchI).slaveTractionForMaster()
-                   - normalModel(activePatchI).slavePressure();
-				 
-				//******************** End ORG ********************
-
-                const vectorField targetGlobalPolyPatchFaceZoneTraction =
-                    targetGlobalPolyPatchFaceZone(activePatchI).patchFaceToGlobal
-                    (
-                        targetPatchTraction
-                    );
-
-                // We have two options for interpolating from the slave to the
-                // master:
-                // 1. face-to-face
-                // 2. point-to-point
-                // We will use 1.
-
-                // Calculate traction for this contact
-					vectorField tractionForThisTarget =
-                    globalPolyPatchFaceZone().globalFaceToPatch
-                    (
-                        zoneToZone(activePatchI).slaveToMaster
-                        (
-                            targetGlobalPolyPatchFaceZoneTraction
-                        )()
-                    );
-
-                // Accumulate the traction on the master patch
-                curPatchTractions(activePatchI) = tractionForThisTarget;
-				//traction() += tractionForThisTarget;
-				curPatchTraction += curPatchTractions(activePatchI);
-				
-				#if(masterOfPairDEBUG)
-				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-				Info<<"MASTER curPatchTraction in updateCoeffs() :"<<curPatchTraction<<endl;
-                #endif
-				
-				// Update contactPerSlave field
-                // Note: this is used by thermalContact to know which faces
-                // are in contact
-                const scalarField magTraction = mag(tractionForThisTarget);
-                const scalar tol = 1e-6*gMax(magTraction);
-                scalarField& contactForThisSlave =
-                    contactPerSlave()[activePatchI];
-					forAll(contactForThisSlave, faceI)
-					{
-						if (magTraction[faceI] > tol)
-						{
-                        contactForThisSlave[faceI] = 1.0;
-						}
-						else
-						{
-                        contactForThisSlave[faceI] = 0.0;
-						}
-					}
-				}
-				
-				#if(masterOfPairDEBUG)
-			Info<<"End of MASTER computation in updateCoeffs() line:"<<__LINE__<<endl;
-			Info<<"Which pair of this - MASTER in updateCoeffs(): "<<activePatchI<<endl;
+				#if(!ActivePairDEBUG)				
+				Info<<"Checking mMASTER or sSLAVE in updateCoeffs() line:"<<__LINE__<<endl;
+				Info<<"locSlave[activePatchI] in updateCoeffs(): "<<locSlave[activePatchI]<<endl;				
+				Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;	
+				Info<< "patch INDEX in updateCoeffs() "<<patch().index()<<endl;
+				Info<< "shadowPatch INDEX in updateCoeffs() "<<targetPatchIndices()[activePatchI]<<endl;
+				Info<<"shadowPatchNames in updateCoeffs() "<<targetPatchNames()[activePatchI]<<endl;
 				#endif
-			Info<<"....................end........... "<<endl;	
-			}
-			else
-			{
-			
-			Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
-			Info<<"activePatchI in updateCoeffs(): "<<activePatchI<<endl;
-			
-			// Get traction from local slave
+                if (locSlave[activePatchI])
+                {
+					#if(ActivePairDEBUG)
+					Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
+					Info<<"globalPolyPatchFaceZone().globalPatch() in updateCoeffs(): "<<globalPolyPatchFaceZone().globalPatch()<<endl;
+                    Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
+					#endif
+					// Correct normal and friction contact models for the
+                    // current contact pair
+
+                    // Calculate the slave patch face unit normals as they are
+                    // units by both the normal and friction models
+                    const vectorField patchFaceNormals = 
+										globalPolyPatchFaceZone().globalFaceToPatch
+										(
+										globalPolyPatchFaceZone().globalPatch().faceNormals()
+										);
+					#if(ISDEBUG)
+					Info<<"slave patchFaceNormals in updateCoeffs(): "<<patchFaceNormals<<endl;
+					#endif
+					 /*
+                        patchField
+                        (
+                            targetPatchIndices()[activePatchI],
+                            shadowZoneIndices()[activePatchI],
+                            targetGlobalPolyPatchFaceZone(activePatchI).globalPatch().faceNormals()
+                        );
+						*/
+						
+						#if(ISDEBUG)
+						Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
+						#endif
+                    // Interpolate the master displacement increment to the
+                    // slave patch as it is required by specific normal and
+                    // friction contact models
+
+                    vectorField patchDD(patch().size(), vector::zero);
+                    vectorField targetPatchDD
+                    (
+                        patch().boundaryMesh()
+                        [
+                            targetPatchIndices()[activePatchI]
+                        ].size(),
+                        vector::zero
+                    );
+
+                    if (movingMesh())
+                    {
+                        // Updated Lagrangian, we will directly lookup the
+                        // displacement increment
+
+                        const volVectorField& DD =
+                            db().lookupObject<volVectorField>("DU");
+
+                        patchDD = DD.boundaryField()[patch().index()];
+                        targetPatchDD =
+                            DD.boundaryField()[targetPatchIndices()[activePatchI]];
+                    }
+                    else
+                    {
+                        // We will lookup the total displacement and old total
+                        // displacement
+
+                        const volVectorField& D =
+                            db().lookupObject<volVectorField>("U");
+
+                        patchDD =
+                            D.boundaryField()[patch().index()]
+                          - D.oldTime().boundaryField()[patch().index()];
+                        targetPatchDD =
+                            D.boundaryField()[targetPatchIndices()[activePatchI]]
+                          - D.oldTime().boundaryField()
+                            [
+                                targetPatchIndices()[activePatchI]
+                            ];
+                    }
+					
+					#if(ISDEBUG)
+					Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
+					Info<<"patchDD in updateCoeffs(): "<<patchDD<<endl;
+					Info<<"targetPatchDD in updateCoeffs() line:"<<targetPatchDD<<endl;
+					#endif
+					
+                    // Master zone DD
+                    const vectorField tagetZoneDD = targetGlobalPolyPatchFaceZone(activePatchI).patchFaceToGlobal(targetPatchDD);
+					
+					#if(ISDEBUG)
+					Info<<"tagetZoneDD in updateCoeffs(): "<<tagetZoneDD<<endl;
+					#endif
+					
+					/*	
+					   zoneField
+                        (
+                            zoneIndex(),
+                            patch().index(),
+                            patchDD
+                        );
+					*/
+					
+					#if(ISDEBUG)
+					Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
+					#endif
+					
+                    // Master patch DD interpolated to the slave patch
+                    const vectorField patchDDInterpToShadowPatch =
+						globalPolyPatchFaceZone().globalFaceToPatch
+										(
+										zoneToZone(activePatchI).masterToSlave(tagetZoneDD)()
+										);
+					
+					#if(ISDEBUG)
+					Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
+					
+					Info<<"patchDDInterpToShadowPatch in updateCoeffs(): "<<patchDDInterpToShadowPatch<<endl;
+					#endif
+					/*
+                        patchField
+                        (
+                            targetPatchIndices()[activePatchI],
+                            shadowZoneIndices()[activePatchI],
+                            zoneToZone(activePatchI).masterToSlave(zoneDD)()
+                        );
+						*/
+
+                    //FatalError
+                    //    << "Disabled: use jasakSolidContact" << abort(FatalError);
+                     
+					 normalModel(activePatchI).correct
+                     (
+                         patchFaceNormals,
+                         //zoneToZone(activePatchI),
+						 //targetGlobalPolyPatchFaceZone(activePatchI).globalPointToPatch
+						 //(
+						 zoneToZone(activePatchI).slavePointDistanceToIntersection(),
+						 //),
+                         targetPatchDD,
+                         patchDDInterpToShadowPatch
+                     );
+					 
+					 #if(ISDEBUG)
+					 Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
+					 Info<<"normalModel(activePatchI).slavePressure()in updateCoeffs(): "<<normalModel(activePatchI).slavePressure()<<endl;
+					 #endif
+					 
+                    frictionModel(activePatchI).correct
+                    (
+                        normalModel(activePatchI).slavePressure(),
+                        patchFaceNormals,
+                        normalModel(activePatchI).areaInContact(),
+                        targetPatchDD,
+                        patchDDInterpToShadowPatch
+                    );
+					
+					#if(ISDEBUG)
+					Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
+					#endif
+					
+                    // Accumulate traction
+
+                    curPatchTractions(activePatchI) =
+                        frictionModel(activePatchI).slaveTraction()
+                        + normalModel(activePatchI).slavePressure();
+
+                    curPatchTraction += curPatchTractions(activePatchI);
+					
+					#if(!ISDEBUG)
+					Info<<"SLAVE curPatchTraction in updateCoeffs() :"<<curPatchTraction<<endl;
+					#endif
+				}
+                else // local master
+                {
+					#if(ActivePairDEBUG)
+					Info<<"MASTER in updateCoeffs() line:"<<__LINE__<<endl;
+                    #endif
+					
+					// Get traction from local slave
 
                     const volVectorField& field =
                         db().lookupObject<volVectorField>
@@ -2202,157 +2029,95 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 
                     const label masterTargetI =
                         localMasterField.findTargetID(patch().index());
-			
-					/*
-					const vectorField targetGlobalPolyPatchFaceZoneTraction =
-                    targetGlobalPolyPatchFaceZone(activePatchI).patchFaceToGlobal
-                    (
-                        targetPatchTraction
-                    );
-					*/
-			
-		// Set the traction on the target patch
-        // The master stores the friction and normal models, so we need to find
-        // which models correspond to the current target
-        //traction() =
-		
-		/*		
-                curPatchTractions(activePatchI) =
-                   - frictionModel(activePatchI).targetTractionForMaster()
-                   - normalModel(activePatchI).slavePressure();
-		*/
-		Info<<"masterTargetI in updateCoeffs(): "<<masterTargetI<<endl;
-		
-		#if(masterOfPairDEBUG)
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-        #endif
-		
 
-		//****************** Remove ForThisSlave for now *************
-		Info<<"normalModel(masterTargetI).slavePressure() in updateCoeffs()"<< normalModel(masterTargetI).slavePressure()<<endl;
-			
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-		//******************** start ORG ********************
-		
-		curPatchTractions(activePatchI) =
-            frictionModel(masterTargetI).slaveTraction()
-          + normalModel(masterTargetI).slavePressure();
-		  
-		//******************** End ORG ********************
-		//****************** End removing ForThisSlave for now *************
-		
-		
-		
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-		
-		Info<<"activePatchI in updateCoeffs(): "<<activePatchI<<endl;
-		Info<<"targetPatchIndices()[activePatchI] in updateCoeffs(): "<<targetPatchIndices()[activePatchI]<<endl;
-		
-		curPatchTraction += curPatchTractions(activePatchI);
-		
-		Info<<"SLAVE curPatchTraction in updateCoeffs() :"<<curPatchTraction<<endl;
-		
-        // TESTING - START
-        // Scale traction vectors on faces, which share an edge with the
-        // downstream patch
-        // This is an attempt to fix an issue where the first row of faces
-        // deform unphysically when being drawn into the die
-				if (scaleFaceTractionsNearDownstreamPatch_)
-				{
-					Info<<"TESTING - START in updateCoeffs() line:"<<__LINE__<<endl;
-				//traction() *= scaleTractionField();
-				curPatchTractions(activePatchI) *= scaleTractionField();
-				}
-        // TESTING - END
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-		
-		#if(slaveOfPairDEBUG)
-        // Update contactPerSlave field
-        // Note: this is used by thermalContact to know which faces
-        // are in contact
-        //const scalarField magTraction = mag(traction());
-        const scalarField magTraction = mag(curPatchTractions(activePatchI));
-		const scalar tol = 1e-6*gMax(magTraction);		
-        scalarField& contactForThisSlave = contactPerSlave()[activePatchI];  //[0];
-		Info<<"Which pair of this - SLAVE in updateCoeffs(): "<<activePatchI<<endl;
-				forAll(contactForThisSlave, faceI)
-				{
-					Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-					if (magTraction[faceI] > tol)
-					{
-					contactForThisSlave[faceI] = 1.0;
-					}
-					else
-					{
-					contactForThisSlave[faceI] = 0.0;
-					}
-				}
-		#endif
-				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-				Info<<"targetPatchNames()[activePatchI] in updateCoeffs(): "<<targetPatchNames()[activePatchI]<<endl;
-				Info<<"targetPatchIndices()[activePatchI] in updateCoeffs(): "<<targetPatchIndices()[activePatchI]<<endl;
-				Info<<"Which pair of this - SLAVE in updateCoeffs(): "<<activePatchI<<endl;
-				Info<<"End of SLAVE computation in updateCoeffs(): "<<__LINE__<<endl;
-				Info<<".................end.............. "<<endl;				
-			}// SLAVE \n
-		} // if contact pair is active
-	}// forAll contact pairs
-	
-	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-	
-	// Set master gradient based on accumulated traction
-    traction() = curPatchTraction;
-	
-	Info<<"traction() in updateCoeffs():"<<traction()<<endl;
+                    vectorField shadowPatchTraction =
+                        -localMasterField.frictionModel
+                        (
+                            masterTargetI
+                        ).slaveTractionForMaster()
+                        -localMasterField.normalModel
+                        (
+                            masterTargetI
+                        ).slavePressure();
 
-    // Accumulate the contact indicator field
-    contact_ = 0.0;
-    PtrList<scalarField>& contactPerSlave = this->contactPerSlave();
-		forAll(contactPerSlave, shadI)
-		{
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-        contact_ += contactPerSlave[shadI];
-		}
+                    vectorField shadowZoneTraction = targetGlobalPolyPatchFaceZone(activePatchI).patchFaceToGlobal(shadowPatchTraction);
+                        /*
+						zoneField
+                        (
+                            shadowZoneIndices()[activePatchI],
+                            targetPatchIndices()[activePatchI],
+                            shadowPatchTraction
+                        );
+						*/
+					
+					#if(ISDEBUG)
+					Info<<"MASTER in updateCoeffs() line:"<<__LINE__<<endl;
+					#endif
+					
+                    // Face-to-face
+                    vectorField masterZoneTraction =
+                        localMasterField.zoneToZone
+                        (
+                            masterTargetI
+                        ).slaveToMaster(shadowZoneTraction);
 
-    // Scale any face in contact with more than one slave
-	//******************* START Scaling any face in contact ******************
-     	if (gMax(contact_) > (1.0 + SMALL))
-		{
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-			forAll(contact_, faceI)
-			{
-				if (contact_[faceI] > (1.0 + SMALL))
-				{
-				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-                // Update the contact weights corresponding to each slave
-                scalar sumContact = 0.0;
-					forAll(contactPerSlave, shadI)
-					{
-                    contactPerSlave[shadI][faceI] /= contact_[faceI];
-                    sumContact += contactPerSlave[shadI][faceI];
-					}
+                    // We store master patch traction as thermalGeneralContact
+                    // uses it
+                    curPatchTractions(activePatchI) =
+						globalPolyPatchFaceZone().globalFaceToPatch(masterZoneTraction);
+						/*
+                        patchField
+                        (
+                            patch().index(),
+                            zoneIndex(),
+                            masterZoneTraction
+                        );
+						*/
 
-					if (sumContact > (1.0 + SMALL))
-					{
-                    FatalErrorIn
-                    (
-                        "void solid4GeneralContactFvPatchVectorField::"
-                        "updateCoeffs()"
-                    )   << "There is a problem normalising the contact field"
-                        << ", sumContact is: " << sumContact
-                        << abort(FatalError);
-					}
+                    curPatchTraction += curPatchTractions(activePatchI);
+					
+					#if(!ISDEBUG)
+					Info<<"MASTER curPatchTraction in updateCoeffs() :"<<curPatchTraction<<endl;
+					#endif
+                }
+            } // if contact pair is active
+        } // forAll contact pairs
 
-                // Reset accumulated contact face value to 1.0
-                contact_[faceI] = 1.0;
-				}
-			}
-		} 
-	//******************* END Scaling any face in contact ******************
-	Info<<"Before solidTractionFvPatch in updateCoeffs() line:"<<__LINE__<<endl;
+        // Set master gradient based on accumulated traction
+        traction() = curPatchTraction;
+    }
+
     solidTractionFvPatchVectorField::updateCoeffs();
-}
+	
+	Info<<"In updateCoeffs() line"<<__LINE__<<endl;
+		//******************** Testing face coordinates ************************
+		const fvMesh& mesh = patch().boundaryMesh().mesh();
+		label PatchI = mesh.boundaryMesh().findPatchID("patchName");
+		// const vectorField& faceCentres = mesh.boundaryMesh()[patchI].faceCentres();
+		Info<<"In updateCoeffs() line"<<__LINE__<<endl;
+		
+		const fvPatchVectorField& faceCentres = mesh.C().boundaryField()[PatchI];
+		
+		const vectorField& patchFaceCenter = patch().Cf();
+		Info<<"In updateCoeffs() line"<<__LINE__<<endl;
 
+        //const scalarField& zpatchFaceCenter = patchFaceCenter.component(2);	
+		
+        Info<< "Field patchFaceCenter: " << patchFaceCenter << endl;
+        //Info<< "Field zpatchFaceCenter:" << zpatchFaceCenter << endl;		
+
+        //label celli(0);
+        //const scalar z0 = patchFaceCenter[celli].z();
+        //Info<< "Just the first cell: " << z0 << endl;
+
+        Info<< "All cells Cf():" << endl;
+        forAll(patchFaceCenter, facei) 
+		{
+            Info<< "patchFaceCenter ["<<facei<<"]:" << patchFaceCenter[facei] << endl;
+        }
+		//******************** End testing face coordinates *********************
+		Info<<"In updateCoeffs() line"<<__LINE__<<endl;	
+}
 
 /*
 void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()

@@ -28,6 +28,7 @@ Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 \*---------------------------------------------------------------------------*/
+#define masterToSlaveDEBUG false
 
 namespace Foam
 {
@@ -167,8 +168,11 @@ newGGIInterpolation<MasterPatch, SlavePatch>::masterToSlave
     const Field<Type>& ff
 ) const
 {
+	#if(masterToSlaveDEBUG)
 	Info<<"Here I am in newGGIInterpolate.C masterToSlave(..) line: "<<__LINE__<<endl;
 	Info<<"masterPatch_ in newGGIInterpolate.C masterToSlave(..) line: "<<masterPatch_<<endl;
+	#endif
+	
 	if (ff.size() != masterPatch_.size())
     {
         FatalErrorIn
@@ -340,8 +344,11 @@ newGGIInterpolation<MasterPatch, SlavePatch>::slaveToMaster
     const Field<Type>& ff
 ) const
 {
+	#if(masterToSlaveDEBUG)
 	Info<<"Here I am in newGGIInterpolate.C line "<<__LINE__<<endl;
 	Info<<"ff.size() "<<ff.size()<<endl;
+	#endif
+	
     if (ff.size() != slavePatch_.size())
     {
         FatalErrorIn

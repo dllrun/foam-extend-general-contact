@@ -258,8 +258,11 @@ Foam::generalStandardPenaltyFriction::generalStandardPenaltyFriction
     ),
     contactIterNum_(0)
 {
+	#if(standardPenaltyFrictionDEBUG)
 	Info<<"In generalStandardPenaltyFriction c1(name, patch, dict, ID, ID) line:"<<__LINE__<<endl;
-    // Create friction law
+    #endif
+	
+	// Create friction law
     frictionLawPtr_.set
     (
         generalFrictionLaw::New
@@ -312,6 +315,10 @@ void Foam::generalStandardPenaltyFriction::correct
 	Info<<"Step4C: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
     #endif
 	
+	#if(standardPenaltyFrictionDEBUG)
+	Info<<"slaveDD in generalStandardPenaltyFriction::correct(..):"<<slaveDD<<endl;
+    #endif
+	
 	// Preliminaries
     const fvMesh& mesh = mesh_;
     const label slavePatchIndex = slavePatchID();
@@ -332,9 +339,17 @@ void Foam::generalStandardPenaltyFriction::correct
     scalarField slipTraction(magSlavePressure.size(), 0.0);
     vectorField newSlaveTraction(slipTraction.size(), vector::zero);
 	
-    forAll(magSlavePressure, faceI)
+	#if(standardPenaltyFrictionDEBUG)
+	Info<<"magSlavePressure in generalStandardPenaltyFriction::correct(..): "<<magSlavePressure<<endl;
+    #endif
+	
+	forAll(magSlavePressure, faceI)
     {
-        if (areaInContact[faceI] > SMALL)
+		#if(standardPenaltyFrictionDEBUG)
+		Info<<"Step4D: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
+        #endif
+		
+		if (areaInContact[faceI] > SMALL)
         {
             // Compute slip as the we need the difference of DD between the
             // master and slave
@@ -348,7 +363,9 @@ void Foam::generalStandardPenaltyFriction::correct
 
             newSlaveTraction[faceI] = -frictionPenaltyFac*slip_[faceI];
 			
+			#if(standardPenaltyFrictionDEBUG)
 			Info<<"Step4D: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
+			#endif
 			
             const scalar magSlip = mag(slip_[faceI]);
             maxMagSlip = max(maxMagSlip, magSlip);
@@ -408,8 +425,10 @@ void Foam::generalStandardPenaltyFriction::correct
     // Under-relax traction
     slaveTraction() =
         relaxFac_*newSlaveTraction + (1.0 - relaxFac_)*slaveTraction();
-
+	
+	#if(standardPenaltyFrictionDEBUG)
 	Info<<"Step4E: Here I am in generalStandardPenaltyFriction::correct(..):"<<__LINE__<<endl;
+	#endif
 }
 
 
