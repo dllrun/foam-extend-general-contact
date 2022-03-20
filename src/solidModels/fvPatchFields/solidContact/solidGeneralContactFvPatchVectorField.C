@@ -411,6 +411,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcShadowZoneNames() const
     labelList& shadowZoneIndices = *shadowZoneIndicesPtr_;
 
     const fvMesh& mesh = patch().boundaryMesh().mesh();
+	
+	Info<<"In calcShadowZoneNames() line:"<<__LINE__<<endl;
 
     forAll(shadNames, shadowI)
     {
@@ -630,6 +632,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneIndex() const
     word zoneName = patch().name() + "FaceZone";
 
     faceZoneID zone(zoneName, mesh.faceZones());
+	
+	Info<<"In calcZoneIndex() line:"<<__LINE__<<endl;
 
     if (!zone.active())
     {
@@ -816,13 +820,87 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
                         true,           // global data
                         0,              // Non-overlapping face tolerances
                         0,              //
+						//********** based on solids4Foam code********
+						// Do not rescale weighting factors, as it is wrong on
+						// partially covered faces						
+						false,
+						quickReject_,
+						regionOfInterest_
+						//************ End based on solids4Foam code **********
+						/*						
                         true,           // Rescale weighting factors.
-                        newGgiInterpolation::AABB
+                        newGgiInterpolation::AABB						
                         //newGgiInterpolation::BB_OCTREE
                         //newGgiInterpolation::THREE_D_DISTANCE
-                        //newGgiInterpolation::N_SQUARED
+                        //newGgiInterpolation::N_SQUARED						
+						*/
                     )
                 );
+				
+				
+				
+		//******************** START based on solids4Foam ********************
+		
+		// Check which point distance calculation method to use
+            const Switch useNewPointDistanceMethod =
+                dict_.lookupOrDefault<Switch>
+                (
+                    "useNewPointDistanceMethod", false
+                );
+
+            Info<< "    " << type() << ": " << patch().name() << nl
+                << "        useNewPointDistanceMethod: "
+                << useNewPointDistanceMethod
+                << endl;
+
+            zoneToZones_[shadowI].useNewPointDistanceMethod() =
+                useNewPointDistanceMethod;
+
+            // Check if the projectPointsToPatchBoundary switch is set
+            const Switch projectPointsToPatchBoundary =
+                dict_.lookupOrDefault<Switch>
+                (
+                    "projectPointsToPatchBoundary",
+                    false
+                );
+
+            Info<< "        projectPointsToPatchBoundary: "
+                << projectPointsToPatchBoundary
+                << endl;
+
+            zoneToZones_[shadowI].projectPointsToPatchBoundary() =
+                projectPointsToPatchBoundary;
+
+            if (dict_.found("checkPointDistanceOrientations"))
+            {
+                const Switch checkPointDistanceOrientations =
+                    Switch(dict_.lookup("checkPointDistanceOrientations"));
+
+                Info<< "        checkPointDistanceOrientations: "
+                    << checkPointDistanceOrientations
+                    << endl;
+
+                zoneToZones_[shadowI].checkPointDistanceOrientations() =
+                    checkPointDistanceOrientations;
+            }
+
+            // Check if the usePrevCandidateMasterNeighbors switch is set
+            const Switch usePrevCandidateMasterNeighbors =
+                dict_.lookupOrDefault<Switch>
+                (
+                    "usePrevCandidateMasterNeighbors",
+                    false
+                );
+
+            Info<< "        usePrevCandidateMasterNeighbors: "
+                << usePrevCandidateMasterNeighbors
+                << endl;
+
+            zoneToZones_[shadowI].usePrevCandidateMasterNeighbors() =
+                usePrevCandidateMasterNeighbors;
+		
+		//******************** END based on solids4Foam ********************
+		
         }
     }
 }
@@ -1112,6 +1190,10 @@ solidGeneralContactFvPatchVectorField
     frictionModels_(0),
     zonePtr_(NULL),
     zoneToZones_(0),
+	quickReject_(Foam::newGgiInterpolation::AABB),
+	regionOfInterestTopCorner_(vector::max),
+    regionOfInterestBottomCorner_(vector::min),
+    regionOfInterest_(vector::min, vector::max),
     alg_(Foam::intersection::VISIBLE),
     dir_(Foam::intersection::CONTACT_SPHERE),
     curTimeIndex_(-1),
@@ -1160,6 +1242,10 @@ solidGeneralContactFvPatchVectorField
     frictionModels_(ptf.frictionModels_),
     zonePtr_(NULL),
     zoneToZones_(0),
+	quickReject_(ptf.quickReject_),
+	regionOfInterestTopCorner_(ptf.regionOfInterestTopCorner_),
+    regionOfInterestBottomCorner_(ptf.regionOfInterestBottomCorner_),
+    regionOfInterest_(ptf.regionOfInterest_),
     alg_(ptf.alg_),
     dir_(ptf.dir_),
     curTimeIndex_(ptf.curTimeIndex_),
@@ -1284,7 +1370,43 @@ solidGeneralContactFvPatchVectorField
     normalModels_(0),
     frictionModels_(0),
     zonePtr_(0),
-    zoneToZones_(0),
+    zoneToZones_(0),	
+	quickReject_
+    (
+        newGgiInterpolation::quickRejectNames_
+        [
+            dict.lookupOrDefault<word>("quickReject", "AABB")
+        ]
+    ),
+	regionOfInterestTopCorner_
+    (
+        dict.lookupOrDefault<vector>
+        (
+            "regionOfInterestTopCorner",
+            vector::max
+        )
+    ),
+    regionOfInterestBottomCorner_
+    (
+        dict.lookupOrDefault<vector>
+        (
+            "regionOfInterestBottomCorner",
+            vector::min
+        )
+    ),
+    regionOfInterest_
+    (
+        boundBox
+        (
+            regionOfInterestBottomCorner_,
+            regionOfInterestTopCorner_
+        )
+//        dict.lookupOrDefault<boundBox>
+//        (
+//            "regionOfInterest",
+//            boundBox(vector::min, vector::max)
+//        )
+    ),
     alg_(Foam::intersection::VISIBLE),
     dir_(Foam::intersection::CONTACT_SPHERE),
     curTimeIndex_(-1),
@@ -1296,6 +1418,9 @@ solidGeneralContactFvPatchVectorField
     Info<< "Creating " << solidGeneralContactFvPatchVectorField::typeName
         << " patch" << endl;
 	Info<<"In C3(p,iF,dict) line:"<<__LINE__<<endl;
+	Info<<"p.name() in C3(p,iF,dict) :"<<p.name()<<endl;
+	Info<<"p.patch() in C3(p,iF,dict) :"<<p.patch()<<endl;
+	Info<<"p.size() in C3(p,iF,dict) :"<<p.size()<<endl;
 
     if (dict.found("gradient"))
     {
@@ -1341,6 +1466,10 @@ solidGeneralContactFvPatchVectorField
     frictionModels_(ptf.frictionModels_),
     zonePtr_(NULL),
     zoneToZones_(0),
+	quickReject_(ptf.quickReject_),
+	regionOfInterestTopCorner_(ptf.regionOfInterestTopCorner_),
+    regionOfInterestBottomCorner_(ptf.regionOfInterestBottomCorner_),
+    regionOfInterest_(ptf.regionOfInterest_),
     alg_(ptf.alg_),
     dir_(ptf.dir_),
     curTimeIndex_(ptf.curTimeIndex_),
@@ -1463,6 +1592,10 @@ solidGeneralContactFvPatchVectorField
     frictionModels_(ptf.frictionModels_),
     zonePtr_(NULL),
     zoneToZones_(0),
+	quickReject_(ptf.quickReject_),
+	regionOfInterestTopCorner_(ptf.regionOfInterestTopCorner_),
+    regionOfInterestBottomCorner_(ptf.regionOfInterestBottomCorner_),
+    regionOfInterest_(ptf.regionOfInterest_),
     alg_(ptf.alg_),
     dir_(ptf.dir_),
     curTimeIndex_(ptf.curTimeIndex_),
@@ -1470,8 +1603,9 @@ solidGeneralContactFvPatchVectorField
     QcPtr_(NULL),
     QcsPtr_(NULL),
     bbOffset_(ptf.bbOffset_)
-{
+{		
 	Info<<"In C5(ptf,iF) line:"<<__LINE__<<endl;
+	Info<<"*ptf in C5(ptf,iF) line:"<<*ptf<<endl;
     if (debug)
     {
         InfoIn
@@ -1571,6 +1705,7 @@ solidGeneralContactFvPatchVectorField
         QcsPtr_ = new List<scalarField>(*ptf.QcsPtr_);
     }
 	Info<<"In C5(ptf,iF) line:"<<__LINE__<<endl;
+	
 }
 
 
@@ -1756,6 +1891,9 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
                 // case they need to update anything
                 normalModel(shadowI).newTimeStep();
                 frictionModel(shadowI).newTimeStep();
+				
+				// Force N^2 contact search at least once per time-step
+                zoneToZone(shadowI).clearPrevCandidateMasterNeighbors();
             }
         }
     }

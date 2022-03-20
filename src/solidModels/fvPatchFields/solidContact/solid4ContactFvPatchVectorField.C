@@ -1249,6 +1249,7 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
                     contactPerShadow()[shadPatchI];
                 forAll(contactForThisShadow, faceI)
                 {
+					Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
                     if (magTraction[faceI] > tol)
                     {
                         contactForThisShadow[faceI] = 1.0;
@@ -1290,6 +1291,7 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
         // deform unphysically when being drawn into the die
         if (scaleFaceTractionsNearDownstreamPatch_)
         {
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             traction() *= scaleTractionField();
         }
         // TESTING - END
@@ -1302,6 +1304,7 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
         scalarField& contactForThisShadow = contactPerShadow()[0];
         forAll(contactForThisShadow, faceI)
         {
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             if (magTraction[faceI] > tol)
             {
                 contactForThisShadow[faceI] = 1.0;
@@ -1328,6 +1331,7 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
     // Scale any face in contact with more than one shadow
     if (gMax(contact_) > (1.0 + SMALL))
     {
+		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         forAll(contact_, faceI)
         {
             if (contact_[faceI] > (1.0 + SMALL))

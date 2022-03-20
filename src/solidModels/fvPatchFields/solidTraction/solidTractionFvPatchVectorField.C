@@ -49,6 +49,7 @@ solidTractionFvPatchVectorField
     nonLinear_(nonLinearGeometry::OFF),
     orthotropic_(false)
 {
+	Info<<"In solidTraction::C1(p,iF) line:"<<__LINE__<<endl;
     fvPatchVectorField::operator=(patchInternalField());
     gradient() = vector::zero;
 }
@@ -69,6 +70,7 @@ solidTractionFvPatchVectorField
     nonLinear_(nonLinearGeometry::OFF),
     orthotropic_(false)
 {
+	Info<<"In solidTraction::C2(p,iF,dict) line:"<<__LINE__<<endl;
     fvPatchVectorField::operator=(patchInternalField());
     gradient() = vector::zero;
 
@@ -138,7 +140,9 @@ solidTractionFvPatchVectorField
     pressure_(stpvf.pressure_, mapper),
     nonLinear_(stpvf.nonLinear_),
     orthotropic_(stpvf.orthotropic_)
-{}
+{
+	Info<<"In solidTraction::C3(stpvf,p,iF,mapper) line:"<<__LINE__<<endl;
+}
 
 
 solidTractionFvPatchVectorField::
@@ -153,7 +157,9 @@ solidTractionFvPatchVectorField
     pressure_(stpvf.pressure_),
     nonLinear_(stpvf.nonLinear_),
     orthotropic_(stpvf.orthotropic_)
-{}
+{
+	Info<<"In solidTraction::C4(stpvf) line:"<<__LINE__<<endl;
+}
 
 
 solidTractionFvPatchVectorField::
@@ -169,7 +175,9 @@ solidTractionFvPatchVectorField
     pressure_(stpvf.pressure_),
     nonLinear_(stpvf.nonLinear_),
     orthotropic_(stpvf.orthotropic_)
-{}
+{
+	Info<<"In solidTraction::C1(stpvf,iF) line:"<<__LINE__<<endl;
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //

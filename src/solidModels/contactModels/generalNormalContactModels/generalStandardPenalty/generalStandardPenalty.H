@@ -181,6 +181,7 @@ public:
         //- Return area in contact of slave patch
         virtual const scalarField& areaInContact() const
         {
+			Info<<"In generalStandardPenalty::areaInContact() line:"<<__LINE__<<endl;
             return areaInContactVolField_.boundaryField()[slavePatchID()];
         };
 

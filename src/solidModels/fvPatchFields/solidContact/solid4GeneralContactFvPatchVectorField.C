@@ -1406,6 +1406,7 @@ solid4GeneralContactFvPatchVectorField
     alg_(ptf.alg_),
     dir_(ptf.dir_),
     curTimeIndex_(ptf.curTimeIndex_),
+	curPatchTractionPtr_(NULL),
     QcPtr_(NULL),
     QcsPtr_(NULL),
     bbOffset_(ptf.bbOffset_)
