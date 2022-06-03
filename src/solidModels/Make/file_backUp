@@ -1,2 +1,0 @@
-$(boundaryConditions)/solidContact/thermalContactFvPatchScalarField.C
-$(boundaryConditions)/solidContact/thermalGeneralContactFvPatchScalarField.C 

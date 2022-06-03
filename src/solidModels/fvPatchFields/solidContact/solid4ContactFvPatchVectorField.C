@@ -40,7 +40,7 @@ InClass
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-// *********************** START solidGeneralContact ************************
+
 bool Foam::solid4ContactFvPatchVectorField::movingMesh() const
 {
     // If the deformation gradient "F" and the displacement increment DU" are
@@ -58,24 +58,14 @@ bool Foam::solid4ContactFvPatchVectorField::movingMesh() const
         return false;
     }
 }
-// *********************** END solidGeneralContact ************************
 
-/*
-bool Foam::solid4ContactFvPatchVectorField::movingMesh() const
-{
-	
-    // Check if the solid model moves the mesh
-    return lookupSolidModel(patch().boundaryMesh().mesh()).movingMesh();
-	
-}
-*/
 
 void Foam::solid4ContactFvPatchVectorField::makeShadowPatchNames
 (
     const dictionary& dict
 ) const
 {
-	Info<<"In makeShadowPatchNames() line:"<<__LINE__<<endl;
+
     if (master_)
     {
         // Check if only one shadow patch is specified
@@ -278,7 +268,7 @@ void Foam::solid4ContactFvPatchVectorField::makeFrictionModels
 
 void Foam::solid4ContactFvPatchVectorField::clearOut()
 {
-	Info<<"In clearOut() line:"<<__LINE__<<endl;
+
     if (debug)
     {
         InfoIn
@@ -389,7 +379,6 @@ Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
     scaleTractionFieldPtr_(),
     curTimeIndex_(-1)
 {
-	Info<<"Does it enter here? in C1(p, iF)"<<__LINE__<<endl;
 }
 
 
@@ -465,7 +454,6 @@ Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
     scaleTractionFieldPtr_(),
     curTimeIndex_(-1)
 {
-	Info<<"Does it enter here? in C2(p, iF, dict)"<<__LINE__<<endl;
     if (debug)
     {
         Info<< "Creating " << solid4ContactFvPatchVectorField::typeName
@@ -550,7 +538,6 @@ Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
     scaleTractionFieldPtr_(),
     curTimeIndex_(ptf.curTimeIndex_)
 {
-    Info<<"Does it enter here? in C3(ptf, p, iF, mapper)"<<__LINE__<<endl;
 	// Do not copy pointer objects: they will be re-created.
 }
 
@@ -587,7 +574,6 @@ Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
     scaleTractionFieldPtr_(),
     curTimeIndex_(ptf.curTimeIndex_)
 {
-    Info<<"Does it enter here? in C4(ptf)"<<__LINE__<<endl;
 	// Do not copy pointer objects
 }
 
@@ -625,7 +611,6 @@ Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
     scaleTractionFieldPtr_(),
     curTimeIndex_(ptf.curTimeIndex_)
 {
-    Info<<"Does it enter here? in C5(ptf, iF)"<<__LINE__<<endl;
 	// Do not copy pointer objects
 }
 
@@ -636,7 +621,6 @@ Foam::solid4ContactFvPatchVectorField::solid4ContactFvPatchVectorField
 Foam::solid4ContactFvPatchVectorField::
 ~solid4ContactFvPatchVectorField()
 {
-	Info<<"Does it enter destructor?"<<__LINE__<<endl;
     clearOut();
 }
 
@@ -731,14 +715,13 @@ void Foam::solid4ContactFvPatchVectorField::rmap
 const Foam::wordList&
 Foam::solid4ContactFvPatchVectorField::shadowPatchNames() const
 {
-	Info<<"In shadowPatchNames() line:"<<__LINE__<<endl;
+
     if (shadowPatchNames_.size() == 0)
     {
-		Info<<"In shadowPatchNames() line:"<<__LINE__<<endl;
+
         makeShadowPatchNames(dict_);
     }
 	
-	Info<<"shadowPatchNames_ in shadowPatchNames(): "<<shadowPatchNames_<<endl;
     return shadowPatchNames_;
 }
 
@@ -1029,31 +1012,25 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
 {
     if (this->updated())
     {
-		Info<<"this->updated() in updateCoeffs() line:"<<__LINE__<<endl;
         return;
     }
 	
-	Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
-	Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
-	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-	Info<< "this->db().time().timeIndex() "<<this->db().time().timeIndex()<<endl;
-	Info<< "curTimeIndex_ "<<curTimeIndex_<<endl;
 	
     if (curTimeIndex_ != this->db().time().timeIndex())
     {
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+
         // Update old quantities at the start of a new time-step
         curTimeIndex_ = this->db().time().timeIndex();
 		
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+
         if (master_)
         {
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+			
             // Let the contact models know that it is a new time-step, in case
             // they need to update anything
             forAll(shadowPatchNames(), shadPatchI)
             {
-				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+
                 normalModels()[shadPatchI].newTimeStep();
                 frictionModels()[shadPatchI].newTimeStep();
 
@@ -1062,34 +1039,31 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
             }
         }
     }
-	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+
     // Move the master and slave zone to the deformed configuration
     moveZonesToDeformedConfiguration();
 
     // Delete the zone-to-zone interpolator weights as the zones have moved
     const wordList& shadPatchNames = shadowPatchNames();
-	Info<<"shadPatchNames in updateCoeffs() "<<shadPatchNames<<endl;
+
     forAll(shadPatchNames, shadPatchI)
     {
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+
         zoneToZones()[shadPatchI].movePoints
         (
             tensorField(0), tensorField(0), vectorField(0)
         );
     }
 	
-	Info<<"Checking mMASTER or sSLAVE in updateCoeffs() line:"<<__LINE__<<endl;
 	// Calculate and apply contact forces
     if (master_)
     {
-		Info<<"MASTER in updateCoeffs() line:"<<__LINE__<<endl;
-        Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
-		Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
+
 		// Reset the traction to zero as we will accumulate it over all the
         // shadow patches
         traction() = vector::zero;
 	
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+
         forAll(shadPatchNames, shadPatchI)
         {
             // Calculate the slave patch face unit normals as they are used by
@@ -1145,21 +1119,15 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
 						
             // Master zone DD
             const vectorField zoneDD = zone().patchFaceToGlobal(patchDD);
-			Info<<"zoneDD in updateCoeffs(): "<<zoneDD<<endl;
+
 			
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             // Master patch DD interpolated to the slave patch
             const vectorField patchDDInterpToShadowPatch =
                 shadowZones()[shadPatchI].globalFaceToPatch
                 (
                     zoneToZones()[shadPatchI].masterToSlave(zoneDD)()
                 );
-				
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-			
-			Info<<"normalModels()[shadPatchI].slavePressure() in updateCoeffs()"<< normalModels()[shadPatchI].slavePressure()<<endl;
-            
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+
 			
 			// Calculate normal contact forces
             // shadowPatchDD is the DU on the shadow patch, whereas
@@ -1199,11 +1167,6 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
             else
             {
 				
-				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-			
-				Info<<"normalModels()[shadPatchI].slavePressure() in updateCoeffs()"<<normalModels()[shadPatchI].slavePressure()<<endl;
-			 
-				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 			
                 // Interpolate slave traction to the master
                 const vectorField slavePatchTraction =
@@ -1233,23 +1196,21 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
                     );
 
                 // Accumulate the traction on the master patch
-				Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-				Info<<"tractionForThisShadow in updateCoeffs() "<<tractionForThisShadow<<endl;
+
                 traction() += tractionForThisShadow;
 				
-				Info<<"traction() in updateCoeffs():"<<traction()<<endl;
 				
                 // Update contactPerShadow field
                 // Note: this is used by thermalContact to know which faces
                 // are in contact
                 const scalarField magTraction = mag(tractionForThisShadow);
-				Info<<"magTraction in updateCoeffs() "<<magTraction<<endl;
+
                 const scalar tol = 1e-6*gMax(magTraction);
                 scalarField& contactForThisShadow =
                     contactPerShadow()[shadPatchI];
                 forAll(contactForThisShadow, faceI)
                 {
-					Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+
                     if (magTraction[faceI] > tol)
                     {
                         contactForThisShadow[faceI] = 1.0;
@@ -1260,21 +1221,14 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
                     }
                 }
             }
-		Info<<"In updateCoeffs() loop line:"<<__LINE__<<endl;
+
         }
-		Info<<"End of MASTER computation in updateCoeffs() line:"<<__LINE__<<endl;
+
     }
     else
     {
-		Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
-        Info<< "patch().name() in updateCoeffs() "<<patch().name()<<endl;
-		Info<< "patch().index() in updateCoeffs() "<<patch().index()<<endl;
 		
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
-			
-		Info<<"normalModelForThisSlave().slavePressure() in updateCoeffs()"<<normalModelForThisSlave().slavePressure()<<endl;
 			 
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 		// Set the traction on the slave patch
         // The master stores the friction and normal models, so we need to find
         // which models correspond to the current shadow
@@ -1282,7 +1236,6 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
             frictionModelForThisSlave().slaveTraction()
           + normalModelForThisSlave().slavePressure();
 		  
-		Info<<"SLAVE traction() in updateCoeffs() :"<<traction()<<endl;
 
         // TESTING - START
         // Scale traction vectors on faces, which share an edge with the
@@ -1291,7 +1244,6 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
         // deform unphysically when being drawn into the die
         if (scaleFaceTractionsNearDownstreamPatch_)
         {
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             traction() *= scaleTractionField();
         }
         // TESTING - END
@@ -1304,7 +1256,6 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
         scalarField& contactForThisShadow = contactPerShadow()[0];
         forAll(contactForThisShadow, faceI)
         {
-			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
             if (magTraction[faceI] > tol)
             {
                 contactForThisShadow[faceI] = 1.0;
@@ -1314,8 +1265,7 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
                 contactForThisShadow[faceI] = 0.0;
             }
         }
-		Info<<"End of SLAVE computation in updateCoeffs() line:"<<__LINE__<<endl;
-		Info<<""<<endl;
+
     }
 
     // Accumulate the contact indicator field
@@ -1323,15 +1273,13 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
     PtrList<scalarField>& contactPerShadow = this->contactPerShadow();
     forAll(contactPerShadow, shadI)
     {
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
         contact_ += contactPerShadow[shadI];
-		Info<<"contact_ in updateCoeffs(): "<<contact_<<endl;
     }
 
     // Scale any face in contact with more than one shadow
     if (gMax(contact_) > (1.0 + SMALL))
     {
-		Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+
         forAll(contact_, faceI)
         {
             if (contact_[faceI] > (1.0 + SMALL))
@@ -1360,9 +1308,9 @@ void Foam::solid4ContactFvPatchVectorField::updateCoeffs()
             }
         }
     }
-	Info<<"Before solidTractionFvPatch in updateCoeffs() line:"<<__LINE__<<endl;
+
     solidTractionFvPatchVectorField::updateCoeffs();
-	Info<<"After calling solidTractionFvPatch in updateCoeffs() line:"<<__LINE__<<endl;
+
 }
 
 
@@ -1456,13 +1404,13 @@ Foam::solid4ContactFvPatchVectorField::contactPerShadow() const
 
 void Foam::solid4ContactFvPatchVectorField::write(Ostream& os) const
 {
-	Info<<"In solid4Contact::write function "<<__LINE__<<endl;
+
     // If the shadowPatchIndices pointer is not set then we will assume that the
     // contact models were not created and nothing has changed; so we will just
     // output the input dict unchanged
     if (shadowPatchNames_.size() == 0)
     {
-		Info<<"In solid4GeneralContact::write function "<<__LINE__<<endl;
+
         // Overwrite fields in the dict
         dictionary& dict = const_cast<dictionary&>(dict_);
 
