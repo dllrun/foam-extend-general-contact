@@ -36,9 +36,7 @@ License
 
 void Foam::thermalContactFvPatchScalarField::checkConsistentMaster() const
 {
-	Info<<"In thermalContact::checkConsistentMaster() line:"<<__LINE__<<endl;
-	Info<<"master_ in thermalContact::checkConsistentMaster(): "<<master_<<endl;
-    Info<<"solid4ContactPatch().master() in thermalContact::checkConsistentMaster(): "<<solid4ContactPatch().master()<<endl;
+
 	if (master_ != solid4ContactPatch().master())
     {
         FatalErrorIn("void checkConsistentMaster() const")
@@ -46,7 +44,7 @@ void Foam::thermalContactFvPatchScalarField::checkConsistentMaster() const
             << "thermalContact master patch!" << nl
             << abort(FatalError);
     }
-	Info<<"In thermalContact::checkConsistentMaster() line:"<<__LINE__<<endl;
+
 }
 
 
@@ -117,7 +115,7 @@ Foam::thermalContactFvPatchScalarField::shadowPatchField
 const Foam::solid4ContactFvPatchVectorField&
 Foam::thermalContactFvPatchScalarField::solid4ContactPatch() const
 {
-	Info<<"In thermalContact::solid4ContactPatch() line:"<<__LINE__<<endl;
+
     return
         refCast<const solid4ContactFvPatchVectorField>
         (
@@ -146,7 +144,7 @@ Foam::thermalContactFvPatchScalarField::thermalContactFvPatchScalarField
     DUName_("undefined"),
     curTimeIndex_(-1)
 {
-	Info<<"In thermalContact c1(p,iF) line:"<<__LINE__<<endl;
+
     fvPatchScalarField::operator=(patchInternalField());
     gradient() = 0.0;
 }
@@ -172,7 +170,7 @@ Foam::thermalContactFvPatchScalarField::thermalContactFvPatchScalarField
     DUName_(ptf.DUName_),
     curTimeIndex_(ptf.curTimeIndex_)
 {
-	Info<<"In thermalContact c2(ptf,p,iF,mapper) line:"<<__LINE__<<endl;
+
 }
 
 
@@ -195,8 +193,7 @@ Foam::thermalContactFvPatchScalarField::thermalContactFvPatchScalarField
     DUName_(dict.lookupOrDefault<word>("DUName", "U")), //("DUName", "DU"))
     curTimeIndex_(-1)
 {
-	Info<<"In thermalContact c3(p,iF,dict) line:"<<__LINE__<<endl;
-    Info<<"master() in thermalContact c3(p,iF,dict): "<<master()<<endl;
+
 	if (debug)
     {
         Info<< patch().name() << ": " << type() << endl;
@@ -263,7 +260,6 @@ Foam::thermalContactFvPatchScalarField::thermalContactFvPatchScalarField
     DUName_(ptf.DUName_),
     curTimeIndex_(ptf.curTimeIndex_)
 {
-	Info<<"In thermalContact c4(ptf) line:"<<__LINE__<<endl;
 }
 
 
@@ -285,7 +281,6 @@ Foam::thermalContactFvPatchScalarField::thermalContactFvPatchScalarField
     DUName_(ptf.DUName_),
     curTimeIndex_(ptf.curTimeIndex_)
 {
-	Info<<"In thermalContact c5(ptf,iF) line:"<<__LINE__<<endl;
 }
 
 
@@ -657,7 +652,7 @@ void Foam::thermalContactFvPatchScalarField::rmap
 
 void Foam::thermalContactFvPatchScalarField::updateCoeffs()
 {
-	Info<<"In thermalContact::updateCoeffs() line:"<<__LINE__<<endl;
+
     if (updated())
     {
         return;
@@ -666,9 +661,9 @@ void Foam::thermalContactFvPatchScalarField::updateCoeffs()
     // Delete ggi interpolation at the begining of each time step
     if (curTimeIndex_ != db().time().timeIndex())
     {
-		Info<<"In thermalContact::updateCoeffs() line:"<<__LINE__<<endl;
+
         checkConsistentMaster();
-		Info<<"In thermalContact::updateCoeffs() line:"<<__LINE__<<endl;
+
         curTimeIndex_ = db().time().timeIndex();
     }
 
@@ -679,11 +674,10 @@ void Foam::thermalContactFvPatchScalarField::updateCoeffs()
     //         this->dimensionedInternalField().name()
     //     );
 	
-	Info<<"In thermalContact::updateCoeffs() line:"<<__LINE__<<endl;
     // Lookup the thermal conductivity field
 	//Note: k is replaced by DT (e.g. you have DT in createFields.H of elasticThermalSolid)
     const volScalarField& k = db().lookupObject<volScalarField>("DT"); 
-	Info<<"In thermalContact::updateCoeffs() line:"<<__LINE__<<endl;
+
 	
     // K on the current patch
     const scalarField& curPatchK = k.boundaryField()[patch().index()];
@@ -808,20 +802,18 @@ void Foam::thermalContactFvPatchScalarField::evaluate
     const Pstream::commsTypes
 )
 {
-	Info<<"In thermalContact::evaluate(..) line:"<<__LINE__<<endl;
+
     if (!this->updated())
     {
         this->updateCoeffs();
     }
 
-	Info<<"In thermalContact::evaluate(..) line:"<<__LINE__<<endl;
     const fvPatchField<vector>& gradT =
         patch().lookupPatchField<volVectorField, vector>
         (
             "grad(" + dimensionedInternalField().name() + ")"
         );
 	
-	Info<<"In thermalContact::evaluate(..) line:"<<__LINE__<<endl;
 	
     // Unit normals
     const vectorField n = patch().nf();

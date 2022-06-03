@@ -198,7 +198,7 @@ public:
             //- Return if this patch is the master
             Switch master() const
             {
-				Info<<"In thermalContact.H::master() line:"<<__LINE__<<endl;
+
                 return master_;
             }
 
