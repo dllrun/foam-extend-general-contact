@@ -25,7 +25,6 @@ License
 
 #include "globalPolyPatch.H"
 #include "polyPatchID.H"
-#define globalPatchDEBUG false
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -491,19 +490,12 @@ const Foam::polyMesh& Foam::globalPolyPatch::mesh() const
 
 const Foam::standAlonePatch& Foam::globalPolyPatch::globalPatch() const
 {
-	#if(globalPatchDEBUG) 
-	Info<<"patch().name() in globalPolyPatch::globalPatch(): "<<patch().name()<<endl;
-	Info<<"patch().index() in globalPolyPatch::globalPatch(): "<<patch().index()<<endl;
-    #endif
 	
     if (!globalPatchPtr_)
     {
         calcGlobalPatch();
     }
 	
-	#if(globalPatchDEBUG)
-	Info<<"*globalPatchPtr_ in globalPolyPatch::globalPatch(): "<<*globalPatchPtr_<<endl;
-    #endif
 	
 	return *globalPatchPtr_;
 }

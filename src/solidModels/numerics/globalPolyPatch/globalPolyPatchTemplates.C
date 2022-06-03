@@ -25,8 +25,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "globalPolyPatch.H"
-#define patchFace2GlobalDEBUG false 
-#define globalFace2PatchDEBUG false
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -144,11 +142,6 @@ Foam::tmp<Foam::Field<Type> > Foam::globalPolyPatch::patchFaceToGlobal
     const Field<Type>& pField
 ) const
 {
-	#if(patchFace2GlobalDEBUG) 
-	Info<<"patch().name() in globalPolyPatch::patchFaceToGlobal(): "<<patch().name()<<endl;
-	Info<<"patch().index() in globalPolyPatch::patchFaceToGlobal(): "<<patch().index()<<endl;
-    Info<<"patch().size() in globalPolyPatch::patchFaceToGlobal(): "<<patch().size()<<endl;
-	#endif
 	
 	if (pField.size() != patch().size())
     {
@@ -168,9 +161,6 @@ Foam::tmp<Foam::Field<Type> > Foam::globalPolyPatch::patchFaceToGlobal
         new Field<Type>(globalPatch().size(), pTraits<Type>::zero)
     );
 	
-	#if(patchFace2GlobalDEBUG) 
-	Info<<"globalPatch().size() in globalPolyPatch::patchFaceToGlobal(): "<<globalPatch().size()<<endl;
-	#endif
 	
 #ifdef OPENFOAMESIORFOUNDATION
     Field<Type>& gField = tgField.ref();
@@ -205,10 +195,6 @@ Foam::tmp<Foam::Field<Type> > Foam::globalPolyPatch::globalFaceToPatch
     const Field<Type>& gField
 ) const
 {
-	#if(globalFace2PatchDEBUG) 
-	Info<<"patch().name() in globalPolyPatch::globalFaceToPatch(): "<<patch().name()<<endl;
-	Info<<"patch().index() in globalPolyPatch::globalFaceToPatch(): "<<patch().index()<<endl;
-    #endif
 	
 	if (gField.size() != globalPatch().size())
     {
@@ -229,9 +215,6 @@ Foam::tmp<Foam::Field<Type> > Foam::globalPolyPatch::globalFaceToPatch
         new Field<Type>(patch().size(), pTraits<Type>::zero)
     );
 	
-	#if(globalFace2PatchDEBUG) 
-	Info<<"patch().size() in globalPolyPatch::globalFaceToPatch(): "<<patch().size()<<endl;
-	#endif
 	
 #ifdef OPENFOAMESIORFOUNDATION
     Field<Type>& pField = tpField.ref();
@@ -253,9 +236,6 @@ Foam::tmp<Foam::Field<Type> > Foam::globalPolyPatch::globalFaceToPatch
         pField = gField;
     }
 	
-	#if(globalFace2PatchDEBUG) 
-	Info<<"gField in globalPolyPatch::globalFaceToPatch(): "<<gField<<endl;
-    #endif
 	
 	return tpField;
 }
