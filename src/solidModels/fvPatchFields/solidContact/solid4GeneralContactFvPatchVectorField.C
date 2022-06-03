@@ -470,12 +470,14 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcNormalModels(const dictio
                 generalNormalContactModel::New
                 (
                     word(contactDict.lookup("generalNormalContactModel")),
-                    patch().boundaryMesh()[targetPatchIndices()[targetI]],
+                    patch(), //.boundaryMesh()[targetPatchIndices()[targetI]],
                     contactDict,
-                    targetPatchIndices()[targetI], // master
-                    patch().index(), // slave
-                    targetGlobalPolyPatchFaceZone(targetI).globalPatch(), // master
-                    globalPolyPatchFaceZone().globalPatch() // slave
+                    //targetPatchIndices()[targetI], // master
+                    patch().index(), // master
+					targetPatchIndices()[targetI], //slave
+                    //targetGlobalPolyPatchFaceZone(targetI).globalPatch(), // master
+                    globalPolyPatchFaceZone().globalPatch(), // master
+					targetGlobalPolyPatchFaceZone(targetI).globalPatch() // slave
                 )
             );
         }
@@ -558,10 +560,11 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcFrictionModels(const dict
                     generalFrictionContactModel::New
                     (
                         word(contactDict.lookup("generalFrictionContactModel")),
-                        patch().boundaryMesh()[targetPatchIndices()[targetI]],
+                        patch(), //.boundaryMesh()[targetPatchIndices()[targetI]],
                         contactDict,
-                        targetPatchIndices()[targetI], // master
-                        patch().index() // slave
+                        //targetPatchIndices()[targetI], // master
+                        patch().index(), // master
+						targetPatchIndices()[targetI] // slave
                     )
                 );
         }
@@ -782,8 +785,9 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcGlobalPolyPatchFaceZoneTo
                     targetI,
                     new newGgiStandAlonePatchInterpolation
                     (
-                        targetGlobalPolyPatchFaceZone(targetI).globalPatch(), // master
-                        globalPolyPatchFaceZone().globalPatch(), // slave
+                        //targetGlobalPolyPatchFaceZone(targetI).globalPatch(), // master
+                        globalPolyPatchFaceZone().globalPatch(), // master
+						targetGlobalPolyPatchFaceZone(targetI).globalPatch(), // slave
                         tensorField(0),
                         tensorField(0),
                         vectorField(0), // Slave-to-master separation.
@@ -797,6 +801,68 @@ void Foam::solid4GeneralContactFvPatchVectorField::calcGlobalPolyPatchFaceZoneTo
                         //newGgiInterpolation::N_SQUARED
                     )
                 );
+				
+				//******************** START based on solids4Foam ********************
+		
+		// Check which point distance calculation method to use
+            const Switch useNewPointDistanceMethod =
+                dict_.lookupOrDefault<Switch>
+                (
+                    "useNewPointDistanceMethod", false
+                );
+
+            Info<< "    " << type() << ": " << patch().name() << nl
+                << "        useNewPointDistanceMethod: "
+                << useNewPointDistanceMethod
+                << endl;
+
+            zoneToZones_[targetI].useNewPointDistanceMethod() =
+                useNewPointDistanceMethod;
+
+            // Check if the projectPointsToPatchBoundary switch is set
+            const Switch projectPointsToPatchBoundary =
+                dict_.lookupOrDefault<Switch>
+                (
+                    "projectPointsToPatchBoundary",
+                    false
+                );
+
+            Info<< "        projectPointsToPatchBoundary: "
+                << projectPointsToPatchBoundary
+                << endl;
+
+            zoneToZones_[targetI].projectPointsToPatchBoundary() =
+                projectPointsToPatchBoundary;
+
+            if (dict_.found("checkPointDistanceOrientations"))
+            {
+                const Switch checkPointDistanceOrientations =
+                    Switch(dict_.lookup("checkPointDistanceOrientations"));
+
+                Info<< "        checkPointDistanceOrientations: "
+                    << checkPointDistanceOrientations
+                    << endl;
+
+                zoneToZones_[targetI].checkPointDistanceOrientations() =
+                    checkPointDistanceOrientations;
+            }
+
+            // Check if the usePrevCandidateMasterNeighbors switch is set
+            const Switch usePrevCandidateMasterNeighbors =
+                dict_.lookupOrDefault<Switch>
+                (
+                    "usePrevCandidateMasterNeighbors",
+                    false
+                );
+
+            Info<< "        usePrevCandidateMasterNeighbors: "
+                << usePrevCandidateMasterNeighbors
+                << endl;
+
+            zoneToZones_[targetI].usePrevCandidateMasterNeighbors() =
+                usePrevCandidateMasterNeighbors;
+		
+		//******************** END based on solids4Foam ********************
         }
     }
 }
@@ -1847,13 +1913,13 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 
                     // Calculate the slave patch face unit normals as they are
                     // units by both the normal and friction models
-                    const vectorField patchFaceNormals = 
-										globalPolyPatchFaceZone().globalFaceToPatch
+                    const vectorField targetPatchFaceNormals = 
+										targetGlobalPolyPatchFaceZone(activePatchI).globalFaceToPatch
 										(
-										globalPolyPatchFaceZone().globalPatch().faceNormals()
+										targetGlobalPolyPatchFaceZone(activePatchI).globalPatch().faceNormals()
 										);
 					#if(ISDEBUG)
-					Info<<"slave patchFaceNormals in updateCoeffs(): "<<patchFaceNormals<<endl;
+					Info<<"slave targetPatchFaceNormals in updateCoeffs(): "<<targetPatchFaceNormals<<endl;
 					#endif
 					 /*
                         patchField
@@ -1919,10 +1985,10 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 					#endif
 					
                     // Master zone DD
-                    const vectorField tagetZoneDD = targetGlobalPolyPatchFaceZone(activePatchI).patchFaceToGlobal(targetPatchDD);
+                    const vectorField zoneDD = globalPolyPatchFaceZone().patchFaceToGlobal(patchDD);
 					
 					#if(ISDEBUG)
-					Info<<"tagetZoneDD in updateCoeffs(): "<<tagetZoneDD<<endl;
+					Info<<"zoneDD in updateCoeffs(): "<<zoneDD<<endl;
 					#endif
 					
 					/*	
@@ -1939,16 +2005,16 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
 					#endif
 					
                     // Master patch DD interpolated to the slave patch
-                    const vectorField patchDDInterpToShadowPatch =
-						globalPolyPatchFaceZone().globalFaceToPatch
+                    const vectorField patchDDInterpToTargetPatch =
+						targetGlobalPolyPatchFaceZone(activePatchI).globalFaceToPatch
 										(
-										zoneToZone(activePatchI).masterToSlave(tagetZoneDD)()
+										zoneToZone(activePatchI).masterToSlave(zoneDD)()
 										);
 					
 					#if(ISDEBUG)
 					Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
 					
-					Info<<"patchDDInterpToShadowPatch in updateCoeffs(): "<<patchDDInterpToShadowPatch<<endl;
+					Info<<"patchDDInterpToTargetPatch in updateCoeffs(): "<<patchDDInterpToTargetPatch<<endl;
 					#endif
 					/*
                         patchField
@@ -1964,14 +2030,14 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                      
 					 normalModel(activePatchI).correct
                      (
-                         patchFaceNormals,
+                         targetPatchFaceNormals,
                          //zoneToZone(activePatchI),
-						 //targetGlobalPolyPatchFaceZone(activePatchI).globalPointToPatch
-						 //(
-						 zoneToZone(activePatchI).slavePointDistanceToIntersection(),
-						 //),
+						 targetGlobalPolyPatchFaceZone(activePatchI).globalPointToPatch
+						 (
+						 zoneToZone(activePatchI).slavePointDistanceToIntersection()
+						 ),
                          targetPatchDD,
-                         patchDDInterpToShadowPatch
+                         patchDDInterpToTargetPatch
                      );
 					 
 					 #if(ISDEBUG)
@@ -1982,22 +2048,59 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                     frictionModel(activePatchI).correct
                     (
                         normalModel(activePatchI).slavePressure(),
-                        patchFaceNormals,
+                        targetPatchFaceNormals,
                         normalModel(activePatchI).areaInContact(),
                         targetPatchDD,
-                        patchDDInterpToShadowPatch
+                        patchDDInterpToTargetPatch
                     );
 					
 					#if(ISDEBUG)
 					Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
 					#endif
 					
-                    // Accumulate traction
+					//******************** Completed Editing *************
+					//******************** Move/Remove this *************
 
+                    vectorField targetPatchTraction =
+                        -frictionModel(activePatchI).slaveTractionForMaster()
+                        -normalModel(activePatchI).slavePressure();
+
+                    vectorField targetZoneTraction = targetGlobalPolyPatchFaceZone(activePatchI).patchFaceToGlobal(targetPatchTraction);
+                        /*
+						zoneField
+                        (
+                            shadowZoneIndices()[activePatchI],
+                            targetPatchIndices()[activePatchI],
+                            targetPatchTraction
+                        );
+						*/
+					
+					#if(ISDEBUG)
+					Info<<"MASTER in updateCoeffs() line:"<<__LINE__<<endl;
+					#endif
+					
+                    // Face-to-face
+                    vectorField masterZoneTraction =
+                        //globalPolyPatchFaceZone().globalFaceToPatch
+						//(
+						zoneToZone(activePatchI).slaveToMaster(targetZoneTraction);
+						//);
+					
+                    // We store master patch traction as thermalGeneralContact
+                    // uses it
                     curPatchTractions(activePatchI) =
-                        frictionModel(activePatchI).slaveTraction()
-                        + normalModel(activePatchI).slavePressure();
-
+						globalPolyPatchFaceZone().globalFaceToPatch(masterZoneTraction);
+						/*
+                        patchField
+                        (
+                            patch().index(),
+                            zoneIndex(),
+                            masterZoneTraction
+                        );
+						*/
+					
+					//******************** End Move/Remove this *************
+					
                     curPatchTraction += curPatchTractions(activePatchI);
 					
 					#if(!ISDEBUG)
@@ -2019,7 +2122,7 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                         );
 
                     const solid4GeneralContactFvPatchVectorField&
-                        localMasterField =
+                        localSlaveField =
                         refCast<const solid4GeneralContactFvPatchVectorField>
                         (
                             field.boundaryField()
@@ -2028,53 +2131,18 @@ void Foam::solid4GeneralContactFvPatchVectorField::updateCoeffs()
                             ]
                         );
 
-                    const label masterTargetI =
-                        localMasterField.findTargetID(patch().index());
-
-                    vectorField shadowPatchTraction =
-                        -localMasterField.frictionModel
-                        (
-                            masterTargetI
-                        ).slaveTractionForMaster()
-                        -localMasterField.normalModel
-                        (
-                            masterTargetI
-                        ).slavePressure();
-
-                    vectorField shadowZoneTraction = targetGlobalPolyPatchFaceZone(activePatchI).patchFaceToGlobal(shadowPatchTraction);
-                        /*
-						zoneField
-                        (
-                            shadowZoneIndices()[activePatchI],
-                            targetPatchIndices()[activePatchI],
-                            shadowPatchTraction
-                        );
-						*/
+                    const label slaveTargetI =
+                        localSlaveField.findTargetID(patch().index());
+						
 					
-					#if(ISDEBUG)
-					Info<<"MASTER in updateCoeffs() line:"<<__LINE__<<endl;
-					#endif
-					
-                    // Face-to-face
-                    vectorField masterZoneTraction =
-                        localMasterField.zoneToZone
-                        (
-                            masterTargetI
-                        ).slaveToMaster(shadowZoneTraction);
+					// Accumulate traction
 
-                    // We store master patch traction as thermalGeneralContact
-                    // uses it
                     curPatchTractions(activePatchI) =
-						globalPolyPatchFaceZone().globalFaceToPatch(masterZoneTraction);
-						/*
-                        patchField
-                        (
-                            patch().index(),
-                            zoneIndex(),
-                            masterZoneTraction
-                        );
-						*/
-
+                        localSlaveField.frictionModel(slaveTargetI).slaveTraction()
+                        + localSlaveField.normalModel(slaveTargetI).slavePressure();
+					
+					//******************** Completed Editing *************
+					
                     curPatchTraction += curPatchTractions(activePatchI);
 					
 					#if(!ISDEBUG)

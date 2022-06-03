@@ -474,12 +474,14 @@ void Foam::solidGeneralContactFvPatchVectorField::calcNormalModels(const diction
                 generalNormalContactModel::New
                 (
                     word(contactDict.lookup("generalNormalContactModel")),
-                    patch().boundaryMesh()[shadowPatchIndices()[shadowI]],
+                    patch(), //.boundaryMesh()[shadowPatchIndices()[shadowI]],
                     contactDict,
-                    shadowPatchIndices()[shadowI], // master
-                    patch().index(), // slave
-                    shadowZone(shadowI).globalPatch(), // master
-                    zone().globalPatch() // slave
+                    //shadowPatchIndices()[shadowI], // master
+                    patch().index(), // master
+					shadowPatchIndices()[shadowI], // slave
+                    //shadowZone(shadowI).globalPatch(), // master
+                    zone().globalPatch(), // master
+					shadowZone(shadowI).globalPatch() // slave
                 )
             );
         }
@@ -564,10 +566,11 @@ void Foam::solidGeneralContactFvPatchVectorField::calcFrictionModels(const dicti
                     generalFrictionContactModel::New
                     (
                         word(contactDict.lookup("generalFrictionContactModel")),
-                        patch().boundaryMesh()[shadowPatchIndices()[shadowI]],
+                        patch(), //.boundaryMesh()[shadowPatchIndices()[shadowI]],
                         contactDict,
-                        shadowPatchIndices()[shadowI], // master
-                        patch().index() // slave
+                        //shadowPatchIndices()[shadowI], // master
+                        patch().index(), // slave
+						shadowPatchIndices()[shadowI] // master
                     )
                 );
         }
@@ -812,8 +815,9 @@ void Foam::solidGeneralContactFvPatchVectorField::calcZoneToZones() const
                     shadowI,
                     new newGgiStandAlonePatchInterpolation
                     (
-                        shadowZone(shadowI).globalPatch(), // master
-                        zone().globalPatch(), // slave
+                        //shadowZone(shadowI).globalPatch(), // master
+                        zone().globalPatch(), // master
+						shadowZone(shadowI).globalPatch(), // slave
                         tensorField(0),
                         tensorField(0),
                         vectorField(0), // Slave-to-master separation.
@@ -1871,7 +1875,7 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
 	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;	
 	#endif
 
-    boolList activeContactPairs(shadowPatchNames().size(), true);
+    boolList activeContactPairs(shadowPatchNames().size(), true);  //true
 
     // if it is a new time step then reset iCorr
     if (curTimeIndex_ != db().time().timeIndex())
@@ -1989,10 +1993,13 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
             // pairs: if the BBs of pair intersect then we will designate the
             // pair as active.
 			
+			
 			//***************** Start boundBox comment ************
 			#if(ISDEBUG)
             // Create shadow bounding box
             boundBox shadowBb(shadowZone(shadowI).patch().localPoints(), false);
+			
+			Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
 
             // Check for a zero dimension in the shadowBb
             if (shadowBb.minDim() < bbOff)
@@ -2033,6 +2040,8 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
             // pairs
             // Accumulate contact force contributions for all active contact
             // pairs
+			
+			//Info<<"Is the pair activeContactPairs[shadowI]? "<<activeContactPairs[shadowI]<<endl;
 
             if (activeContactPairs[shadowI])
             {
@@ -2046,7 +2055,7 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
 				#endif
                 if (locSlave[shadowI])
                 {
-					#if(ActivePairDEBUG)
+					#if(!ActivePairDEBUG)
 					Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
 					Info<<"zone().globalPatch() in updateCoeffs(): "<<zone().globalPatch()<<endl;
                     Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
@@ -2056,13 +2065,13 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
 
                     // Calculate the slave patch face unit normals as they are
                     // units by both the normal and friction models
-                    const vectorField patchFaceNormals = 
-										zone().globalFaceToPatch
+                    const vectorField shadowPatchFaceNormals = 
+										shadowZone(shadowI).globalFaceToPatch
 										(
-										zone().globalPatch().faceNormals()
+										shadowZone(shadowI).globalPatch().faceNormals()
 										);
 					#if(ISDEBUG)
-					Info<<"slave patchFaceNormals in updateCoeffs(): "<<patchFaceNormals<<endl;
+					Info<<"slave shadowPatchFaceNormals in updateCoeffs(): "<<shadowPatchFaceNormals<<endl;
 					#endif
 					 /*
                         patchField
@@ -2073,7 +2082,7 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
                         );
 						*/
 						
-						#if(ISDEBUG)
+						#if(!ISDEBUG)
 						Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
 						#endif
                     // Interpolate the master displacement increment to the
@@ -2127,11 +2136,12 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
 					Info<<"shadowPatchDD in updateCoeffs() line:"<<shadowPatchDD<<endl;
 					#endif
 					
+					
                     // Master zone DD
-                    const vectorField shadowZoneDD = shadowZone(shadowI).patchFaceToGlobal(shadowPatchDD);
+                    const vectorField zoneDD = zone().patchFaceToGlobal(patchDD);
 					
 					#if(ISDEBUG)
-					Info<<"shadowZoneDD in updateCoeffs(): "<<shadowZoneDD<<endl;
+					Info<<"zoneDD in updateCoeffs(): "<<zoneDD<<endl;
 					#endif
 					
 					/*	
@@ -2149,10 +2159,11 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
 					
                     // Master patch DD interpolated to the slave patch
                     const vectorField patchDDInterpToShadowPatch =
-						zone().globalFaceToPatch
+						shadowZone(shadowI).globalFaceToPatch
 										(
-										zoneToZone(shadowI).masterToSlave(shadowZoneDD)()
+										zoneToZone(shadowI).masterToSlave(zoneDD)()
 										);
+					Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
 					
 					#if(ISDEBUG)
 					Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
@@ -2171,27 +2182,29 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
                     //FatalError
                     //    << "Disabled: use jasakSolidContact" << abort(FatalError);
                      
+					 Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
 					 normalModel(shadowI).correct
                      (
-                         patchFaceNormals,
+                         shadowPatchFaceNormals,
                          //zoneToZone(shadowI),
-						 //shadowZone(shadowI).globalPointToPatch
-						 //(
-						 zoneToZone(shadowI).slavePointDistanceToIntersection(),
-						 //),
+						 shadowZone(shadowI).globalPointToPatch
+						 (
+						 zoneToZone(shadowI).slavePointDistanceToIntersection()
+						 ),
                          shadowPatchDD,
                          patchDDInterpToShadowPatch
                      );
+					 Info<<"shadowI - SLAVE in updateCoeffs(): "<<shadowI<<endl;
 					 
-					 #if(ISDEBUG)
+					 #if(!ISDEBUG)
 					 Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
-					 Info<<"normalModel(shadowI).slavePressure()in updateCoeffs(): "<<normalModel(shadowI).slavePressure()<<endl;
+					 //Info<<"normalModel(shadowI).slavePressure()in updateCoeffs(): "<<normalModel(shadowI).slavePressure()<<endl;
 					 #endif
 					 
                     frictionModel(shadowI).correct
                     (
                         normalModel(shadowI).slavePressure(),
-                        patchFaceNormals,
+                        shadowPatchFaceNormals,
                         normalModel(shadowI).areaInContact(),
                         shadowPatchDD,
                         patchDDInterpToShadowPatch
@@ -2200,55 +2213,12 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
 					#if(ISDEBUG)
 					Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
 					#endif
-					
-                    // Accumulate traction
-
-                    curPatchTractions(shadowI) =
-                        frictionModel(shadowI).slaveTraction()
-                        + normalModel(shadowI).slavePressure();
-
-                    curPatchTraction += curPatchTractions(shadowI);
-					
-					#if(!ISDEBUG)
-					Info<<"SLAVE curPatchTraction in updateCoeffs() :"<<curPatchTraction<<endl;
-					#endif
-				}
-                else // local master
-                {
-					#if(ActivePairDEBUG)
-					Info<<"MASTER in updateCoeffs() line:"<<__LINE__<<endl;
-                    #endif
-					
-					// Get traction from local slave
-
-                    const volVectorField& field =
-                        db().lookupObject<volVectorField>
-                        (
-                            dimensionedInternalField().name()
-                        );
-
-                    const solidGeneralContactFvPatchVectorField&
-                        localMasterField =
-                        refCast<const solidGeneralContactFvPatchVectorField>
-                        (
-                            field.boundaryField()
-                            [
-                                shadowPatchIndices()[shadowI]
-                            ]
-                        );
-
-                    const label masterShadowI =
-                        localMasterField.findShadowID(patch().index());
-
-                    vectorField shadowPatchTraction =
-                        -localMasterField.frictionModel
-                        (
-                            masterShadowI
-                        ).slaveTractionForMaster()
-                        -localMasterField.normalModel
-                        (
-                            masterShadowI
-                        ).slavePressure();
+				
+				//******************** Completed Editing *************
+				
+				vectorField shadowPatchTraction =
+                        - frictionModel(shadowI).slaveTractionForMaster()
+                        - normalModel(shadowI).slavePressure();
 
                     vectorField shadowZoneTraction = shadowZone(shadowI).patchFaceToGlobal(shadowPatchTraction);
                         /*
@@ -2260,17 +2230,18 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
                         );
 						*/
 					
-					#if(ISDEBUG)
+					#if(!ISDEBUG)
 					Info<<"MASTER in updateCoeffs() line:"<<__LINE__<<endl;
 					#endif
 					
                     // Face-to-face
-                    vectorField masterZoneTraction =
-                        localMasterField.zoneToZone
-                        (
-                            masterShadowI
-                        ).slaveToMaster(shadowZoneTraction);
-
+                    vectorField masterZoneTraction = 
+					zone().globalFaceToPatch
+					(
+					zoneToZone(shadowI).slaveToMaster(shadowZoneTraction)()
+					);
+					Info<<"SLAVE in updateCoeffs() line:"<<__LINE__<<endl;
+					
                     // We store master patch traction as thermalGeneralContact
                     // uses it
                     curPatchTractions(shadowI) =
@@ -2285,6 +2256,48 @@ void Foam::solidGeneralContactFvPatchVectorField::updateCoeffs()
 						*/
 
                     curPatchTraction += curPatchTractions(shadowI);
+					
+					#if(!ISDEBUG)
+					Info<<"SLAVE curPatchTraction in updateCoeffs() :"<<curPatchTraction<<endl;
+					#endif
+				}
+                else // local slave
+                {
+					#if(!ActivePairDEBUG)
+					Info<<"MASTER in updateCoeffs() line:"<<__LINE__<<endl;
+                    #endif
+					
+					// Get traction from local slave
+	
+                    const volVectorField& field =
+                        db().lookupObject<volVectorField>
+                        (
+                            dimensionedInternalField().name()
+                        );
+						
+					// Lookup the master patch corresponding to the current slave patch
+                    const solidGeneralContactFvPatchVectorField&
+                        localSlaveField =
+                        refCast<const solidGeneralContactFvPatchVectorField>
+                        (
+                            field.boundaryField()
+                            [
+                                shadowPatchIndices()[shadowI]
+                            ]
+                        );
+
+                    const label slaveShadowI =
+                        localSlaveField.findShadowID(patch().index());
+						
+					// Accumulate traction
+
+                    curPatchTractions(shadowI) =
+                        localSlaveField.frictionModel(slaveShadowI).slaveTraction()
+                        + localSlaveField.normalModel(slaveShadowI).slavePressure();
+						
+					curPatchTraction += curPatchTractions(shadowI);
+						
+					//******************** Completed Editing *************
 					
 					#if(!ISDEBUG)
 					Info<<"MASTER curPatchTraction in updateCoeffs() :"<<curPatchTraction<<endl;
@@ -2464,7 +2477,8 @@ void Foam::solidGeneralContactFvPatchVectorField::calcBbOffset() const
         minDim = min(sqrt(patch().magSf()));
     }
 
-    bbOffset_ = 5.0*returnReduce(minDim, minOp<scalar>());
+    //bbOffset_ = 5.0*returnReduce(minDim, minOp<scalar>()); //oRG
+	bbOffset_ = 1.25*returnReduce(minDim, minOp<scalar>());
 
     if (debug)
     {

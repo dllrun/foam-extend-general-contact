@@ -354,16 +354,19 @@ void generalStandardPenalty::correct
     // Calculate the point pressures
     // We will also record the average and minium penetrations
 
-    Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
+    //Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
 	const scalar penaltyFac = penaltyFactor();
+	
     scalarField totalSlavePointPressure(slavePointPenetration.size(), 0.0);
-    averagePenetration_ = 0.0;
+    
+	averagePenetration_ = 0.0;
     minPenetration_ = 0.0;
     int nPointsInContact = 0;
-
+	
+	Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
 	
     forAll(totalSlavePointPressure, pointI)
-    {
+    {		
         // Take copy of penetration
         const scalar d = slavePointPenetration[pointI];
 
@@ -388,8 +391,9 @@ void generalStandardPenalty::correct
             {
                 totalSlavePointPressure[pointI] = 0.0;
             }
-        }
+        }		
     }
+	
 
     // Find global minimum penetration
     // IB 11/2018
@@ -406,7 +410,7 @@ void generalStandardPenalty::correct
     {
         averagePenetration_ = 0.0;
     }
-
+ 
 
     // Interpolate point pressures to the faces
 
@@ -422,6 +426,7 @@ void generalStandardPenalty::correct
 	Info<<"These slave point tractions are interpolated to slave face centers"<<__LINE__<<endl;
     #endif
 	
+	
 	// Interpolate point pressures to the face centres and apply in the negative
     // normal direction
     vectorField newSlaveTraction =
@@ -433,11 +438,15 @@ void generalStandardPenalty::correct
 		#if(standardPenaltyDEBUG)
 	Info<<"In generalStandardPenalty::correct(..):"<<__LINE__<<endl;
 		#endif
+		
+	Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
 
     // Under-relax pressure/traction
     // Note: slavePressure_ is really a traction vector
     slavePressure() =
         relaxFac_*newSlaveTraction + (1.0 - relaxFac_)*slavePressure();
+	
+	Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
 }
 
 
