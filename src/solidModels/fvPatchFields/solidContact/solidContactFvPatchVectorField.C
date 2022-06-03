@@ -598,10 +598,10 @@ void solidContactFvPatchVectorField::rmap
 
 void solidContactFvPatchVectorField::updateCoeffs()
 {
-	Info<<"In updateCoeffs() line:"<<__LINE__<<endl;
+
     if (this->updated())
     {
-		Info<<"this->updated() in updateCoeffs() line:"<<__LINE__<<endl;
+
         return;
     }
 
@@ -867,7 +867,7 @@ void solidContactFvPatchVectorField::updateCoeffs()
     }
 		
     directionMixedFvPatchVectorField::updateCoeffs();
-	Info<<"After directionMixedFvPatchVectorField in updateCoeffs() line:"<<__LINE__<<endl;
+
 }
 
 
@@ -1265,7 +1265,7 @@ bool solidContactFvPatchVectorField::checkPatchAndFaceZones
 
 void solidContactFvPatchVectorField::evaluate(const Pstream::commsTypes)
 {
-	Info<<"In evaluate(..) line:"<<__LINE__<<endl;
+
 	if (!this->updated())
     {
         this->updateCoeffs();
@@ -1273,8 +1273,6 @@ void solidContactFvPatchVectorField::evaluate(const Pstream::commsTypes)
 
     vectorField normalValue = transform(valueFraction(), refValue());
 	
-	Info<<"fieldName_ in solidContact::evaluate(..) line:"<<fieldName_<<endl;
-	Info<<"In solidContact::evaluate(..) line:"<<__LINE__<<endl;
 
     //- non-orthogonal correction vectors needed to calculate gradValue
     const fvPatchField<tensor>& gradField =
@@ -1283,7 +1281,6 @@ void solidContactFvPatchVectorField::evaluate(const Pstream::commsTypes)
             "grad(" + fieldName_ + ")"
         );
 		
-		Info<<"In solidContact::evaluate(..) line:"<<__LINE__<<endl;
     vectorField n = patch().nf();
     vectorField delta = patch().delta();
     vectorField k = delta - n*(n&delta);
@@ -1299,7 +1296,7 @@ void solidContactFvPatchVectorField::evaluate(const Pstream::commsTypes)
     Field<vector>::operator=(normalValue + transformGradValue);
 
     fvPatchField<vector>::evaluate();
-	Info<<"After fvPatchField<vector> in evaluate(..) line:"<<__LINE__<<endl;
+
 }
 
 Foam::tmp<Foam::Field<vector> > solidContactFvPatchVectorField::
