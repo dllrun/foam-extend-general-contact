@@ -33,7 +33,6 @@ InClass
 #include "addToRunTimeSelectionTable.H"
 #include "primitivePatchInterpolation.H"
 #include "constitutiveModel.H"
-#define standardPenaltyDEBUG false
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,7 +64,7 @@ void generalStandardPenalty::calcPenaltyFactor() const
     const label masterPatchIndex =  masterPatchID();
     const label slavePatchIndex =  slavePatchID();
 	
-	//************** START standardPenalty based on ORG foam-extend-4.0 ************
+
 	const constitutiveModel& rheology =
 	mesh_.objectRegistry::lookupObject<constitutiveModel>
         ("rheologyProperties");
@@ -78,32 +77,15 @@ void generalStandardPenalty::calcPenaltyFactor() const
     scalarField slaveLambda =
       rheology.lambda()().boundaryField()[slavePatchIndex];
 	  
-	//************** END standardPenalty based on ORG foam-extend-4.0 ************	
-
-	//******************* Comment the section with object impK ***************
-    // Lookup implicit stiffness = 2*mu + lambda, approximately equal to the
-    // bulk modulus 
-	/*
-    const volScalarField& impK = mesh_.lookupObject<volScalarField>("impK");
-	*/
-	//******************* END the section with object impK ***************
 	
 	
     // Note: for solidRigidContact, only the master index is set
     if (masterPatchIndex > -1 && slavePatchIndex > -1)
     {
-	//************** START standardPenalty based on ORG foam-extend-4.0 ************	
-	//************* const in front of scalar masterK & scalar slaveK ****** 	
+		
 	// avarage contact patch bulk modulus
     const scalar masterK = gAverage(masterLambda + (2.0/3.0)*masterMu);
     const scalar slaveK = gAverage(slaveLambda + (2.0/3.0)*slaveMu);
-	//************** END standardPenalty based on ORG foam-extend-4.0 ************	
-	
-        //******************* Comment the section with object impK ***************
-	/*	// Avarage contact patch bulk modulus
-        const scalar masterK = gAverage(impK.boundaryField()[masterPatchIndex]);
-        const scalar slaveK = gAverage(impK.boundaryField()[slavePatchIndex]);
-	*/	//******************* END the section with object impK ***************
 		
         // Simple average
         //const scalar bulkModulus = 0.5*(masterK + slaveK);
@@ -146,17 +128,9 @@ void generalStandardPenalty::calcPenaltyFactor() const
     else if (slavePatchIndex > -1)
     {
 		
-		//************** START standardPenalty based on ORG foam-extend-4.0 ************	
-		// avarage contact patch bulk modulus
     const scalar bulkModulus = 
 			gAverage(slaveLambda + (2.0/3.0)*slaveMu);
-	//************** END standardPenalty based on ORG foam-extend-4.0 ************	
 	
-		//******************* Comment the section with object impK ***************
-    /*    // Avarage contact patch bulk modulus
-        const scalar bulkModulus =
-            gAverage(impK.boundaryField()[slavePatchIndex]);
-	*/	//******************* END the section with object impK ***************	
 
         // Average contact patch face area
         const scalar faceArea =
@@ -261,9 +235,6 @@ generalStandardPenalty::generalStandardPenalty
     ),
     contactIterNum_(0)
 {
-	Info<<"Step0: Constructor C1(5 arguments) in ::generalStandardPenalty:"<<__LINE__<<endl;
-	Info<<"masterPatchID in Constructor C1(5 arguments) in ::generalStandardPenalty:"<<masterPatchID<<endl;
-	Info<<"slavePatchID in Constructor C1(5 arguments) in ::generalStandardPenalty:"<<slavePatchID<<endl;
 }
 
 
@@ -282,7 +253,6 @@ generalStandardPenalty::generalStandardPenalty(const generalStandardPenalty& nm)
     epsilon0_(nm.epsilon0_),
     contactIterNum_(nm.contactIterNum_)
 {
-	Info<<"Step0: Constructor C2(1 argument) in generalStandardPenalty:"<<__LINE__<<endl;
 }
 
 
@@ -314,10 +284,6 @@ void generalStandardPenalty::correct
     scalarField& areaInContact = this->areaInContact();
     forAll(slavePatchLocalFaces, faceI)
     {
-		#if(standardPenaltyDEBUG)
-	Info<<"Step2: Here I am in generalStandardPenalty::correct(..):"<<__LINE__<<endl;
-    Info<<"Slave vertices are checked to find the vertex penetrations face: "<<faceI<<endl;
-		#endif
 		
 		areaInContact[faceI] =
             slavePatchLocalFaces[faceI].areaInContact
@@ -346,15 +312,11 @@ void generalStandardPenalty::correct
         slavePatchLocalFaceAreas[faceI] =
             mag(slavePatchLocalFaces[faceI].normal(slavePatchLocalPoints));
 			
-			#if(standardPenaltyDEBUG)
-    Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
-			#endif
 	}
 
     // Calculate the point pressures
     // We will also record the average and minium penetrations
 
-    //Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
 	const scalar penaltyFac = penaltyFactor();
 	
     scalarField totalSlavePointPressure(slavePointPenetration.size(), 0.0);
@@ -363,7 +325,6 @@ void generalStandardPenalty::correct
     minPenetration_ = 0.0;
     int nPointsInContact = 0;
 	
-	Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
 	
     forAll(totalSlavePointPressure, pointI)
     {		
@@ -372,10 +333,6 @@ void generalStandardPenalty::correct
 
         // Note: penetration is negative for points in contact
         {
-			#if(standardPenaltyDEBUG)
-			Info<<"Step3: Here I am in generalStandardPenalty::correct(..):"<<__LINE__<<endl;
-			Info<<"Corrective contact forces added to penetrating slave vertices"<<__LINE__<<endl;
-            #endif
 			
 			// The force is linearly proportional the penetration, like a spring
             if (d < epsilon0_)
@@ -421,11 +378,6 @@ void generalStandardPenalty::correct
         mesh.boundaryMesh()[slavePatchIndex]
     );
 	
-	#if(standardPenaltyDEBUG)
-	Info<<"Step4: Here I am in generalStandardPenalty::correct(..):"<<__LINE__<<endl;
-	Info<<"These slave point tractions are interpolated to slave face centers"<<__LINE__<<endl;
-    #endif
-	
 	
 	// Interpolate point pressures to the face centres and apply in the negative
     // normal direction
@@ -435,18 +387,12 @@ void generalStandardPenalty::correct
             totalSlavePointPressure
         )*(-slavePatchFaceNormals);
 		
-		#if(standardPenaltyDEBUG)
-	Info<<"In generalStandardPenalty::correct(..):"<<__LINE__<<endl;
-		#endif
-		
-	Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
 
     // Under-relax pressure/traction
     // Note: slavePressure_ is really a traction vector
     slavePressure() =
         relaxFac_*newSlaveTraction + (1.0 - relaxFac_)*slavePressure();
 	
-	Info<<"generalStandardPenalty::correct(..) line: "<<__LINE__<<endl;
 }
 
 

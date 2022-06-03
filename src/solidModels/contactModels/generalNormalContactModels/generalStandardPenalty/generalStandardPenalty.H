@@ -171,7 +171,6 @@ public:
         //- Return slave pressure
         virtual vectorField& slavePressure()
         {
-			//Info<<"In -- generalStandardPenalty::slavePressure() line:"<<__LINE__<<endl;
             return slavePressureVolField_.boundaryField()[slavePatchID()];
         }
 
@@ -181,22 +180,13 @@ public:
         //- Return area in contact of slave patch
         virtual const scalarField& areaInContact() const
         {
-			Info<<"In generalStandardPenalty.H::areaInContact() line:"<<__LINE__<<endl;
-			//Info<<"areaInContactVolField_ in generalStandardPenalty.H::areaInContact(): "<<areaInContactVolField_<<endl;
-            Info<<"slavePatchID() in generalStandardPenalty.H::areaInContact(): "<<slavePatchID()<<endl;
-			return areaInContactVolField_.boundaryField()[slavePatchID()];
-			//***************** Testing master patchID ************************
-            //return areaInContactVolField_.boundaryField()[masterPatchID()];
-			//***************** End testing master patchID ************************
+			return areaInContactVolField_.boundaryField()[slavePatchID()];	
         };
 
         //- Return area in contact of slave patch
         virtual scalarField& areaInContact()
         {
 			return areaInContactVolField_.boundaryField()[slavePatchID()];
-			//***************** Testing master patchID ************************
-            //return areaInContactVolField_.boundaryField()[masterPatchID()];
-			//***************** End testing master patchID ************************
         };
 
         //- Update penalty scale factors (for penalty laws)
