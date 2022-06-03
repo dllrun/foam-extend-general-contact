@@ -272,21 +272,14 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
     const bool incremental
 )
 {
-//	Info<<"Here I am in tractionBoundaryGradient's snGrad(..)"<<__LINE__<<endl;
     // Create result
     tmp<vectorField> tgradient(new vectorField(traction.size(), vector::zero));
     vectorField& gradient = tgradient();
 	
-	#if(snGradDEBUG)
-	Info<<"tgradient() in tractionBoundaryGradient's snGrad(..)"<<tgradient()<<endl;
-	#endif
 	
     // Orthotropic material
     if (orthotropic)
     {
-		#if(snGradDEBUG)
-		Info<<"Here I am in tractionBoundaryGradient's snGrad(..)"<<__LINE__<<endl;
-        #endif
 		
 		// Get mechanical properties
         const constitutiveModel& rheology =
@@ -391,9 +384,6 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
     }
     else
     {
-		#if(snGradDEBUG)
-		Info<<"Here I am in tractionBoundaryGradient's snGrad(..)"<<__LINE__<<endl;
-        #endif
 		
 		// Standard isotropic solvers
 
@@ -416,7 +406,6 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
 
         vectorField n = patch.nf();
 		
-//		Info<<"Here I am in tractionBoundaryGradient's snGrad(..)"<<__LINE__<<endl;
 		
         // gradient of the field
         const fvPatchTensorField& gradField =
@@ -425,7 +414,6 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
                 "grad(" + workingFieldName + ")"
             );
 
-//		Info<<"Here I am in tractionBoundaryGradient's snGrad(..)"<<__LINE__<<endl;
         vectorField Traction(n.size(), vector::zero);
 
         // Total Lagrangian, small strain
@@ -435,7 +423,6 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
          && nonLinear == nonLinearGeometry::OFF
         )
         {
-//			Info<<"Here I am in tractionBoundaryGradient's snGrad(..)"<<__LINE__<<endl;
             // Use total traction
             Traction = (traction - n*pressure);
         }
@@ -537,10 +524,6 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
             Traction -= (n & DSigmaCorr);
         }
 		
-		#if(snGradDEBUG)
-		Info<<"Here I am in tractionBoundaryGradient's snGrad(..)"<<__LINE__<<endl;
-		Info<<"gradient in tractionBoundaryGradient's snGrad(..)"<<gradient<<endl;
-        #endif
 		
 		// Calculate the normal gradient based on the traction
 
@@ -637,10 +620,6 @@ Foam::tmp<Foam::vectorField> Foam::tractionBoundaryGradient::snGrad
         gradient /= (2.0*mu + lambda);
     }
 	
-	//Info<<"gradient in tractionBoundaryGradient's snGrad(..)"<<gradient<<endl;
-	#if(snGradDEBUG)
-	Info<<"tgradient() in tractionBoundaryGradient's snGrad(..)"<<tgradient()<<endl;
-	#endif
 
     return tgradient;
 }
