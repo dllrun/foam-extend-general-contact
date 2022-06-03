@@ -49,7 +49,6 @@ solidTractionFvPatchVectorField
     nonLinear_(nonLinearGeometry::OFF),
     orthotropic_(false)
 {
-	Info<<"In solidTraction::C1(p,iF) line:"<<__LINE__<<endl;
     fvPatchVectorField::operator=(patchInternalField());
     gradient() = vector::zero;
 }
@@ -70,7 +69,6 @@ solidTractionFvPatchVectorField
     nonLinear_(nonLinearGeometry::OFF),
     orthotropic_(false)
 {
-	Info<<"In solidTraction::C2(p,iF,dict) line:"<<__LINE__<<endl;
     fvPatchVectorField::operator=(patchInternalField());
     gradient() = vector::zero;
 
@@ -141,7 +139,6 @@ solidTractionFvPatchVectorField
     nonLinear_(stpvf.nonLinear_),
     orthotropic_(stpvf.orthotropic_)
 {
-	Info<<"In solidTraction::C3(stpvf,p,iF,mapper) line:"<<__LINE__<<endl;
 }
 
 
@@ -158,7 +155,6 @@ solidTractionFvPatchVectorField
     nonLinear_(stpvf.nonLinear_),
     orthotropic_(stpvf.orthotropic_)
 {
-	Info<<"In solidTraction::C4(stpvf) line:"<<__LINE__<<endl;
 }
 
 
@@ -176,7 +172,6 @@ solidTractionFvPatchVectorField
     nonLinear_(stpvf.nonLinear_),
     orthotropic_(stpvf.orthotropic_)
 {
-	Info<<"In solidTraction::C1(stpvf,iF) line:"<<__LINE__<<endl;
 }
 
 
@@ -213,16 +208,13 @@ void solidTractionFvPatchVectorField::rmap
 // Update the coefficients associated with the patch field
 void solidTractionFvPatchVectorField::updateCoeffs()
 {
-//	Info<<"Here I am in solidTraction's updateCoeffs()"<<__LINE__<<endl;
     if (updated())
     {
-		Info<<"if (updated()) check in solidTraction's updateCoeffs()"<<__LINE__<<endl;
         return;
     }
 
     bool incremental(fieldName_ == "DU");
 	
-//	Info<<"Here I am in solidTraction's updateCoeffs()"<<__LINE__<<endl;
     gradient() = tractionBoundaryGradient::snGrad
     (
         traction_,
@@ -234,20 +226,16 @@ void solidTractionFvPatchVectorField::updateCoeffs()
         nonLinear_,
         incremental
     );
-//	Info<<"Here I am in solidTraction's updateCoeffs()"<<__LINE__<<endl;
 	
     fixedGradientFvPatchVectorField::updateCoeffs();
 	
-	Info<<"Here I am in solidTraction's updateCoeffs()"<<__LINE__<<endl;
 }
 
 
 void solidTractionFvPatchVectorField::evaluate(const Pstream::commsTypes)
 {
-	Info<<"Here I am in solidTraction's evaluate(..)"<<__LINE__<<endl;
     if (!this->updated())
     {
-		Info<<"!this->updated() check in solidTraction's evaluate(..)"<<__LINE__<<endl;
         this->updateCoeffs();
     }
 
@@ -276,7 +264,6 @@ void solidTractionFvPatchVectorField::evaluate(const Pstream::commsTypes)
 // Write
 void solidTractionFvPatchVectorField::write(Ostream& os) const
 {
-	Info<<"In solidTraction::write function line "<<__LINE__<<endl;
     fvPatchVectorField::write(os);
     os.writeKeyword("nonLinear")
         << nonLinearGeometry::nonLinearNames_[nonLinear_]
