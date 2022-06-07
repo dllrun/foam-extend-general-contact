@@ -38,6 +38,8 @@ SourceFiles
     generalStandardPenalty.C
 
 Author
+	Ranjan Dhakal, IPPE, Graz University of Technology 
+Co-Author
     Philip Cardiff, UCD. All rights reserved.
 
 \*---------------------------------------------------------------------------*/

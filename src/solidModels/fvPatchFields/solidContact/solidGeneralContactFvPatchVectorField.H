@@ -54,11 +54,12 @@ Description
 
 SourceFiles
     solidGeneralContactFvPatchVectorField.C
-    solidGeneralContactFvPatchVectorFieldCalcContact.C
 
 Author
-    Philip Cardiff, UCD. All rights reserved.
-    Rewrite by Hrvoje Jasak.
+	Ranjan Dhakal, IPPE, Graz University of Technology 
+Co-Author	 
+	Stefan Radl, IPPE, Graz University of Technology  
+    Philip Cardiff, University College Dublin 
 
 \*---------------------------------------------------------------------------*/
 

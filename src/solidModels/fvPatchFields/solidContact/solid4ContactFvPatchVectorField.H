@@ -57,8 +57,9 @@ SourceFiles
     solid4ContactFvPatchVectorFieldCalcContact.C
 
 Author
-    Philip Cardiff, UCD. All rights reserved.
-    Rewrite by Hrvoje Jasak.
+    Philip Cardiff, UCD. All rights reserved.	
+Co-Author
+	Ranjan Dhakal, IPPE, Graz University of Technology 
 
 \*---------------------------------------------------------------------------*/
 
