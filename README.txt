@@ -1,8 +1,17 @@
-SOLID CONTACT ANALYSIS TOOL WITH FOAM-EXTEND
+	     ______________________________________________
+
+	     *SOLID CONTACT ANALYSIS TOOL WITH FOAM-EXTEND*
+	     ______________________________________________
+
+
+			 Author: Ranjan Dhakal
+			   Date: June 2022
+
+
 
 Version: foam-extend-4.0
 Licence: GPL-3.0 licence
-Last commit: 
+Last commit: June 2022
 
 1. Introduction
 
@@ -12,18 +21,17 @@ The code is based on Finite Volume Method and it is forked from Unofficial-Exten
 2. Documentation
 The documention provides guidelines for 
 
-* [Installation](https://github.com/dllrun/foam-extend-general-contact/blob/633aa115a2ab25a67175a043d56ca872236670c7/howToInstall.txt#L1)
-* [Application or Tutorials](https://github.com/dllrun/matheGRAMRanjanCases/blob/e3affbc35effcae50d988d2b59c52fe0a595d404/deliverablesCasesToPublish/howToRunApplication.txt#L1)
+* [Installation]( https://github.com/dllrun/foam-extend-general-contact/blob/633aa115a2ab25a67175a043d56ca872236670c7/howToInstall.txt#L1 )
+* [Application or Tutorials]( https://github.com/dllrun/matheGRAMRanjanCases/blob/e3affbc35effcae50d988d2b59c52fe0a595d404/deliverablesCasesToPublish/howToRunApplication.txt#L1 )
 
 
 4. How to cite this work?
 If you are using the library " https://github.com/dllrun/foam-extend-general-contact/blob/633aa115a2ab25a67175a043d56ca872236670c7/src/solidModels/fvPatchFields/solidContact/solidGeneralContactFvPatchVectorField.H#L1 " for your research then please cite it as follows.
 
-
       author      = {Dhakal, Ranjan},
       title       = {{Solid contact analysis tool with Foam-extend}},
       year        = {2022},
-      institution = {Intitute of Process and Particle Engineering, Graz University of Technology},
+      institution = {Institute of Process and Particle Engineering, Graz University of Technology},
       url         = {https://github.com/dllrun/foam-extend-general-contact.git}}
 
 
