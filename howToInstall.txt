@@ -1,3 +1,13 @@
+	            ______________________________
+
+	     	     *HOW TO INSTALL FOAM-EXTEND*
+	            ______________________________
+
+
+			 Author: Ranjan Dhakal
+			   Date: June 2022
+
+
 Before installation,
 
 1. Get the source code: 
