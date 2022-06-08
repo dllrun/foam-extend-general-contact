@@ -4,8 +4,8 @@
 	            ______________________________
 
 
-			 Author: Ranjan Dhakal
-			   Date: June 2022
+					Author: Ranjan Dhakal
+					Date: June 2022
 
 
 Before installation,
@@ -38,9 +38,14 @@ Before installation,
 
 
 OpenFOAM-5.0: 
-Since, foam-extend-4.0 does not support the mesh generation for spherical geometry, we need to import the mesh from OpenFOAM-5.0. Therefore, it is recommended to have a OpenFOAM-5.0 installed.
-- For the official release, details can be found in this page: https://openfoam.org/release/5-0/ 
-- If you are using an OpenSUSE Leap with Windows 10, a further detail on downloading the precomplied version can be found here: https://wiki.openfoam.com/Win10OpenSUSEShell_by_Stefan_Radl 
+Since, foam-extend-4.0 does not support the mesh generation for spherical 
+geometry, we need to import the mesh from OpenFOAM-5.0. Therefore, it is 
+recommended to have a OpenFOAM-5.0 installed.
+- For the official release, details can be found in this page: 
+https://openfoam.org/release/5-0/ 
+- If you are using an OpenSUSE Leap with Windows 10, a further detail on 
+downloading the precomplied version can be found here: 
+https://wiki.openfoam.com/Win10OpenSUSEShell_by_Stefan_Radl 
 
 
 Note: foam-extend in windows 
