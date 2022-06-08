@@ -36,6 +36,13 @@ Before installation,
   cd foam/foam-extend-4.0/
   ./Allwmake
 
+
+OpenFOAM-5.0: 
+Since, foam-extend-4.0 does not support the mesh generation for spherical geometry, we need to import the mesh from OpenFOAM-5.0. Therefore, it is recommended to have a OpenFOAM-5.0 installed.
+- For the official release, details can be found in this page: https://openfoam.org/release/5-0/ 
+- If you are using an OpenSUSE Leap with Windows 10, a further detail on downloading the precomplied version can be found here: https://wiki.openfoam.com/Win10OpenSUSEShell_by_Stefan_Radl 
+
+
 Note: foam-extend in windows 
 i. If we want to use the foam-extend installed in windows directory,
 - Always move the foam-extend in windows
