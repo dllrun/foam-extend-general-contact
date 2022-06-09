@@ -1,0 +1,82 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     newStressedFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0.006;
+
+deltaT          0.001;
+
+writeControl    adjustableRunTime;
+
+writeInterval   0.001;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+functions
+{
+	setsOfMyData
+	{
+
+		type            sets;
+        functionObjectLibs ( "libsampling.so" );
+
+        interpolationScheme cellPointFace;
+		writeControl writeTime;
+
+        setFormat raw;
+		sets
+		(
+			   xLine
+               {
+
+                       type            midPoint;
+                       axis            distance;
+                       start           (0 -1 0);
+                       end             (0 1 0);
+               }
+
+		);
+
+        fields
+        (
+			T U V sigma
+        );
+
+        // Write at same frequency as fields
+        outputControl   outputTime;
+        outputInterval  1;
+	}
+}
+
+
+// ************************************************************************* // 

@@ -1,0 +1,53 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 50;
+
+boundaryField
+{
+    topBrickUp
+    {
+        type            fixedValue;
+        value           uniform 100;
+    }
+    topBrickDown
+    {
+        type            thermalContact; //fixedValue;
+		master          yes;
+		alpha			uniform 90;
+		Tinf            300;
+		underRelaxation 1;
+		Rc				0.001; //according to Clément Joulin1 et al.
+		value           uniform 100;
+    }
+    
+	
+	bottomBrickUp
+    {
+        type            thermalContact; //fixedValue;
+		master          no;
+		alpha			uniform 90;
+		Tinf            300;
+        value           uniform 10;
+    }
+    
+}
+
+
+// ************************************************************************* //

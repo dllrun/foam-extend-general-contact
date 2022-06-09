@@ -1,0 +1,37 @@
+ 
+  Disk1.back
+ 	{
+ 	 type            empty;
+ 	}
+  Disk1.front
+ 	{
+ 	 type            empty;
+ 	}
+ 
+  Disk2.back
+ 	{
+ 	 type            empty;
+ 	}
+  Disk2.front
+ 	{
+ 	 type            empty;
+ 	}
+ 
+  Disk3.back
+ 	{
+ 	 type            empty;
+ 	}
+  Disk3.front
+ 	{
+ 	 type            empty;
+ 	}
+ 
+  Disk4.back
+ 	{
+ 	 type            empty;
+ 	}
+  Disk4.front
+ 	{
+ 	 type            empty;
+ 	}
+ 

@@ -1,0 +1,56 @@
+faceSet Sphere1.contactFaceZone new patchToFace Sphere1.contact
+faceSet Sphere2.contactFaceZone new patchToFace Sphere2.contact
+faceSet Sphere3.contactFaceZone new patchToFace Sphere3.contact
+faceSet Sphere4.contactFaceZone new patchToFace Sphere4.contact
+faceSet Sphere5.contactFaceZone new patchToFace Sphere5.contact
+faceSet Sphere6.contactFaceZone new patchToFace Sphere6.contact
+faceSet Sphere7.contactFaceZone new patchToFace Sphere7.contact
+faceSet Sphere8.contactFaceZone new patchToFace Sphere8.contact
+faceSet Sphere9.contactFaceZone new patchToFace Sphere9.contact
+faceSet Sphere10.contactFaceZone new patchToFace Sphere10.contact
+faceSet Sphere11.contactFaceZone new patchToFace Sphere11.contact
+faceSet Sphere12.contactFaceZone new patchToFace Sphere12.contact
+faceSet Sphere13.contactFaceZone new patchToFace Sphere13.contact
+faceSet Sphere14.contactFaceZone new patchToFace Sphere14.contact
+faceSet Sphere15.contactFaceZone new patchToFace Sphere15.contact
+faceSet Sphere16.contactFaceZone new patchToFace Sphere16.contact
+faceSet Sphere17.contactFaceZone new patchToFace Sphere17.contact
+faceSet Sphere18.contactFaceZone new patchToFace Sphere18.contact
+faceSet Sphere19.contactFaceZone new patchToFace Sphere19.contact
+faceSet Sphere20.contactFaceZone new patchToFace Sphere20.contact
+faceSet Sphere21.contactFaceZone new patchToFace Sphere21.contact
+faceSet Sphere22.contactFaceZone new patchToFace Sphere22.contact
+faceSet Sphere23.contactFaceZone new patchToFace Sphere23.contact
+faceSet bottomPunchUpFaceZone new patchToFace bottomPunchUp
+faceSet topPunchDownFaceZone new patchToFace topPunchDown
+faceSet leftFaceZone new patchToFace left
+faceSet rightFaceZone new patchToFace right
+pointSet Sphere1.contactPointZone new faceToPoint Sphere1.contactFaceZone all 
+pointSet Sphere2.contactPointZone new faceToPoint Sphere2.contactFaceZone all 
+pointSet Sphere3.contactPointZone new faceToPoint Sphere3.contactFaceZone all 
+pointSet Sphere4.contactPointZone new faceToPoint Sphere4.contactFaceZone all 
+pointSet Sphere5.contactPointZone new faceToPoint Sphere5.contactFaceZone all 
+pointSet Sphere6.contactPointZone new faceToPoint Sphere6.contactFaceZone all 
+pointSet Sphere7.contactPointZone new faceToPoint Sphere7.contactFaceZone all 
+pointSet Sphere8.contactPointZone new faceToPoint Sphere8.contactFaceZone all 
+pointSet Sphere9.contactPointZone new faceToPoint Sphere9.contactFaceZone all 
+pointSet Sphere10.contactPointZone new faceToPoint Sphere10.contactFaceZone all 
+pointSet Sphere11.contactPointZone new faceToPoint Sphere11.contactFaceZone all 
+pointSet Sphere12.contactPointZone new faceToPoint Sphere12.contactFaceZone all 
+pointSet Sphere13.contactPointZone new faceToPoint Sphere13.contactFaceZone all 
+pointSet Sphere14.contactPointZone new faceToPoint Sphere14.contactFaceZone all 
+pointSet Sphere15.contactPointZone new faceToPoint Sphere15.contactFaceZone all 
+pointSet Sphere16.contactPointZone new faceToPoint Sphere16.contactFaceZone all 
+pointSet Sphere17.contactPointZone new faceToPoint Sphere17.contactFaceZone all 
+pointSet Sphere18.contactPointZone new faceToPoint Sphere18.contactFaceZone all 
+pointSet Sphere19.contactPointZone new faceToPoint Sphere19.contactFaceZone all 
+pointSet Sphere20.contactPointZone new faceToPoint Sphere20.contactFaceZone all 
+pointSet Sphere21.contactPointZone new faceToPoint Sphere21.contactFaceZone all 
+pointSet Sphere22.contactPointZone new faceToPoint Sphere22.contactFaceZone all 
+pointSet Sphere23.contactPointZone new faceToPoint Sphere23.contactFaceZone all 
+pointSet bottomPunchUpPointZone new faceToPoint bottomPunchUpFaceZone all 
+pointSet topPunchDownPointZone new faceToPoint topPunchDownFaceZone all 
+pointSet leftPointZone new faceToPoint leftFaceZone all 
+pointSet rightPointZone new faceToPoint rightFaceZone all 
+quit 
+ 

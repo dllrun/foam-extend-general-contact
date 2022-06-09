@@ -1,0 +1,1060 @@
+ 
+  Sphere1.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere2.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere3.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere4.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere5.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere6.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere7.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere8.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere9.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere10.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere11.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere12.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere13.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere14.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere15.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere16.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere17.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere18.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere19.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere20.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere21.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere22.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 
+  Sphere23.contact
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          no;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+	
+	
+	bottomPunchUp
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          yes;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+	
+	
+	topPunchDown
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          yes;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+	
+	
+	
+	
+	left
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          yes;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+	
+	
+	right	
+ 	{
+ 	 type    solidGeneralContact;
+ 	 contactActive        yes;
+ 	 rigidMaster          yes;
+ 	 interpolationMethod  ggi;
+ 	 projectionAlgo       visible;
+ 	 projectionDir        contactSphere;
+ 	 correctionFrequency   1;
+ 	 generalNormalContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyNormalModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	limitPenetration               no;
+ 	 	penetrationLimit               -0.03;
+ 	 	correctMissedVertices          yes;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	}
+ 	 generalFrictionContactModel generalStandardPenalty;
+ 	 generalStandardPenaltyFrictionModelDict
+ 	 	{
+ 	 	relaxationFactor               0.1;
+ 	 	penaltyScale                   1;
+ 	 	oscillationCorrection          yes;
+ 	 	smoothingSteps                 1;
+ 	 	infoFrequency                  10;
+ 	 	   
+ 	 	generalFrictionLaw	coulomb;   
+ 	 	frictionLawDict   
+ 	 	   {   
+ 	 	    frictionCoeff     0.1;   
+ 	 	   }
+ 	 	}
+ 	 	value                uniform (0 0 0); 
+ 	}
+ 

@@ -1,0 +1,9 @@
+ 
+  topPunch
+ 	{
+ 	 type    timeVaryingFixedDisplacement;
+ 	 outOfBounds     clamp;
+ 	 fileName        "$FOAM_CASE/constant/timeVsTopDisp";
+ 	 value           uniform (0 0 0);
+ 	}
+ 

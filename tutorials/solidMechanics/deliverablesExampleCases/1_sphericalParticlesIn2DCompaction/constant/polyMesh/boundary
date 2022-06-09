@@ -1,0 +1,225 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+29
+(
+    Sphere1.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       6448;
+    }
+    Sphere2.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       6544;
+    }
+    Sphere3.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       6640;
+    }
+    Sphere4.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       6736;
+    }
+    Sphere5.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       6832;
+    }
+    Sphere6.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       6928;
+    }
+    Sphere7.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       7024;
+    }
+    Sphere8.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       7120;
+    }
+    Sphere9.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       7216;
+    }
+    Sphere10.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       7312;
+    }
+    Sphere11.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       7408;
+    }
+    Sphere12.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       7504;
+    }
+    Sphere13.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       7600;
+    }
+    Sphere14.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       7696;
+    }
+    Sphere15.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       7792;
+    }
+    Sphere16.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       7888;
+    }
+    Sphere17.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       7984;
+    }
+    Sphere18.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       8080;
+    }
+    Sphere19.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       8176;
+    }
+    Sphere20.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       8272;
+    }
+    Sphere21.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       8368;
+    }
+    Sphere22.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       8464;
+    }
+    Sphere23.contact
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          96;
+        startFace       8560;
+    }
+    bottomPunch
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          272;
+        startFace       8656;
+    }
+    bottomPunchUp
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          80;
+        startFace       8928;
+    }
+    topPunch
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          272;
+        startFace       9008;
+    }
+    topPunchDown
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          80;
+        startFace       9280;
+    }
+    left
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          352;
+        startFace       9360;
+    }
+    right
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          352;
+        startFace       9712;
+    }
+)
+
+// ************************************************************************* //
