@@ -66,10 +66,8 @@ agreement No 812638
 
 ![logo](mathegram_logo.png)
 
-<img src="mathegram_logo.png" alt="drawing" width="200"/>
-<img src="mathegram_logo.png" width="100" height="100" />
-<img src="mathegram_logo.png" width="200" height="200" />
-<img src="mathegram_logo.png" width="300" height="300" />
+<h1><p align="center"> <img src="mathegram_logo.png" alt="drawing" width="500"/>
+
 
 <br/>
 <hr>
