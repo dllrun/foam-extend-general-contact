@@ -22,7 +22,7 @@ contact boundary condition for one-to-one contact.
 ## 2. Documentation
 The documention provides guidelines for 
 
-* [Installation]( https://github.com/dllrun/foam-extend-general-contact/blob/e1e042d74237d32b1aae087a3d0f400aa3015b36/howToInstall.md )
+* [Installation]( https://github.com/dllrun/foam-extend-general-contact/blob/3d82df8585651fefc04d914f1d7c94ca8d6d643e/howToInstall.md )
 * [Application or Tutorials]( https://github.com/dllrun/matheGRAMRanjanCases/blob/7d947b54375ac684a0c3e75272af7b196188a000/deliverablesCasesToPublish/howToRunApplication.md )
 
 <br/>
