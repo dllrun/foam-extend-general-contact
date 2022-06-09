@@ -23,14 +23,14 @@ contact boundary condition for one-to-one contact.
 The documention provides guidelines for 
 
 * [Installation](howToInstall.md)
-* [Application or Tutorials](howToRunApplication.md)
+* [Application or Tutorials](tutorials/solidMechanics/deliverablesExampleCases/howToRunApplication.md)
 
 <br/>
 <hr>
 
 ## 4. How to cite this work?
 If you are using the library 
-" [solidContact] ( https://github.com/dllrun/foam-extend-general-contact/blob/633aa115a2ab25a67175a043d56ca872236670c7/src/solidModels/fvPatchFields/solidContact/ ) " for your research then please cite it as follows.
+" [solidContact](src/solidModels/fvPatchFields/solidContact/) " for your research then please cite it as follows.
 
       author      = {Dhakal, Ranjan},
       title       = {{Solid contact analysis tool with Foam-extend}},
@@ -43,7 +43,7 @@ If you are using the library
 
 ## 5. License
 This toolkit is released under the GNU General Public License (version 3). More 
-details can be found in the "[LICENSE] ( https://github.com/dllrun/foam-extend-general-contact/blob/7aba4ea1116042b94bb711327133a0d3a91ccbf6/LICENSE )" file.
+details can be found in the "[LICENSE](LICENSE)" file.
 
 <br/>
 <hr>
