@@ -6,7 +6,6 @@
 
 
 Before installation,
------------------------
 
 #### 1. Get the source code: 
 - Go to home directory in your terminal using,
