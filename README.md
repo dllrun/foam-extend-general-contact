@@ -73,7 +73,7 @@ agreement No 812638
 
 ![logo](mathegram_logo.png | width=100)
 
-![logo](mathegram_logo.png | width=250x250)
+<img src="mathegram_logo.png" alt="drawing" width="200"/>
 
 <br/>
 <hr>
