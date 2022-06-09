@@ -5,10 +5,9 @@
 
 
 
-Before installation,
-
-#### 1. Get the source code: 
-- Go to home directory in your terminal using,
+#### 1. Before installation: 
+- Get the source code
+  - Go to home directory in your terminal using,
   - `cd ~`
 - Make a directory,
   - `mkdir foam`
