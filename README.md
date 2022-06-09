@@ -8,8 +8,8 @@
 
 ## 1. Introduction
 
-The code is based on Finite Volume Method and it is forked from 
-Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0. This library is 
+This code is based on Finite Volume Method and it is forked from 
+Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0. The code library is 
 an extension of the tools to predict deformation due to contact in solids. This 
 includes the new tool for contact analysis in order to bridge the gap for 
 multiple solids in contact. It also provides the coupling of the thermal 
@@ -20,7 +20,7 @@ contact boundary condition for one-to-one contact.
 
 
 ## 2. Documentation
-The documention provides guidelines for how to install this foam-extend code library. Please follow the link to the installation instruction given below:
+The documention provides guidelines on how to install this foam-extend code library. Please follow the link to the instruction for installation given below:
 
 * [Installation](howToInstall.md)
 
@@ -36,10 +36,10 @@ If you are using the library
 " [solidContact](src/solidModels/fvPatchFields/solidContact/) " for your research then please cite it as follows.
 
       author      = {Dhakal, Ranjan},
-      title       = {{Solid contact analysis tool with Foam-extend}},
+      title       = {Solid contact analysis tool with Foam-extend},
       year        = {2022},
       institution = {Institute of Process and Particle Engineering, Graz University of Technology},
-      url         = {https://github.com/dllrun/foam-extend-general-contact.git}}
+      url         = {https://github.com/dllrun/foam-extend-general-contact.git}
 
 <br/>
 <hr>
