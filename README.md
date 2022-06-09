@@ -23,7 +23,7 @@ contact boundary condition for one-to-one contact.
 The documention provides guidelines for 
 
 * [Installation](howToInstall.md)
-* [Application or Tutorials]( https://github.com/dllrun/matheGRAMRanjanCases/blob/7d947b54375ac684a0c3e75272af7b196188a000/deliverablesCasesToPublish/howToRunApplication.md )
+* [Application or Tutorials](howToRunApplication.md)
 
 <br/>
 <hr>
