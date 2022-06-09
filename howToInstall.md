@@ -8,7 +8,7 @@
 Before installation,
 --------------------
 
-1. Get the source code: 
+#### 1. Get the source code: 
 - Go to home directory in your terminal using,
   - `cd ~`
 - Make a directory,
@@ -16,26 +16,27 @@ Before installation,
   - `cd foam`
   - `git clone https://github.com/dllrun/foam-extend-general-contact.git `
 
-2. (Install missing packages if any)
-3. Adjust the `~/.bashrc` file: 
+#### 2. (Install missing packages if any)
+#### 3. Adjust the `~/.bashrc` file: 
 - In the home directory, type 
   - `vim .bashrc`
 - (Set the environment variables if any)
 - Set the path correctly
   - `alias switchToExtend='source $HOME/foam/foam-extend-4.0/etc/bashrc'`
 
-4. Source the .bashrc file
+#### 4. Source the .bashrc file
 - Type,
   - `source .bashrc`
   - `switchToExtend`
 
-5. Start Compilation
+#### 5. Start Compilation
 - Go to installation directory,
   - `cd foam/foam-extend-4.0/`
   - `./Allwmake`
 
 
-OpenFOAM-5.0: 
+OpenFOAM-5.0:
+------------ 
 Since, foam-extend-4.0 does not support the mesh generation for spherical 
 geometry, we need to import the mesh from OpenFOAM-5.0. Therefore, it is 
 recommended to have a OpenFOAM-5.0 installed.
@@ -47,6 +48,7 @@ https://wiki.openfoam.com/Win10OpenSUSEShell_by_Stefan_Radl
 
 
 Note: foam-extend in windows 
+-----------------------------
 i. If we want to use the foam-extend installed in windows directory,
 - Always move the foam-extend in windows
 - Never copy it to windows directory
