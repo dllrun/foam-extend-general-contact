@@ -70,4 +70,12 @@ ii. Changing the bashrc:
 
 <br/>
 <hr>
+
+
+Author
+------------------
+
+- Ranjan Dhakal 
+- IPPE, Graz University of Technology 
+- June 2022
  
