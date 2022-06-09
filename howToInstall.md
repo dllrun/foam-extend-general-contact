@@ -1,40 +1,38 @@
-	            ______________________________
+<hr>
 
-	     	     *HOW TO INSTALL FOAM-EXTEND*
-	            ______________________________
+<h1><p align="center"> How to install Foam-Extend 
+</p></h1>	           
 
-
-					Author: Ranjan Dhakal
-					Date: June 2022
 
 
 Before installation,
+--------------------
 
 1. Get the source code: 
 - Go to home directory in your terminal using,
-  cd ~
+ `cd ~`
 - Make a directory,
-  mkdir foam
-  cd foam
-  git clone https://github.com/dllrun/foam-extend-general-contact.git
+  `mkdir foam`
+  `cd foam`
+  `git clone https://github.com/dllrun/foam-extend-general-contact.git `
 
 2. (Install missing packages if any)
-3. Adjust the ~/.bashrc file: 
+3. Adjust the `~/.bashrc` file: 
 - In the home directory, type 
-  vim .bashrc
+  `vim .bashrc`
 - (Set the environment variables if any)
 - Set the path correctly
-  alias switchToExtend='source $HOME/foam/foam-extend-4.0/etc/bashrc'
+  `alias switchToExtend='source $HOME/foam/foam-extend-4.0/etc/bashrc'`
 
 4. Source the .bashrc file
 - Type,
-  source .bashrc
-  switchToExtend
+  `source .bashrc`
+  `switchToExtend`
 
 5. Start Compilation
 - Go to installation directory,
-  cd foam/foam-extend-4.0/
-  ./Allwmake
+  `cd foam/foam-extend-4.0/`
+  `./Allwmake`
 
 
 OpenFOAM-5.0: 
@@ -55,7 +53,7 @@ i. If we want to use the foam-extend installed in windows directory,
 
 ii. Changing the bashrc: 
 - Make a change of relative path in the etc/bashrc file to 
-  foamInstall=/mnt/c/Users/<yourUserName>/Documents/foam
+  `foamInstall=/mnt/c/Users/<yourUserName>/Documents/foam`
 - Source the bashrc file once again.
 
 

@@ -32,7 +32,7 @@ https://github.com/dllrun/matheGRAMRanjanCases/blob/e3affbc35effcae50d988d2b59c5
 
 ## 4. How to cite this work?
 If you are using the library 
-" https://github.com/dllrun/foam-extend-general-contact/blob/633aa115a2ab25a67175a043d56ca872236670c7/src/solidModels/fvPatchFields/solidContact/solidGeneralContactFvPatchVectorField.H " for your research then please cite it as follows.
+" https://github.com/dllrun/foam-extend-general-contact/blob/633aa115a2ab25a67175a043d56ca872236670c7/src/solidModels/fvPatchFields/solidContact/ " for your research then please cite it as follows.
 
       author      = {Dhakal, Ranjan},
       title       = {{Solid contact analysis tool with Foam-extend}},
@@ -64,9 +64,8 @@ Project. The project has received funding from the European Union’s Horizon
 2020 research and innovation programme under the Marie Skłodowska-Curie grant 
 agreement No 812638
 
-![logo](mathegram_logo.png)
 
-<h1><p align="center"> <img src="mathegram_logo.png" alt="drawing" width="500"/>
+<h1><p align="center"> <img src="mathegram_logo.png" alt="drawing" width="600"/>
 
 
 <br/>
