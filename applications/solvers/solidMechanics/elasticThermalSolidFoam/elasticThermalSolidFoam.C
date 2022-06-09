@@ -35,6 +35,8 @@ Description
 
 Author
    Philip Cardiff UCD
+Co-Author
+	Ranjan Dhakal, IPPE, Graz University of Technology 
 
 \*---------------------------------------------------------------------------*/
 
@@ -63,8 +65,6 @@ int main(int argc, char *argv[])
 
 #       include "readSolidMechanicsControls.H"
 		
-		Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
-		
         int iCorr = 0;
         scalar initialResidual = 1.0;
         scalar relResT = 1.0;
@@ -78,23 +78,16 @@ int main(int argc, char *argv[])
         Info<< "Solving for " << T.name() << nl;
         do
         {
-			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
             T.storePrevIter();
-			
-			Info<<"BEFORE TEqn build: Here I am in thermal solver line"<<__LINE__<<endl;
 
             fvScalarMatrix TEqn
             (
                 rhoC*fvm::ddt(T) == fvm::laplacian(k, T, "laplacian(k,T)")
             );
 			
-			Info<<"AFTER TEqn build: Here I am in thermal solver line"<<__LINE__<<endl;
-			
-			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
 			
             solverPerfT = TEqn.solve();
 			
-			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
 
             T.relax();
 
@@ -108,7 +101,6 @@ int main(int argc, char *argv[])
                     << ", inner iters = " << solverPerfT.nIterations() << endl;
             }
 			
-			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
         }
         while
         (
@@ -116,7 +108,6 @@ int main(int argc, char *argv[])
          && ++iCorr < nCorr
         );
 		
-		Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
 		
         Info<< "Solved for " << T.name()
             << " using " << solverPerfT.solverName()
@@ -137,12 +128,10 @@ int main(int argc, char *argv[])
         Info<< "Solving for " << U.name() << nl;
         do
         {
-			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
             U.storePrevIter();
 
 #           include "calculateDivSigmaExp.H"
 			
-			Info<<"BEFORE build: Here I am in thermal solver line"<<__LINE__<<endl;
 
             // Linear momentum equaiton
             fvVectorMatrix UEqn
@@ -153,11 +142,9 @@ int main(int argc, char *argv[])
               + divSigmaExp
             );
 			
-			Info<<"AFTER build: Here I am in thermal solver line"<<__LINE__<<endl;
 
             solverPerfU = UEqn.solve();
 			
-			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
 
             if (aitkenRelax)
             {
@@ -170,7 +157,6 @@ int main(int argc, char *argv[])
 
             gradU = fvc::grad(U);
 			
-			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
 
 #           include "calculateRelResU.H"
 
@@ -179,7 +165,6 @@ int main(int argc, char *argv[])
                 initialResidual = solverPerfU.initialResidual();
             }
 			
-			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
 
             if (iCorr % infoFrequency == 0)
             {
@@ -194,7 +179,6 @@ int main(int argc, char *argv[])
                 Info<< ", inner iters = " << solverPerfU.nIterations() << endl;
             }
 			
-			Info<<"Here I am in thermal solver line"<<__LINE__<<endl;
         }
         while
         (
