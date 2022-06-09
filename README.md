@@ -6,13 +6,6 @@
 <br/>
 		 
 
-
-Version: foam-extend-4.0
-
-Licence: GPL-3.0 licence
-
-Last commit: June 2022
-
 ## 1. Introduction
 
 The code is based on Finite Volume Method and it is forked from 
@@ -71,9 +64,12 @@ Project. The project has received funding from the European Union’s Horizon
 2020 research and innovation programme under the Marie Skłodowska-Curie grant 
 agreement No 812638
 
-![logo](mathegram_logo.png | width=100)
+![logo](mathegram_logo.png)
 
 <img src="mathegram_logo.png" alt="drawing" width="200"/>
+<img src="mathegram_logo.png" width="100" height="100" />
+<img src="mathegram_logo.png" width="200" height="200" />
+<img src="mathegram_logo.png" width="300" height="300" />
 
 <br/>
 <hr>
@@ -84,3 +80,8 @@ Copyright Notice
 
 - Copyright 2022 - Graz University of Technology (R. Dhakal, S. Radl).
 
+- Version: foam-extend-4.0
+
+- Licence: GPL-3.0 licence
+
+- Last commit: June 2022
