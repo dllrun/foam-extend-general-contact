@@ -30,7 +30,7 @@ The documention provides guidelines for
 
 ## 4. How to cite this work?
 If you are using the library 
-" https://github.com/dllrun/foam-extend-general-contact/blob/633aa115a2ab25a67175a043d56ca872236670c7/src/solidModels/fvPatchFields/solidContact/ " for your research then please cite it as follows.
+" [solidContact] src/solidModels/fvPatchFields/solidContact/ " for your research then please cite it as follows.
 
       author      = {Dhakal, Ranjan},
       title       = {{Solid contact analysis tool with Foam-extend}},
