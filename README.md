@@ -1,6 +1,6 @@
 <hr>
 
-<h1><p align="center"> SOLID CONTACT ANALYSIS TOOL WITH FOAM-EXTEND
+<h1><p align="center"> Solid Contact Analysis Tool With Foam-Extend 
 </p></h1>
 
 <br/>
@@ -8,12 +8,14 @@
 Copyright Notice
 ------------------
 
-- Copyright 2022 - Graz University of Technology (Ranjan Dhakal, Stefan Radl).
+- Copyright 2022 - Graz University of Technology (R. Dhakal, S. Radl).
 
 
 
 Version: foam-extend-4.0
+
 Licence: GPL-3.0 licence
+
 Last commit: June 2022
 
 ## 1. Introduction
@@ -42,14 +44,12 @@ https://github.com/dllrun/matheGRAMRanjanCases/blob/e3affbc35effcae50d988d2b59c5
 
 ## 4. How to cite this work?
 If you are using the library 
-* [![GITHUB]" 
-https://github.com/dllrun/foam-extend-general-contact/blob/633aa115a2ab25a67175a043d56ca872236670c7/src/solidModels/fvPatchFields/solidContact/solidGeneralContactFvPatchVectorField.H#L1 " for your research then please cite it as follows.
+" https://github.com/dllrun/foam-extend-general-contact/blob/633aa115a2ab25a67175a043d56ca872236670c7/src/solidModels/fvPatchFields/solidContact/solidGeneralContactFvPatchVectorField.H " for your research then please cite it as follows.
 
       author      = {Dhakal, Ranjan},
       title       = {{Solid contact analysis tool with Foam-extend}},
       year        = {2022},
-      institution = {Institute of Process and Particle Engineering, Graz 
-University of Technology},
+      institution = {Institute of Process and Particle Engineering, Graz University of Technology},
       url         = {https://github.com/dllrun/foam-extend-general-contact.git}}
 
 <br/>
@@ -76,7 +76,7 @@ Project. The project has received funding from the European Union’s Horizon
 2020 research and innovation programme under the Marie Skłodowska-Curie grant 
 agreement No 812638
 
-![logo](mathegram_logo.png)
+![logo](mathegram_logo.png){:height="50%" width="50%"}
 
 <br/>
 <hr>
