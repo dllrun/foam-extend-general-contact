@@ -6,7 +6,7 @@
 
 
 Before installation,
---------------------
+-----------------------
 
 #### 1. Get the source code: 
 - Go to home directory in your terminal using,
@@ -15,6 +15,10 @@ Before installation,
   - `mkdir foam`
   - `cd foam`
   - `git clone https://github.com/dllrun/foam-extend-general-contact.git `
+
+<br/>
+<hr>  
+
 
 #### 2. (Install missing packages if any)
 #### 3. Adjust the `~/.bashrc` file: 
@@ -28,15 +32,20 @@ Before installation,
 - Type,
   - `source .bashrc`
   - `switchToExtend`
+  
+<br/>
+<hr>
 
 #### 5. Start Compilation
 - Go to installation directory,
   - `cd foam/foam-extend-4.0/`
   - `./Allwmake`
 
+<br/>
+<hr>
 
 OpenFOAM-5.0:
------------- 
+---------------- 
 Since, foam-extend-4.0 does not support the mesh generation for spherical 
 geometry, we need to import the mesh from OpenFOAM-5.0. Therefore, it is 
 recommended to have a OpenFOAM-5.0 installed.
@@ -46,9 +55,12 @@ https://openfoam.org/release/5-0/
 downloading the precomplied version can be found here: 
 https://wiki.openfoam.com/Win10OpenSUSEShell_by_Stefan_Radl 
 
+<br/>
+<hr>
+
 
 Note: foam-extend in windows 
------------------------------
+--------------------------------
 i. If we want to use the foam-extend installed in windows directory,
 - Always move the foam-extend in windows
 - Never copy it to windows directory
@@ -58,5 +70,6 @@ ii. Changing the bashrc:
   - `foamInstall=/mnt/c/Users/<yourUserName>/Documents/foam`
 - Source the bashrc file once again.
 
-
+<br/>
+<hr>
  
