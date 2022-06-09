@@ -5,11 +5,6 @@
 
 <br/>
 		 
-Copyright Notice
-------------------
-
-- Copyright 2022 - Graz University of Technology (R. Dhakal, S. Radl).
-
 
 
 Version: foam-extend-4.0
@@ -76,7 +71,16 @@ Project. The project has received funding from the European Union’s Horizon
 2020 research and innovation programme under the Marie Skłodowska-Curie grant 
 agreement No 812638
 
-![logo](mathegram_logo.png){:height="50%" width="50%"}
+![logo](mathegram_logo.png | width=100)
+
+![logo](mathegram_logo.png | width=250x250)
 
 <br/>
 <hr>
+
+
+Copyright Notice
+------------------
+
+- Copyright 2022 - Graz University of Technology (R. Dhakal, S. Radl).
+
