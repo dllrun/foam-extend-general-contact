@@ -20,9 +20,12 @@ contact boundary condition for one-to-one contact.
 
 
 ## 2. Documentation
-The documention provides guidelines for 
+The documention provides guidelines for how to install this foam-extend code library. Please follow the link to the installation instruction given below:
 
 * [Installation](howToInstall.md)
+
+Also, there is a link to the tutorial cases that have been developed for the purpose of demonstrating mechanical and thermal contact behavior of solids. Please follow the link to the example cases given below: 
+
 * [Application or Tutorials](tutorials/solidMechanics/deliverablesExampleCases/howToRunApplication.md)
 
 <br/>
