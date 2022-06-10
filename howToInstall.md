@@ -38,7 +38,8 @@
 - Go to installation directory,
   - `cd foam/foam-extend-4.0/`
   - `./Allwmake`
-XXX detail what happens here
+  In principle this will execute the Allwmake script and build everything for a while (depending on your PC). 
+  Once the compilation is finished, you should be able to run tutorials. 
 
 <br/>
 <hr>
@@ -47,14 +48,15 @@ OpenFOAM-5.0:
 ---------------- 
 Since, foam-extend-4.0 does not support the mesh generation for spherical 
 geometry, we need to import the mesh from OpenFOAM-5.0. Therefore, it is 
-recommended to have a OpenFOAM-5.0 installed.
+recommended to have a OpenFOAM-5.0 installed. 
 - For the official release, details can be found in this page: 
 https://openfoam.org/release/5-0/ 
 - If you are using an OpenSUSE Leap with Windows 10, a further detail on 
 downloading the precomplied version can be found here: 
 https://wiki.openfoam.com/Win10OpenSUSEShell_by_Stefan_Radl 
 
-XXX mention that it might also work with other versions of OpenFOAM, but was tested with OpenFOAM 5.0
+Please note that this has been only tested with OpenFOAM 5.0. However, it should also work with other versions of OpenFOAM 
+and might not be only limited to OpenFOAM-5.0.
 
 <br/>
 <hr>

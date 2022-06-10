@@ -10,8 +10,8 @@
 
 This code repository is based on the Finite Volume Method and it is forked from " https://github.com/Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0 ". 
 The improved code library " [solidModel](src/solidModels/) " is an extension of the tools to predict deformation due to contact in solids. This 
-includes the new tool " [solidGeneralContact](src/solidModels/fvPatchFields/solidContact/solidGeneralContactFvPatchVectorField.C) " for contact analysis to allow the simulation of 
-multiple solid bodies (e.g. particles) in contact. 
+includes the new tool " [solidGeneralContact](src/solidModels/fvPatchFields/solidContact/solidGeneralContactFvPatchVectorField.C) " for the contact analysis - in order 
+to allow the simulation of multiple solid bodies (e.g. particles) in contact. 
 
 It also provides the coupling of thermal contact boundary condition. Please note that this is limited to one-to-one contact 
 and no multiple solid bodies are allowed currently. Furthermore, the " [elasticThermalSolidFoam](applications/solvers/solidMechanics/elasticThermalSolidFoam) " solver was improved to make it functional with the 
