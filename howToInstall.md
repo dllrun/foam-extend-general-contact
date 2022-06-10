@@ -9,7 +9,7 @@
 - Get the source code
   - Go to home directory in your terminal using,
   - `cd ~`
-- Make a directory,
+- Make a directory and download the Git repository copy into this directory,
   - `mkdir foam`
   - `cd foam`
   - `git clone https://github.com/dllrun/foam-extend-general-contact.git `
