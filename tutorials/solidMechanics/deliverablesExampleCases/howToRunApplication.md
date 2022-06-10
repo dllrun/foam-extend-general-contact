@@ -18,8 +18,7 @@ with OpenFOAM-5.0.
  - Now the mesh can be visualized in paraview by loading the dummy file m.foam 
 (from the case directory).
 
-<br/>
-<hr>  
+ 
 
 ii. Simulation
  - Now, go back to the case ("1_sphericalParticlesIn2DCompaction") directory 
