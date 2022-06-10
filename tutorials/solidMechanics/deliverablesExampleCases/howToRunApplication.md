@@ -9,6 +9,7 @@
    This is a setup to demonstrate elastic contact between multiple spherical 
 particles. This has been illustrated with the case 
 "1_sphericalParticlesIn2DCompaction".
+
 i. Meshing
  - Before running this application, first run the mesh case "23ParticlesMesh" 
 with OpenFOAM-5.0.
