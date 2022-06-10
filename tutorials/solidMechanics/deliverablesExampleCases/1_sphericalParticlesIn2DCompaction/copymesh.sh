@@ -3,6 +3,6 @@
 #author
 #purpose
 
-cp -r ~/ofextend_run/archivedLocal/matheGRAMRanjanCases/deliverablesCasesToPublish/23ParticlesMesh/constant/polyMesh ./constant/
+cp -r ~/EXTEND/foam-extend-4.0/tutorials/solidMechanics/deliverablesCasesToPublish/0_23ParticlesMesh/constant/polyMesh ./constant/
 
 #END

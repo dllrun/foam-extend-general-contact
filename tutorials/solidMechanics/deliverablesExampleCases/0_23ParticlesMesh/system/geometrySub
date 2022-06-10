@@ -1,0 +1,164 @@
+geometry
+{
+
+    sphere1
+    {
+        type searchableSphere;
+        centre (0.0000 0.0000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere2
+    {
+        type searchableSphere;
+        centre (1.4400 0.0000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere3
+    {
+        type searchableSphere;
+        centre (2.8800 0.0000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere4
+    {
+        type searchableSphere;
+        centre (4.3200 0.0000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere5
+    {
+        type searchableSphere;
+        centre (5.7600 0.0000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere6
+    {
+        type searchableSphere;
+        centre (0.7200 1.2000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere7
+    {
+        type searchableSphere;
+        centre (2.1600 1.2000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere8
+    {
+        type searchableSphere;
+        centre (3.6000 1.2000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere9
+    {
+        type searchableSphere;
+        centre (5.0400 1.2000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere10
+    {
+        type searchableSphere;
+        centre (0.0000 2.4000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere11
+    {
+        type searchableSphere;
+        centre (1.4400 2.4000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere12
+    {
+        type searchableSphere;
+        centre (2.8800 2.4000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere13
+    {
+        type searchableSphere;
+        centre (4.3200 2.4000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere14
+    {
+        type searchableSphere;
+        centre (5.7600 2.4000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere15
+    {
+        type searchableSphere;
+        centre (0.7200 3.6000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere16
+    {
+        type searchableSphere;
+        centre (2.1600 3.6000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere17
+    {
+        type searchableSphere;
+        centre (3.6000 3.6000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere18
+    {
+        type searchableSphere;
+        centre (5.0400 3.6000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere19
+    {
+        type searchableSphere;
+        centre (0.0000 4.8000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere20
+    {
+        type searchableSphere;
+        centre (1.4400 4.8000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere21
+    {
+        type searchableSphere;
+        centre (2.8800 4.8000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere22
+    {
+        type searchableSphere;
+        centre (4.3200 4.8000 0.0000);
+        radius 0.7000;
+     }
+
+    sphere23
+    {
+        type searchableSphere;
+        centre (5.7600 4.8000 0.0000);
+        radius 0.7000;
+     }
+}

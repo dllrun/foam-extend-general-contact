@@ -1,6 +1,6 @@
 <hr>
 
-<h1><p align="center"> How to run application  
+<h1><p align="center"> How to run tutorials or example cases 
 </p></h1>	
 
 
@@ -11,9 +11,9 @@ particles. This has been illustrated with the case
 "1_sphericalParticlesIn2DCompaction".
 
 i. Meshing
- - Before running this application, we need to first import the mesh from the case "23ParticlesMesh". 
+ - Before running this application, we need to first import the mesh from the case "0_23ParticlesMesh". 
 This mesh case runs with the OpenFOAM-5.0.
- - The input for this mesh case can be handled from the "system/blocKMeshDict" file.
+ - The input for this mesh case can be handled from the "system/blockMeshDict" file.
  - Clean and run the case with "`./Allclean`" and "`./Allrun`" commmand correspondingly.
  - Now the mesh can be visualized in paraview by loading the dummy file m.foam 
 (from the case directory).
@@ -41,8 +41,8 @@ run the case with "`./Allrun`" commmand
    This is a setup to demonstrate thermal contact between two hexahedral 
 particles. This has been illustrated with the case 
 "2_thermalContactOf2HexaParticles".  
- - Check if the "solid4Contact" boundary condition is specified in the 0/U file 
-and "thermalContact" boundary condition in 0/T file for the correct boundary 
+ - Check if the "solid4Contact" boundary condition is specified in the "0/U" file 
+and "thermalContact" boundary condition in "0/T" file for the correct boundary 
 patches.    
  - The application will be running with the "elasticThermalSolidFoam" solver 
 and the mechanical properties can be specified in the 
