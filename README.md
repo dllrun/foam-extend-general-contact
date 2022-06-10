@@ -8,12 +8,13 @@
 
 ## 1. Introduction
 
-This code is based on Finite Volume Method and it is forked from 
-Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0. The code library is 
+This code repository is based on the Finite Volume Method and it is forked from 
+Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0 (XXX). The improved code library "solidModel"
+(XXX add link) is
 an extension of the tools to predict deformation due to contact in solids. This 
-includes the new tool for contact analysis in order to bridge the gap for 
-multiple solids in contact. It also provides the coupling of the thermal 
-contact boundary condition for one-to-one contact.
+includes the new tool (XXX which one?!?!) for contact analysis to allow the simulation of 
+multiple solid bodies (e.g., particles) in contact. It also provides the coupling of the thermal 
+contact boundary condition for one-to-one contacts (currently, no multiple solid bodies are allowed).
 
 <br/>
 <hr>
