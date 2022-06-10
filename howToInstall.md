@@ -38,7 +38,8 @@
 - Go to installation directory,
   - `cd foam/foam-extend-4.0/`
   - `./Allwmake`
-  In principle this will execute the Allwmake script and build everything for a while (depending on your PC). 
+  - In principle the above command will execute the " Allwmake " script and build everything 
+  (takes a while depending on your PC speed). 
   Once the compilation is finished, you should be able to run tutorials. 
 
 <br/>
@@ -55,8 +56,8 @@ https://openfoam.org/release/5-0/
 downloading the precomplied version can be found here: 
 https://wiki.openfoam.com/Win10OpenSUSEShell_by_Stefan_Radl 
 
-Please note that this has been only tested with OpenFOAM 5.0. However, it should also work with other versions of OpenFOAM 
-and might not be only limited to OpenFOAM-5.0.
+Please note that this has been only tested with OpenFOAM 5.0. However, it might not only be limited to OpenFOAM-5.0 
+and should also work with other versions of OpenFOAM.
 
 <br/>
 <hr>
