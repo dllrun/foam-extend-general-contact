@@ -1,6 +1,6 @@
 <hr>
 
-<h1><p align="center"> How to install Foam-Extend 
+<h1><p align="center"> How to install this Code Repository
 </p></h1>	           
 
 
@@ -38,6 +38,7 @@
 - Go to installation directory,
   - `cd foam/foam-extend-4.0/`
   - `./Allwmake`
+XXX detail what happens here
 
 <br/>
 <hr>
@@ -52,6 +53,8 @@ https://openfoam.org/release/5-0/
 - If you are using an OpenSUSE Leap with Windows 10, a further detail on 
 downloading the precomplied version can be found here: 
 https://wiki.openfoam.com/Win10OpenSUSEShell_by_Stefan_Radl 
+
+XXX mention that it might also work with other versions of OpenFOAM, but was tested with OpenFOAM 5.0
 
 <br/>
 <hr>
