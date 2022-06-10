@@ -8,15 +8,14 @@
 
 ## 1. Introduction
 
-This code repository is based on the Finite Volume Method and it is forked from 
-Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0 (XXX). The improved code library "solidModel"
-(XXX add link) is
-an extension of the tools to predict deformation due to contact in solids. This 
-includes the new tool (XXX which one?!?!) for contact analysis to allow the simulation of 
-multiple solid bodies (e.g., particles) in contact. It also provides the coupling of the thermal 
-contact boundary condition for one-to-one contacts (currently, no multiple solid bodies are allowed).
+This code repository is based on the Finite Volume Method and it is forked from " https://github.com/Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0 ". 
+The improved code library " [solidModel](src/solidModels/) " is an extension of the tools to predict deformation due to contact in solids. This 
+includes the new tool " [solidGeneralContact](src/solidModels/fvPatchFields/solidContact/solidGeneralContactFvPatchVectorField.C) " for contact analysis to allow the simulation of 
+multiple solid bodies (e.g., particles) in contact. It also provides the coupling of the thermal contact boundary condition. Please note that this is limited to one-to-one contact 
+and no multiple solid bodies are allowed currently.
 
-XXX detail on which solvers were improved
+Furthermore, the " [elasticThermalSolidFoam](applications/solvers/solidMechanics/elasticThermalSolidFoam) " solver was improved to make it functional with the  
+" [solidContact](src/solidModels/fvPatchFields/solidContact/) " library. 
 
 <br/>
 <hr>
@@ -35,8 +34,8 @@ Also, there is a link to the tutorial cases that have been developed for the pur
 <hr>
 
 ## 4. How to cite this work?
-If you are using the library 
-" [solidContact](src/solidModels/fvPatchFields/solidContact/) " for your research then please cite it as follows.
+If you are using this repository, especially the library 
+" [solidModel](src/solidModels/) " and the solver " [elasticThermalSolidFoam](applications/solvers/solidMechanics/elasticThermalSolidFoam) " for your research then please cite it as follows.
 
       author      = {Dhakal, Ranjan},
       title       = {Solid contact analysis tool with Foam-extend},
