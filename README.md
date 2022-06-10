@@ -16,12 +16,14 @@ includes the new tool (XXX which one?!?!) for contact analysis to allow the simu
 multiple solid bodies (e.g., particles) in contact. It also provides the coupling of the thermal 
 contact boundary condition for one-to-one contacts (currently, no multiple solid bodies are allowed).
 
+XXX detail on which solvers were improved
+
 <br/>
 <hr>
 
 
 ## 2. Documentation
-The documention provides guidelines on how to install this foam-extend code library. Please follow the link to the instruction for installation given below:
+The documention below provides guidelines on how to install this foam-extend code repository. Please follow the link to the instruction for installation given below:
 
 * [Installation](howToInstall.md)
 
@@ -61,7 +63,7 @@ OPENFOAM®  and OpenCFD®  trade marks.
 <hr>
 
 ## 7. Acknowledgement
-This is a part of the Innovative Training Network (MSCA-ITN) “MATHEGRAM” 
+This contribution is part of the Innovative Training Network (MSCA-ITN) “MATHEGRAM” 
 Project. The project has received funding from the European Union’s Horizon 
 2020 research and innovation programme under the Marie Skłodowska-Curie grant 
 agreement No 812638
